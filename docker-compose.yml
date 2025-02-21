@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: 
+      context: cv-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    # restart: always
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
