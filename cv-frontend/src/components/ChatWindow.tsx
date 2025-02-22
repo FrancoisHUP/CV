@@ -18,6 +18,29 @@ const ChatWindow = ({ onClose }: { onClose: () => void }) => {
       )}px`; // Expand up to max height
     }
   }, [input]);
+  // Listen for key events when the AI response is visible.
+  useEffect(() => {
+    if (response) {
+      const handleResponseKeyDown = (event: KeyboardEvent) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          // Dismiss the AI response and re-enable the text area
+          setResponse(null);
+          setTimeout(() => {
+            textareaRef.current?.focus();
+          }, 0);
+        }
+        if (event.key === "Escape") {
+          onClose();
+        }
+      };
+
+      window.addEventListener("keydown", handleResponseKeyDown);
+      return () => {
+        window.removeEventListener("keydown", handleResponseKeyDown);
+      };
+    }
+  }, [response, onClose]);
 
   // Handle user input submission
   const handleSend = () => {

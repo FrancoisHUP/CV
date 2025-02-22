@@ -147,7 +147,7 @@ const NeuronScene = () => {
     if (controlsRef.current) {
       controlsRef.current.enabled = !chatOpen;
 
-      // 🛑 Force stop movement by resetting velocity
+      // Force stop movement by resetting velocity
       if (chatOpen) {
         controlsRef.current.movementSpeed = 0;
       } else {
