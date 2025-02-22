@@ -6,6 +6,7 @@ import gsap from "gsap";
 import * as THREE from "three";
 import { FlyControls } from "@react-three/drei";
 import ControlsOverlay from "./ControlsOverlay";
+import Particles from "./Particles";
 
 // Define project nodes (Can be loaded from JSON or API later)
 const projects = [
@@ -132,6 +133,9 @@ const NeuronScene = () => {
         {/* Lighting */}
         <ambientLight intensity={0.5} />
         <pointLight position={[5, 5, 5]} intensity={1} />
+
+        <Particles count={1000} />
+
         {/* Central Neuron */}
         <Sphere args={[0.6, 32, 32]}>
           <meshStandardMaterial
