@@ -65,7 +65,7 @@ const ChatWindow = ({ onClose }: { onClose: () => void }) => {
       {/* If AI response is present, show it. Otherwise, show input box */}
       {response ? (
         <div
-          className="text-white px-4 py-2 bg-gray-800 rounded-3xl max-w-full"
+          className="text-white px-4 py-2 rounded-3xl max-w-full"
           onClick={onClose}
         >
           {response}

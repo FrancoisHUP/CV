@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Sphere, Cylinder, Html } from "@react-three/drei";
@@ -9,6 +9,8 @@ import ControlsOverlay from "./ControlsOverlay";
 import Particles from "./Particles";
 import Fairy from "./Fairy";
 import ChatWindow from "./ChatWindow";
+import Node from "./Node";
+import Connection from "./Connections";
 
 // Define project nodes (Can be loaded from JSON or API later)
 const projects = [
@@ -27,79 +29,62 @@ const connections = [
   { from: 2, to: 4 },
 ];
 
-const Node = ({ position, title, link }) => {
-  const ref = useRef<THREE.Mesh>(null);
-  const [isHovered, setIsHovered] = React.useState(false); // Hover state
+// const Connection = ({ start, end }) => {
+//   const ref = useRef<THREE.Mesh>(null);
+//   const startVec = new THREE.Vector3(...start);
+//   const endVec = new THREE.Vector3(...end);
+//   const midPoint = startVec.clone().lerp(endVec, 0.5);
+//   const direction = endVec.clone().sub(startVec);
+//   const length = direction.length();
+//   direction.normalize();
 
-  // Handle hover effects
-  const handleHover = (hover: boolean) => {
-    setIsHovered(hover); // Update state to show/hide text
-    gsap.to(ref.current?.scale, {
-      x: hover ? 1.4 : 1,
-      y: hover ? 1.4 : 1,
-      z: hover ? 1.4 : 1,
-      duration: 0.3,
-    });
-  };
+//   const quaternion = new THREE.Quaternion().setFromUnitVectors(
+//     new THREE.Vector3(0, 1, 0),
+//     direction
+//   );
 
-  return (
-    <>
-      {/* Node (Sphere) */}
-      <Sphere
-        ref={ref}
-        position={position}
-        args={[0.3, 16, 16]}
-        onPointerOver={() => handleHover(true)}
-        onPointerOut={() => handleHover(false)}
-        onClick={() => (window.location.href = link)}
-      >
-        <meshStandardMaterial
-          color="cyan"
-          emissive="blue"
-          emissiveIntensity={0.3}
-        />
-      </Sphere>
+//   const material = useMemo(
+//     () =>
+//       new THREE.ShaderMaterial({
+//         uniforms: {
+//           time: { value: 0 },
+//         },
+//         vertexShader: `
+//           varying vec2 vUv;
+//           void main() {
+//             vUv = uv;
+//             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+//           }
+//         `,
+//         fragmentShader: `
+//           uniform float time;
+//           varying vec2 vUv;
+//           void main() {
+//             float brightness = abs(sin(vUv.y * 10.0 + time * 3.0)); // Creates moving pulses
+//             gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0) * brightness;
+//           }
+//         `,
+//       }),
+//     []
+//   );
 
-      {/* Show text only when hovered */}
-      {isHovered && (
-        <Html position={[position[0], position[1] + 0.5, position[2]]} center>
-          <div className="bg-white p-2 text-sm rounded shadow-lg opacity-75">
-            {title}
-          </div>
-        </Html>
-      )}
-    </>
-  );
-};
+//   useFrame(({ clock }) => {
+//     if (ref.current) {
+//       material.uniforms.time.value = clock.getElapsedTime();
+//     }
+//   });
 
-const Connection = ({ start, end }) => {
-  const startVec = new THREE.Vector3(...start);
-  const endVec = new THREE.Vector3(...end);
-  const midPoint = startVec.clone().lerp(endVec, 0.5);
-
-  const direction = endVec.clone().sub(startVec);
-  const length = direction.length();
-  direction.normalize();
-
-  const quaternion = new THREE.Quaternion().setFromUnitVectors(
-    new THREE.Vector3(0, 1, 0),
-    direction
-  );
-
-  return (
-    <Cylinder
-      args={[0.05, 0.05, length, 16]}
-      position={midPoint.toArray()}
-      quaternion={quaternion}
-    >
-      <meshStandardMaterial
-        color="gray"
-        emissive="white"
-        emissiveIntensity={0.2}
-      />
-    </Cylinder>
-  );
-};
+//   return (
+//     <Cylinder
+//       ref={ref}
+//       args={[0.01, 0.01, length, 16]}
+//       position={midPoint.toArray()}
+//       quaternion={quaternion}
+//     >
+//       <primitive attach="material" object={material} />
+//     </Cylinder>
+//   );
+// };
 
 const NeuronScene = () => {
   const [speed, setSpeed] = useState(10); // Default speed
@@ -111,6 +96,9 @@ const NeuronScene = () => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.key === "Enter" && !chatOpen) {
         setChatOpen(true);
+      }
+      if (event.key === "Escape") {
+        setChatOpen(false);
       }
     };
 
