@@ -7,6 +7,8 @@ import * as THREE from "three";
 import { FlyControls } from "@react-three/drei";
 import ControlsOverlay from "./ControlsOverlay";
 import Particles from "./Particles";
+import Fairy from "./Fairy";
+import ChatWindow from "./ChatWindow";
 
 // Define project nodes (Can be loaded from JSON or API later)
 const projects = [
@@ -101,17 +103,34 @@ const Connection = ({ start, end }) => {
 
 const NeuronScene = () => {
   const [speed, setSpeed] = useState(10); // Default speed
+  const [chatOpen, setChatOpen] = useState(false);
+  const controlsRef = useRef<any>(null); // Reference for FlyControls
+  const [responseVisible, setResponseVisible] = useState(false);
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && !chatOpen) {
+        setChatOpen(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [chatOpen]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (chatOpen) {
+        return;
+      }
       if (event.shiftKey) {
-        setSpeed(30); // Increase speed when Shift is held
+        setSpeed(30);
       }
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
-      if (!event.shiftKey) {
-        setSpeed(10); // Reset speed when Shift is released
+      if (!chatOpen) {
+        setSpeed(10);
       }
     };
 
@@ -122,7 +141,20 @@ const NeuronScene = () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, []);
+  }, [chatOpen]);
+
+  useEffect(() => {
+    if (controlsRef.current) {
+      controlsRef.current.enabled = !chatOpen;
+
+      // 🛑 Force stop movement by resetting velocity
+      if (chatOpen) {
+        controlsRef.current.movementSpeed = 0;
+      } else {
+        controlsRef.current.movementSpeed = speed;
+      }
+    }
+  }, [chatOpen, speed]);
 
   return (
     <div
@@ -135,6 +167,7 @@ const NeuronScene = () => {
         <pointLight position={[5, 5, 5]} intensity={1} />
 
         <Particles count={1000} />
+        <Fairy onChatOpen={() => setChatOpen(true)} isChatOpen={chatOpen} />
 
         {/* Central Neuron */}
         <Sphere args={[0.6, 32, 32]}>
@@ -166,8 +199,21 @@ const NeuronScene = () => {
           ) : null;
         })}
         {/* Camera Controls */}
-        <FlyControls movementSpeed={speed} rollSpeed={2} dragToLook={true} />
+        <FlyControls
+          ref={controlsRef}
+          movementSpeed={speed}
+          rollSpeed={2}
+          dragToLook={true}
+        />
       </Canvas>
+      {chatOpen && (
+        <ChatWindow
+          onClose={() => {
+            setChatOpen(false);
+            setResponseVisible(false);
+          }}
+        />
+      )}
       <ControlsOverlay />
     </div>
   );

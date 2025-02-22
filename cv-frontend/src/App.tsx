@@ -17,13 +17,13 @@ const App = () => {
       }}
     >
       {/* Navigation Bar */}
-      <nav className="flex items-center justify-center gap-4 p-4">
+      <nav className="flex items-center justify-center gap-10 p-4">
         <MagneticLink to="/">HOME</MagneticLink>
-        <div className="align-center">-</div>
+        {/* <div className="align-center">-</div> */}
         <MagneticLink to="/projects">PROJECTS</MagneticLink>
-        <div className="align-center">-</div>
+        {/* <div className="align-center">-</div> */}
         <MagneticLink to="/blog">BLOGS</MagneticLink>
-        <div className="align-center">-</div>
+        {/* <div className="align-center">-</div> */}
         <MagneticLink to="/about">ABOUT ME</MagneticLink>
       </nav>
 
