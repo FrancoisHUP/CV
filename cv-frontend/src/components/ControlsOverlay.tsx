@@ -69,7 +69,7 @@ const ControlsOverlay = () => {
         <div className="absolute bottom-10 right-10 flex  flex-row space-x-6 bg-black p-4 rounded-lg opacity-70 shadow-lg">
           {/* Close Button */}
           <button
-            className="relative text-white bg-red-600 px-2 py-1 rounded"
+            className="relative text-white px-2 py-1 rounded"
             onClick={() => {
               setIsVisible(false);
               setBubbleVisible(true);
@@ -126,7 +126,7 @@ const ControlsOverlay = () => {
       {bubbleVisible && (
         <div className="absolute bottom-10 right-10">
           <motion.button
-            className="w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center"
+            className="w-12 h-12 text-white rounded-full shadow-lg flex items-center justify-center"
             onClick={() => {
               setIsVisible(true);
               setBubbleVisible(false);
