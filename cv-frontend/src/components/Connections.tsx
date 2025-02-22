@@ -1,9 +1,15 @@
-import React, { useRef, useMemo } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Sphere, Cylinder, Html } from "@react-three/drei";
+import { useRef, useMemo } from "react";
+import { useFrame } from "@react-three/fiber";
+import { Cylinder } from "@react-three/drei";
 import * as THREE from "three";
 
-const Connection = ({ start, end }) => {
+const Connection = ({
+  start,
+  end,
+}: {
+  start: [number, number, number];
+  end: [number, number, number];
+}) => {
   const ref = useRef<THREE.Mesh>(null);
   const startVec = new THREE.Vector3(...start);
   const endVec = new THREE.Vector3(...end);

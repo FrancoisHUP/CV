@@ -1,4 +1,3 @@
-import React from "react";
 import NeuronScene from "../components/NeuronScene"; // Ensure correct import path
 
 const Home = () => {

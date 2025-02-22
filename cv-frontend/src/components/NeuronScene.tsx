@@ -1,9 +1,5 @@
-import React, { useRef, useState, useEffect, useMemo } from "react";
-
-import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls, Sphere, Cylinder, Html } from "@react-three/drei";
-import gsap from "gsap";
-import * as THREE from "three";
+import { useRef, useState, useEffect } from "react";
+import { Canvas } from "@react-three/fiber";
 import { FlyControls } from "@react-three/drei";
 import ControlsOverlay from "./ControlsOverlay";
 import Particles from "./Particles";
@@ -12,16 +8,26 @@ import ChatWindow from "./ChatWindow";
 import Node from "./Node";
 import Connection from "./Connections";
 
-// Define project nodes (Can be loaded from JSON or API later)
-const projects = [
+type Project = {
+  id: number;
+  title: string;
+  position: [number, number, number];
+  link: string;
+};
+
+type Connection = {
+  from: number;
+  to: number;
+};
+
+const projects: Project[] = [
   { id: 1, title: "Project A", position: [2, 1, 0], link: "/project-a" },
   { id: 2, title: "Project B", position: [-2, -1, 1], link: "/project-b" },
   { id: 3, title: "Project C", position: [1, -2, -1], link: "/project-c" },
   { id: 4, title: "Project D", position: [-1, 2, -1], link: "/project-d" },
 ];
 
-// Define connections dynamically by referring to node IDs
-const connections = [
+const connections: Connection[] = [
   { from: 1, to: 2 },
   { from: 2, to: 3 },
   { from: 3, to: 1 },
@@ -29,68 +35,11 @@ const connections = [
   { from: 2, to: 4 },
 ];
 
-// const Connection = ({ start, end }) => {
-//   const ref = useRef<THREE.Mesh>(null);
-//   const startVec = new THREE.Vector3(...start);
-//   const endVec = new THREE.Vector3(...end);
-//   const midPoint = startVec.clone().lerp(endVec, 0.5);
-//   const direction = endVec.clone().sub(startVec);
-//   const length = direction.length();
-//   direction.normalize();
-
-//   const quaternion = new THREE.Quaternion().setFromUnitVectors(
-//     new THREE.Vector3(0, 1, 0),
-//     direction
-//   );
-
-//   const material = useMemo(
-//     () =>
-//       new THREE.ShaderMaterial({
-//         uniforms: {
-//           time: { value: 0 },
-//         },
-//         vertexShader: `
-//           varying vec2 vUv;
-//           void main() {
-//             vUv = uv;
-//             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-//           }
-//         `,
-//         fragmentShader: `
-//           uniform float time;
-//           varying vec2 vUv;
-//           void main() {
-//             float brightness = abs(sin(vUv.y * 10.0 + time * 3.0)); // Creates moving pulses
-//             gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0) * brightness;
-//           }
-//         `,
-//       }),
-//     []
-//   );
-
-//   useFrame(({ clock }) => {
-//     if (ref.current) {
-//       material.uniforms.time.value = clock.getElapsedTime();
-//     }
-//   });
-
-//   return (
-//     <Cylinder
-//       ref={ref}
-//       args={[0.01, 0.01, length, 16]}
-//       position={midPoint.toArray()}
-//       quaternion={quaternion}
-//     >
-//       <primitive attach="material" object={material} />
-//     </Cylinder>
-//   );
-// };
-
 const NeuronScene = () => {
   const [speed, setSpeed] = useState(10); // Default speed
   const [chatOpen, setChatOpen] = useState(false);
-  const controlsRef = useRef<any>(null); // Reference for FlyControls
-  const [responseVisible, setResponseVisible] = useState(false);
+  const controlsRef = useRef<React.ElementRef<typeof FlyControls> | null>(null);
+  // Reference for FlyControls
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -116,7 +65,7 @@ const NeuronScene = () => {
       }
     };
 
-    const handleKeyUp = (event: KeyboardEvent) => {
+    const handleKeyUp = () => {
       if (!chatOpen) {
         setSpeed(10);
       }
@@ -133,8 +82,6 @@ const NeuronScene = () => {
 
   useEffect(() => {
     if (controlsRef.current) {
-      controlsRef.current.enabled = !chatOpen;
-
       // Force stop movement by resetting velocity
       if (chatOpen) {
         controlsRef.current.movementSpeed = 0;
@@ -158,13 +105,13 @@ const NeuronScene = () => {
         <Fairy onChatOpen={() => setChatOpen(true)} isChatOpen={chatOpen} />
 
         {/* Central Neuron */}
-        <Sphere args={[0.6, 32, 32]}>
+        {/* <Sphere args={[0.6, 32, 32]}>
           <meshStandardMaterial
-            color="purple"
-            emissive="purple"
+            color="white"
+            emissive="white"
             emissiveIntensity={0.5}
           />
-        </Sphere>
+        </Sphere> */}
         {/* Project Nodes */}
         {projects.map((project, index) => (
           <Node
@@ -191,14 +138,13 @@ const NeuronScene = () => {
           ref={controlsRef}
           movementSpeed={speed}
           rollSpeed={2}
-          dragToLook={true}
+          dragToLook
         />
       </Canvas>
       {chatOpen && (
         <ChatWindow
           onClose={() => {
             setChatOpen(false);
-            setResponseVisible(false);
           }}
         />
       )}

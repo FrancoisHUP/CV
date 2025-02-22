@@ -1,11 +1,16 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { Link } from "react-router-dom";
 import gsap from "gsap";
 
-const MagneticLink = ({ to, children }) => {
-  const linkRef = useRef(null);
+interface MagneticLinkProps {
+  to: string;
+  children: React.ReactNode;
+}
 
-  const handleMouseMove = (event) => {
+const MagneticLink: React.FC<MagneticLinkProps> = ({ to, children }) => {
+  const linkRef = useRef<HTMLAnchorElement | null>(null);
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLAnchorElement>) => {
     const link = linkRef.current;
     if (!link) return;
 
@@ -24,6 +29,8 @@ const MagneticLink = ({ to, children }) => {
   };
 
   const handleMouseLeave = () => {
+    if (!linkRef.current) return;
+
     gsap.to(linkRef.current, {
       x: 0,
       y: 0,

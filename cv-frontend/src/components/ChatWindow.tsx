@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const ChatWindow = ({ onClose }: { onClose: () => void }) => {
   const [input, setInput] = useState("");

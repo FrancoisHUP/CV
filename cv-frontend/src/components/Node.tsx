@@ -3,11 +3,19 @@ import { Sphere, Html } from "@react-three/drei";
 import gsap from "gsap";
 import * as THREE from "three";
 
-const Node = ({ position, title, link }) => {
+const Node = ({
+  position,
+  title,
+  link,
+}: {
+  position: [number, number, number];
+  title: string;
+  link: string;
+}) => {
   const coreRef = useRef<THREE.Mesh>(null);
   const shellRef = useRef<THREE.Mesh>(null);
   const [isHovered, setIsHovered] = useState(false);
-  const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
+  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Animate scale smoothly
   useEffect(() => {

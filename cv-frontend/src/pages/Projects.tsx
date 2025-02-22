@@ -1,5 +1,3 @@
-import React from "react";
-
 const Projects = () => {
   return (
     <div style={{ padding: "20px" }}>

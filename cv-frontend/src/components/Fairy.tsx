@@ -1,10 +1,10 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Sphere } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import gsap from "gsap";
 import * as THREE from "three";
 
-const HEARING_RANGE = 10; // Maximum distance at which the fairy can hear the user
+// const HEARING_RANGE = 10; // Maximum distance at which the fairy can hear the user
 const WANDER_RADIUS = 5; // How far the fairy can wander from its start position
 const MOVE_SPEED = 0.02; // Slow movement for smooth transitions
 const WANDER_INTERVAL = 3; // Interval for direction change
@@ -57,7 +57,7 @@ const Fairy = ({
   useEffect(() => {
     if (!isChatOpen && !wandering) {
       // ✅ When chat closes, return to original position and resume wandering
-      gsap.to(ref.current?.position, {
+      gsap.to(ref.current && ref.current?.position, {
         x: originalPosition.x,
         y: originalPosition.y,
         z: originalPosition.z,

@@ -1,5 +1,3 @@
-import React from "react";
-
 const Blog = () => {
   return (
     <div style={{ padding: "20px" }}>
