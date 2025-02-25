@@ -1,0 +1,14 @@
+### Directory Structure ###
+Directory structure:
+└── francoishup-tp3_inf889g/
+    ├── README.md
+    └── INF889G_TP3.ipynb
+
+
+### Code Content ###
+================================================
+File: README.md
+================================================
+# TP3_INF889G
+
+

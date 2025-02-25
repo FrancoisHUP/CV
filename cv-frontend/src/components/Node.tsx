@@ -1,92 +1,97 @@
-import { useRef, useState, useEffect } from "react";
-import { Sphere, Html } from "@react-three/drei";
+import { useRef, useState, useEffect, useMemo } from "react";
+import { Billboard, Html } from "@react-three/drei";
 import gsap from "gsap";
 import * as THREE from "three";
 
-const Node = ({
-  position,
-  title,
-  link,
-}: {
+type NodeProps = {
   position: [number, number, number];
   title: string;
   link: string;
-}) => {
-  const coreRef = useRef<THREE.Mesh>(null);
-  const shellRef = useRef<THREE.Mesh>(null);
-  const [isHovered, setIsHovered] = useState(false);
-  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  exploded?: boolean;
+};
 
-  // Animate scale smoothly
+const Node = ({ position, title, link, exploded = false }: NodeProps) => {
+  const coreRef = useRef<THREE.Mesh>(null);
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Compute the original position.
+  const originalPos = useMemo(() => new THREE.Vector3(...position), [position]);
+  // Compute an "exploded" position by scaling the original vector.
+  const explosionFactor = 10; // adjust as needed
+  const explodedPos = useMemo(
+    () => originalPos.clone().multiplyScalar(explosionFactor),
+    [originalPos]
+  );
+
+  // Animate node position when exploded state changes.
   useEffect(() => {
     if (coreRef.current) {
-      gsap.to(coreRef.current.scale, {
-        x: isHovered ? 1.4 : 1,
-        y: isHovered ? 1.4 : 1,
-        z: isHovered ? 1.4 : 1,
-        duration: 0.3,
-        ease: "power1.out",
+      const targetPos = exploded ? explodedPos : originalPos;
+      gsap.to(coreRef.current.position, {
+        x: targetPos.x,
+        y: targetPos.y,
+        z: targetPos.z,
+        duration: 1,
+        ease: "power2.out",
       });
     }
-  }, [isHovered]);
+  }, [exploded, originalPos, explodedPos]);
 
-  // Handle hover start (with small delay to prevent flickering)
-  const handlePointerOver = () => {
-    if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
-    hoverTimeout.current = setTimeout(() => {
-      setIsHovered(true);
-    }, 100);
-  };
+  // Hover event handlers.
+  const handlePointerOver = () => setIsHovered(true);
+  const handlePointerOut = () => setIsHovered(false);
 
-  // Handle hover end (with delay to prevent sudden disappearance)
-  const handlePointerOut = () => {
-    if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
-    hoverTimeout.current = setTimeout(() => {
-      setIsHovered(false);
-    }, 200);
-  };
+  // Memoize geometries.
+  const coreGeometry = useMemo(() => new THREE.SphereGeometry(0.1, 16, 16), []);
+  const shellGeometry = useMemo(
+    () => new THREE.SphereGeometry(0.3, 16, 16),
+    []
+  );
 
   return (
     <>
-      {/* Glowing Core */}
-      <Sphere
+      {/* Node Mesh (animated and interactive) */}
+      <mesh
         ref={coreRef}
-        position={position}
-        args={[0.1, 32, 32]}
+        position={originalPos.toArray()}
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
         onClick={() => (window.location.href = link)}
+        geometry={coreGeometry}
       >
         <meshStandardMaterial
           color="cyan"
           emissive="cyan"
           emissiveIntensity={1}
         />
-      </Sphere>
+        {/* Label displayed only when hovered */}
+        {isHovered && (
+          <Billboard>
+            {/* The Html component is now a child of the node mesh so it follows its position.
+                The offset [0, 0.5, 0] places it above the node. */}
+            <Html center position={[0, 0.5, 0]}>
+              <div
+                className="bg-gray-800 text-white p-2 text-sm rounded shadow-lg opacity-90 transition-opacity duration-200 ease-in-out"
+                style={{ pointerEvents: "none" }}
+              >
+                {title}
+              </div>
+            </Html>
+          </Billboard>
+        )}
+      </mesh>
 
-      {/* Transparent Shell */}
-      <Sphere ref={shellRef} position={position} args={[0.3, 32, 32]}>
+      {/* Transparent shell remains at the original position */}
+      {/* <mesh position={originalPos.toArray()} geometry={shellGeometry}>
         <meshPhysicalMaterial
           transparent
           opacity={0.4}
           roughness={0.1}
           clearcoat={1}
           reflectivity={1}
-          transmission={0.9}
+          transmission={0.9}aw
         />
-      </Sphere>
-
-      {/* Display text when hovered (prevents flicker) */}
-      {isHovered && (
-        <Html position={[position[0], position[1] + 0.5, position[2]]} center>
-          <div
-            className="bg-gray-800 text-white p-2 text-sm rounded shadow-lg opacity-90 transition-opacity duration-200 ease-in-out"
-            style={{ pointerEvents: "none" }}
-          >
-            {title}
-          </div>
-        </Html>
-      )}
+      </mesh> */}
     </>
   );
 };

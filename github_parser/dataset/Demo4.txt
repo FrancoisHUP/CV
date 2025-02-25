@@ -1,0 +1,99 @@
+### Directory Structure ###
+Directory structure:
+└── francoishup-demo4/
+    ├── src/
+    │   └── Stack.java
+    └── test/
+        └── StackTest.java
+
+
+### Code Content ###
+================================================
+File: src/Stack.java
+================================================
+public class Stack {
+
+    private int counter=0;
+    private int element[] = new int[2];
+
+    public boolean isEmpty() {
+        return counter == 0 ;
+    }
+
+    public int push(int element) {
+        this.element[counter++] = element;
+        return 0;
+    }
+
+    public int pop() throws UnderFlow {
+        if(isEmpty()) {
+            throw new UnderFlow();
+        }
+        return element[--counter];
+    }
+
+    public class UnderFlow extends Exception {
+    }
+}
+
+
+================================================
+File: test/StackTest.java
+================================================
+import org.junit.Before;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+public class StackTest {
+
+    private Stack stack;
+    @Before
+    public void setUp(){
+        stack = new Stack();
+    }
+    @Test
+    public void newStackIsEmpty() {
+        assertTrue(stack.isEmpty());
+    }
+
+    @Test
+    public void onePush_isNotEmpty(){
+        stack.push(0);
+        assertFalse(stack.isEmpty());
+    }
+
+    @Test(expected = Stack.UnderFlow.class)
+    public void popOnEmptyStack_WillThrowException() throws Stack.UnderFlow {
+        stack.pop();
+    }
+
+    @Test
+    public void afterPushX_PopX() throws Stack.UnderFlow {
+        stack.push(0);
+        assertEquals(stack.pop(), 0);
+        stack.push(1);
+        assertEquals(stack.pop(), 1);
+    }
+
+    @Test
+    public void towPushesOnePop_WillNotBeEmpty() throws Stack.UnderFlow {
+        stack.push(0);
+        stack.push(1);
+        stack.pop();
+        assertFalse(stack.isEmpty());
+    }
+
+    @Test
+    public void afterPushXY_PopYX() throws Stack.UnderFlow {
+        stack.push(0);
+        stack.push(1);
+        assertEquals(stack.pop(),1);
+        assertEquals(stack.pop(),0);
+    }
+
+
+}
+
+
+

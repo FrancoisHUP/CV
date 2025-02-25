@@ -1,0 +1,14 @@
+### Directory Structure ###
+Directory structure:
+└── francoishup-openai_vision/
+    ├── README.md
+    └── data/
+
+
+### Code Content ###
+================================================
+File: README.md
+================================================
+# OpenAi_Vision
+
+

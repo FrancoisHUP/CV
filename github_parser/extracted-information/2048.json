@@ -1,0 +1,1170 @@
+{
+  "project": {
+    "name": "francoishup-2048",
+    "description": "Implementation of the 2048 game with a GUI and AI functionalities (including a DQN-based agent). It supports training, evaluation, replay recording, and a dummy AI for comparison.",
+    "architecture": {
+      "overview": "The project is organized into several modules: 'game' holds the game engine, UI, and a recorder class; 'agent' contains AI implementations (a dummy agent and a DQN-based agent); 'utils' provides utility scripts like GPU availability checks; 'other' includes an alternative animation-based GUI. The main entry point (main.py) can launch the game or run training/evaluation routines.",
+      "components": [
+        {
+          "name": "game",
+          "description": "Contains the core game engine (GameEngine for 2048 mechanics), the Tkinter-based user interface (Game2048GUI), and a recorder (GameRecorder) to log or replay gameplay."
+        },
+        {
+          "name": "agent",
+          "description": "Houses AI agents for the 2048 game: a DummyAI that selects moves randomly, and a DQN-based agent (DQN2048) with replay memory, training, and evaluation logic."
+        },
+        {
+          "name": "utils",
+          "description": "Provides utility scripts, such as a GPU availability check using PyTorch."
+        },
+        {
+          "name": "other",
+          "description": "An alternative 2048 implementation with tile animation, separate from the main game UI."
+        }
+      ]
+    },
+    "dependencies": [
+      {
+        "name": "numpy",
+        "version": "Unknown",
+        "purpose": "Used for array manipulation and numerical operations."
+      },
+      {
+        "name": "tqdm",
+        "version": "Unknown",
+        "purpose": "Provides a progress bar for training and evaluation loops."
+      },
+      {
+        "name": "torch",
+        "version": "Unknown",
+        "purpose": "PyTorch is used for building and training the neural network (DQN)."
+      },
+      {
+        "name": "matplotlib",
+        "version": "Unknown",
+        "purpose": "Used to plot training metrics in the GUI."
+      }
+    ],
+    "files": [
+      {
+        "path": "main.py",
+        "description": "Main entry point for running the game or initiating AI training/evaluation.",
+        "functions": [
+          {
+            "name": "evaluate_dummy",
+            "description": "Evaluates the DummyAI over 100 episodes and prints the average and std of scores.",
+            "parameters": [],
+            "returns": {
+              "type": "None",
+              "description": "Prints evaluation results to the console."
+            }
+          },
+          {
+            "name": "train_dqn_with_ui",
+            "description": "Creates a Tkinter window, initializes the GameEngine and Game2048GUI, and starts the main UI loop for training or interaction.",
+            "parameters": [],
+            "returns": {
+              "type": "None",
+              "description": "No return value."
+            }
+          },
+          {
+            "name": "eval_dqn",
+            "description": "Evaluates a trained DQN model for 100 episodes, printing average, max, min, and std scores.",
+            "parameters": [],
+            "returns": {
+              "type": "None",
+              "description": "Prints evaluation metrics to the console."
+            }
+          },
+          {
+            "name": "play_game",
+            "description": "Runs the 2048 game in a Tkinter window, allowing the user to play manually (no AI move calls).",
+            "parameters": [],
+            "returns": {
+              "type": "None",
+              "description": "Starts the Tk main loop for user gameplay."
+            }
+          },
+          {
+            "name": "main",
+            "description": "Default entry function. Calls train_dqn_with_ui (others are commented out).",
+            "parameters": [],
+            "returns": {
+              "type": "None",
+              "description": "Runs the default training UI flow."
+            }
+          }
+        ],
+        "classes": [],
+        "imports": [
+          {
+            "module": "tkinter",
+            "purpose": "Provides the GUI framework."
+          },
+          {
+            "module": "math",
+            "purpose": "Used for mathematical computations."
+          },
+          {
+            "module": "game.gameui",
+            "purpose": "Imports the 2048 GUI classes (Game2048GUI, TrainingWindow, TrainingConfigWindow)."
+          },
+          {
+            "module": "game.game_engine",
+            "purpose": "Imports the core 2048 game engine (GameEngine, GameRecorder)."
+          },
+          {
+            "module": "agent.dummy.ai",
+            "purpose": "Imports the DummyAI for a random-move baseline."
+          },
+          {
+            "module": "agent.dqn.ai",
+            "purpose": "Imports the DQN2048 class for training and evaluation."
+          }
+        ]
+      },
+      {
+        "path": "requirements.txt",
+        "description": "Lists external libraries required by this project.",
+        "functions": [],
+        "classes": [],
+        "imports": []
+      },
+      {
+        "path": "todo",
+        "description": "A simple TODO file containing future ideas and completed tasks for this 2048 project.",
+        "functions": [],
+        "classes": [],
+        "imports": []
+      },
+      {
+        "path": "agent/dqn/ai.py",
+        "description": "Implements the DQN neural network (dueling architecture), replay memory, and the main DQN2048 agent with training/evaluation methods.",
+        "functions": [
+          {
+            "name": "state_to_tensor",
+            "description": "Converts a 4x4 grid into a log-scale PyTorch tensor shape (1,1,4,4).",
+            "parameters": [
+              {
+                "name": "grid",
+                "type": "list[list[int]]",
+                "description": "The 4x4 game grid."
+              }
+            ],
+            "returns": {
+              "type": "torch.Tensor",
+              "description": "Tensor representation of the state."
+            }
+          },
+          {
+            "name": "boltzmann_exploration",
+            "description": "Uses a softmax over Q-values (divided by temperature) to pick an action index stochastically.",
+            "parameters": [
+              {
+                "name": "q_values",
+                "type": "torch.Tensor",
+                "description": "Q-values for each action."
+              },
+              {
+                "name": "temperature",
+                "type": "float",
+                "description": "Softmax temperature for exploration."
+              }
+            ],
+            "returns": {
+              "type": "int",
+              "description": "Index of the selected action."
+            }
+          }
+        ],
+        "classes": [
+          {
+            "name": "ReplayMemory",
+            "description": "A simple replay buffer to store (state, action, reward, next_state, done) transitions.",
+            "methods": [
+              {
+                "name": "__init__",
+                "description": "Initializes the memory with a maximum capacity.",
+                "parameters": [
+                  {
+                    "name": "capacity",
+                    "type": "int",
+                    "description": "Max number of transitions to store."
+                  }
+                ],
+                "returns": {
+                  "type": "None",
+                  "description": "Sets up internal data structures."
+                }
+              },
+              {
+                "name": "push",
+                "description": "Adds a new transition to the memory, evicting the oldest if at capacity.",
+                "parameters": [
+                  {
+                    "name": "state",
+                    "type": "torch.Tensor",
+                    "description": "The current state."
+                  },
+                  {
+                    "name": "action",
+                    "type": "int",
+                    "description": "Index of the action taken."
+                  },
+                  {
+                    "name": "reward",
+                    "type": "float",
+                    "description": "Reward received after the action."
+                  },
+                  {
+                    "name": "next_state",
+                    "type": "torch.Tensor",
+                    "description": "Next state after the action."
+                  },
+                  {
+                    "name": "done",
+                    "type": "bool",
+                    "description": "True if the episode ended."
+                  }
+                ],
+                "returns": {
+                  "type": "None",
+                  "description": "Transition is stored in the internal deque."
+                }
+              },
+              {
+                "name": "sample",
+                "description": "Randomly selects a batch of transitions from the memory.",
+                "parameters": [
+                  {
+                    "name": "batch_size",
+                    "type": "int",
+                    "description": "Number of transitions to sample."
+                  }
+                ],
+                "returns": {
+                  "type": "tuple",
+                  "description": "A tuple (state, action, reward, next_state, done)."
+                }
+              },
+              {
+                "name": "__len__",
+                "description": "Returns the number of transitions currently stored.",
+                "parameters": [],
+                "returns": {
+                  "type": "int",
+                  "description": "Current size of the replay buffer."
+                }
+              }
+            ],
+            "attributes": [
+              {
+                "name": "memory",
+                "type": "collections.deque",
+                "description": "Stores transitions up to the defined capacity."
+              }
+            ]
+          },
+          {
+            "name": "DQN",
+            "description": "A dueling DQN network that outputs Q-values by combining a shared feature extractor, a value stream, and an advantage stream.",
+            "methods": [
+              {
+                "name": "__init__",
+                "description": "Constructs the fully connected layers and separate value/advantage streams.",
+                "parameters": [],
+                "returns": {
+                  "type": "None",
+                  "description": "Layers are initialized."
+                }
+              },
+              {
+                "name": "forward",
+                "description": "Forward pass that outputs Q-values for each of the four actions.",
+                "parameters": [
+                  {
+                    "name": "x",
+                    "type": "torch.Tensor",
+                    "description": "Input shape (batch_size, 1, 4, 4)."
+                  }
+                ],
+                "returns": {
+                  "type": "torch.Tensor",
+                  "description": "Q-values of shape (batch_size, 4)."
+                }
+              }
+            ],
+            "attributes": [
+              {
+                "name": "feature",
+                "type": "nn.Sequential",
+                "description": "Shared feature extraction layers."
+              },
+              {
+                "name": "value_stream",
+                "type": "nn.Sequential",
+                "description": "Outputs the scalar state value."
+              },
+              {
+                "name": "advantage_stream",
+                "type": "nn.Sequential",
+                "description": "Outputs advantage values for each action."
+              }
+            ]
+          },
+          {
+            "name": "DQN2048",
+            "description": "A class managing the DQN agent (policy network, target network), with methods for training, evaluation, and inference in 2048.",
+            "methods": [
+              {
+                "name": "__init__",
+                "description": "Initializes and optionally loads a saved DQN model, sets up the target network, device, etc.",
+                "parameters": [
+                  {
+                    "name": "model_path",
+                    "type": "str or None",
+                    "description": "Path to a saved model checkpoint, or None to start fresh."
+                  }
+                ],
+                "returns": {
+                  "type": "None",
+                  "description": "Model is ready for inference or training."
+                }
+              },
+              {
+                "name": "create_random_policy",
+                "description": "Optionally saves a random policy checkpoint (initial weights) to file.",
+                "parameters": [],
+                "returns": {
+                  "type": "None",
+                  "description": "Saves initial model weights to disk."
+                }
+              },
+              {
+                "name": "predict_move",
+                "description": "Predicts the best move among valid_actions by comparing their Q-values.",
+                "parameters": [
+                  {
+                    "name": "state",
+                    "type": "list[list[int]]",
+                    "description": "4x4 grid of the current game state."
+                  },
+                  {
+                    "name": "valid_actions",
+                    "type": "list[str]",
+                    "description": "Actions that are valid in the current state."
+                  }
+                ],
+                "returns": {
+                  "type": "str",
+                  "description": "The chosen action from valid_actions."
+                }
+              },
+              {
+                "name": "select_action",
+                "description": "Uses an epsilon-greedy or Boltzmann approach to choose an action, ensuring validity in the environment.",
+                "parameters": [
+                  {
+                    "name": "state",
+                    "type": "torch.Tensor",
+                    "description": "Tensor shape (1,1,4,4) representing the grid."
+                  },
+                  {
+                    "name": "env",
+                    "type": "GameEngine",
+                    "description": "Environment to check valid moves."
+                  },
+                  {
+                    "name": "steps_done",
+                    "type": "int",
+                    "description": "How many steps have occurred so far."
+                  },
+                  {
+                    "name": "eps_start",
+                    "type": "float",
+                    "description": "Initial epsilon value."
+                  },
+                  {
+                    "name": "eps_end",
+                    "type": "float",
+                    "description": "Final epsilon value."
+                  },
+                  {
+                    "name": "eps_decay",
+                    "type": "float",
+                    "description": "Epsilon decay parameter."
+                  },
+                  {
+                    "name": "temperature",
+                    "type": "float",
+                    "description": "Softmax temperature for Boltzmann exploration."
+                  }
+                ],
+                "returns": {
+                  "type": "str",
+                  "description": "One of ['up','down','left','right']. Random or greedy action."
+                }
+              },
+              {
+                "name": "train_in_thread",
+                "description": "Runs the training loop in a background thread, sending progress messages to a queue used by the UI.",
+                "parameters": [
+                  {
+                    "name": "env",
+                    "type": "GameEngine",
+                    "description": "The 2048 environment."
+                  },
+                  {
+                    "name": "episodes",
+                    "type": "int",
+                    "description": "How many episodes to train for."
+                  },
+                  {
+                    "name": "gamma",
+                    "type": "float",
+                    "description": "Reward discount factor."
+                  },
+                  {
+                    "name": "lr_start",
+                    "type": "float",
+                    "description": "Starting learning rate."
+                  },
+                  {
+                    "name": "lr_end",
+                    "type": "float",
+                    "description": "Ending learning rate for scheduling."
+                  },
+                  {
+                    "name": "batch_size",
+                    "type": "int",
+                    "description": "Batch size for optimization steps."
+                  },
+                  {
+                    "name": "memory_size",
+                    "type": "int",
+                    "description": "Capacity of replay memory."
+                  },
+                  {
+                    "name": "target_update",
+                    "type": "int",
+                    "description": "Frequency (in steps) of copying weights to target network."
+                  },
+                  {
+                    "name": "eps_start",
+                    "type": "float",
+                    "description": "Initial epsilon for exploration."
+                  },
+                  {
+                    "name": "eps_end",
+                    "type": "float",
+                    "description": "Final epsilon for exploration."
+                  },
+                  {
+                    "name": "eps_decay",
+                    "type": "float",
+                    "description": "Rate at which epsilon decays."
+                  },
+                  {
+                    "name": "temperature",
+                    "type": "float",
+                    "description": "Temperature for Boltzmann exploration."
+                  },
+                  {
+                    "name": "result_queue",
+                    "type": "queue.Queue",
+                    "description": "Queue for communicating training progress back to the main thread."
+                  }
+                ],
+                "returns": {
+                  "type": "None",
+                  "description": "Periodically saves checkpoints; ends by saving the final model."
+                }
+              },
+              {
+                "name": "train",
+                "description": "A traditional training loop with synchronous steps, logging progress in a CSV, periodically evaluating the model, and saving the best.",
+                "parameters": [
+                  {
+                    "name": "env",
+                    "type": "GameEngine",
+                    "description": "The 2048 environment."
+                  },
+                  {
+                    "name": "episodes",
+                    "type": "int",
+                    "description": "Number of episodes for training."
+                  },
+                  {
+                    "name": "eval_interval",
+                    "type": "int",
+                    "description": "Evaluate the model every eval_interval episodes."
+                  },
+                  {
+                    "name": "eval_episodes",
+                    "type": "int",
+                    "description": "Number of episodes to use for each evaluation pass."
+                  },
+                  {
+                    "name": "recorder",
+                    "type": "GameRecorder or None",
+                    "description": "Optional recorder to record training episodes."
+                  }
+                ],
+                "returns": {
+                  "type": "list[tuple]",
+                  "description": "Evaluation results over time, e.g., [(episode, avg_score, score_std), ...]."
+                }
+              },
+              {
+                "name": "optimize_model",
+                "description": "Runs a single optimization (training) step on a minibatch sampled from the replay memory (Double DQN approach).",
+                "parameters": [
+                  {
+                    "name": "memory",
+                    "type": "ReplayMemory",
+                    "description": "Replay memory holding transitions."
+                  },
+                  {
+                    "name": "gamma",
+                    "type": "float",
+                    "description": "Discount factor for Q-target."
+                  },
+                  {
+                    "name": "optimizer",
+                    "type": "torch.optim.Optimizer",
+                    "description": "PyTorch optimizer (e.g. Adam)."
+                  },
+                  {
+                    "name": "batch_size",
+                    "type": "int",
+                    "description": "Number of transitions per training batch."
+                  }
+                ],
+                "returns": {
+                  "type": "float",
+                  "description": "The training loss (for logging)."
+                }
+              },
+              {
+                "name": "eval",
+                "description": "Evaluates the policy network by playing multiple episodes without exploration. Optionally records the best game.",
+                "parameters": [
+                  {
+                    "name": "env",
+                    "type": "GameEngine",
+                    "description": "The 2048 environment to evaluate on."
+                  },
+                  {
+                    "name": "n_episodes",
+                    "type": "int",
+                    "description": "Number of episodes for evaluation."
+                  },
+                  {
+                    "name": "recorder",
+                    "type": "GameRecorder or None",
+                    "description": "Records the best game if provided."
+                  },
+                  {
+                    "name": "episode",
+                    "type": "int or None",
+                    "description": "Training episode index, used for naming output files."
+                  }
+                ],
+                "returns": {
+                  "type": "tuple",
+                  "description": "(avg_score, max_score, min_score, score_std)."
+                }
+              }
+            ],
+            "attributes": [
+              {
+                "name": "net",
+                "type": "DQN",
+                "description": "Main (policy) network for action selection."
+              },
+              {
+                "name": "target_net",
+                "type": "DQN",
+                "description": "Target network for stable Q-learning."
+              },
+              {
+                "name": "device",
+                "type": "torch.device",
+                "description": "Device to run computations on (CPU or GPU)."
+              },
+              {
+                "name": "action_map",
+                "type": "dict",
+                "description": "Maps action indices to directions: {0:'up', 1:'down', 2:'left', 3:'right'}."
+              }
+            ]
+          }
+        ],
+        "imports": [
+          {
+            "module": "math",
+            "purpose": "Mathematical functions (log2, exp, etc.)."
+          },
+          {
+            "module": "random",
+            "purpose": "Random sampling (actions, replay memory)."
+          },
+          {
+            "module": "numpy",
+            "purpose": "For array manipulation and computing stats."
+          },
+          {
+            "module": "torch",
+            "purpose": "Core PyTorch library (tensors, GPU usage)."
+          },
+          {
+            "module": "time",
+            "purpose": "Measuring elapsed time in training loops."
+          },
+          {
+            "module": "queue",
+            "purpose": "Python queue for background training updates."
+          },
+          {
+            "module": "threading",
+            "purpose": "Running training in a separate thread."
+          },
+          {
+            "module": "torch.nn",
+            "purpose": "Neural network layers (e.g. nn.Linear, nn.ReLU)."
+          },
+          {
+            "module": "torch.optim",
+            "purpose": "Optimizers like Adam."
+          },
+          {
+            "module": "tqdm",
+            "purpose": "Progress bar utility for loops."
+          },
+          {
+            "module": "collections.deque",
+            "purpose": "Deque data structure for replay memory."
+          }
+        ]
+      },
+      {
+        "path": "agent/dummy/ai.py",
+        "description": "Defines a simple DummyAI that picks random moves, and an eval method to test it over multiple episodes.",
+        "functions": [],
+        "classes": [
+          {
+            "name": "DummyAI",
+            "description": "A trivial agent selecting random moves from ['left','right','up','down'].",
+            "methods": [
+              {
+                "name": "predict_move",
+                "description": "Returns a random move ignoring the current state.",
+                "parameters": [
+                  {
+                    "name": "state",
+                    "type": "list[list[int]]",
+                    "description": "The 4x4 grid (unused)."
+                  }
+                ],
+                "returns": {
+                  "type": "str",
+                  "description": "One of ['left','right','up','down']."
+                }
+              },
+              {
+                "name": "eval",
+                "description": "Evaluates the dummy AI over n_episodes, optionally recording certain games.",
+                "parameters": [
+                  {
+                    "name": "env",
+                    "type": "GameEngine",
+                    "description": "The 2048 environment."
+                  },
+                  {
+                    "name": "n_episodes",
+                    "type": "int",
+                    "description": "Number of episodes to play."
+                  },
+                  {
+                    "name": "recorder",
+                    "type": "GameRecorder or None",
+                    "description": "Optionally records some episodes to JSON."
+                  }
+                ],
+                "returns": {
+                  "type": "tuple",
+                  "description": "avg_score, score_std for the episodes played."
+                }
+              }
+            ],
+            "attributes": []
+          }
+        ],
+        "imports": [
+          {
+            "module": "random",
+            "purpose": "Used to pick random moves and sample episodes for recording."
+          },
+          {
+            "module": "numpy",
+            "purpose": "Computing averages and std dev for scores."
+          },
+          {
+            "module": "tqdm",
+            "purpose": "Progress bar for evaluation loops."
+          }
+        ]
+      },
+      {
+        "path": "game/game_engine.py",
+        "description": "Implements the 2048 game logic: a 4x4 grid, merging, random tile spawning, checking for game over, plus a GameRecorder to track steps for replay or training.",
+        "functions": [],
+        "classes": [
+          {
+            "name": "GameEngine",
+            "description": "Implements the 2048 mechanics, including moves, merges, and random tile generation.",
+            "methods": [
+              {
+                "name": "__init__",
+                "description": "Sets up a new 4x4 grid, initializes score, and calls reset().",
+                "parameters": [],
+                "returns": {
+                  "type": "None",
+                  "description": "Grid and score are initialized."
+                }
+              },
+              {
+                "name": "reset",
+                "description": "Clears the grid, spawns two random tiles, and resets score and done state.",
+                "parameters": [],
+                "returns": {
+                  "type": "None",
+                  "description": "Prepares a fresh game."
+                }
+              },
+              {
+                "name": "step",
+                "description": "Applies a move (up/down/left/right), spawns a new tile if the grid changed, and checks if the game has ended.",
+                "parameters": [
+                  {
+                    "name": "action",
+                    "type": "str",
+                    "description": "One of ['up','down','left','right']."
+                  }
+                ],
+                "returns": {
+                  "type": "tuple",
+                  "description": "(new_grid, reward, done, info)."
+                }
+              },
+              {
+                "name": "_add_random_tile",
+                "description": "Picks a random empty cell and places either a 2 or 4 (10% chance for 4).",
+                "parameters": [],
+                "returns": {
+                  "type": "None",
+                  "description": "Modifies the grid in place if an empty cell exists."
+                }
+              },
+              {
+                "name": "_move",
+                "description": "Helper function to perform the action (shift/merge) on the grid in-place.",
+                "parameters": [
+                  {
+                    "name": "direction",
+                    "type": "str",
+                    "description": "Move direction: 'up','down','left','right'."
+                  }
+                ],
+                "returns": {
+                  "type": "None",
+                  "description": "Updates self.grid."
+                }
+              },
+              {
+                "name": "_slide_left",
+                "description": "Slides and merges each row left, returning the resulting grid.",
+                "parameters": [
+                  {
+                    "name": "grid",
+                    "type": "list[list[int]]",
+                    "description": "Grid to slide left."
+                  }
+                ],
+                "returns": {
+                  "type": "list[list[int]]",
+                  "description": "New grid after sliding/merging left."
+                }
+              },
+              {
+                "name": "_compress",
+                "description": "Pushes all non-zero numbers in a row to the left side, leaving zeros on the right.",
+                "parameters": [
+                  {
+                    "name": "row",
+                    "type": "list[int]",
+                    "description": "A single row from the grid."
+                  }
+                ],
+                "returns": {
+                  "type": "list[int]",
+                  "description": "Row after compression."
+                }
+              },
+              {
+                "name": "_merge",
+                "description": "Merges adjacent equal tiles from left to right, updating the score.",
+                "parameters": [
+                  {
+                    "name": "row",
+                    "type": "list[int]",
+                    "description": "A single row from the grid."
+                  }
+                ],
+                "returns": {
+                  "type": "list[int]",
+                  "description": "Row after merging."
+                }
+              },
+              {
+                "name": "_transpose",
+                "description": "Transposes a 2D grid (rows become columns).",
+                "parameters": [
+                  {
+                    "name": "grid",
+                    "type": "list[list[int]]",
+                    "description": "Grid to transpose."
+                  }
+                ],
+                "returns": {
+                  "type": "list[list[int]]",
+                  "description": "Transposed grid."
+                }
+              },
+              {
+                "name": "_check_game_over",
+                "description": "Checks if the board is full and no merges are possible, indicating game over.",
+                "parameters": [],
+                "returns": {
+                  "type": "bool",
+                  "description": "True if no moves remain, else False."
+                }
+              },
+              {
+                "name": "is_valid_action",
+                "description": "Determines if executing the given action would change the grid (i.e., is it a valid move?).",
+                "parameters": [
+                  {
+                    "name": "action",
+                    "type": "str",
+                    "description": "One of ['up','down','left','right']. The move direction to check."
+                  }
+                ],
+                "returns": {
+                  "type": "bool",
+                  "description": "True if the move would change the grid."
+                }
+              },
+              {
+                "name": "get_state",
+                "description": "Returns a copy of the current 4x4 grid.",
+                "parameters": [],
+                "returns": {
+                  "type": "list[list[int]]",
+                  "description": "Current grid state."
+                }
+              },
+              {
+                "name": "print_grid",
+                "description": "Prints the current grid to stdout (debugging).",
+                "parameters": [],
+                "returns": {
+                  "type": "None",
+                  "description": "Displays the grid."
+                }
+              },
+              {
+                "name": "get_score",
+                "description": "Returns the accumulated score for the current game.",
+                "parameters": [],
+                "returns": {
+                  "type": "int",
+                  "description": "Current game score."
+                }
+              },
+              {
+                "name": "is_done",
+                "description": "Checks whether the game has ended.",
+                "parameters": [],
+                "returns": {
+                  "type": "bool",
+                  "description": "True if game is over."
+                }
+              }
+            ],
+            "attributes": [
+              {
+                "name": "grid",
+                "type": "list[list[int]]",
+                "description": "4x4 matrix representing the current board state."
+              },
+              {
+                "name": "score",
+                "type": "int",
+                "description": "Total score accumulated from merges."
+              },
+              {
+                "name": "done",
+                "type": "bool",
+                "description": "Flag indicating if the game is finished."
+              }
+            ]
+          },
+          {
+            "name": "GameRecorder",
+            "description": "Records each step in a sequence of (state, action, next_state, reward, done, score) for replay or training data.",
+            "methods": [
+              {
+                "name": "__init__",
+                "description": "Initializes the recorder with an empty list, not recording by default.",
+                "parameters": [],
+                "returns": {
+                  "type": "None",
+                  "description": "Sets up recording structures."
+                }
+              },
+              {
+                "name": "reset",
+                "description": "Clears any existing recording data.",
+                "parameters": [],
+                "returns": {
+                  "type": "None",
+                  "description": "Resets the recording list and sets active=False."
+                }
+              },
+              {
+                "name": "start",
+                "description": "Begins recording steps.",
+                "parameters": [],
+                "returns": {
+                  "type": "None",
+                  "description": "Enables the active flag and clears existing data."
+                }
+              },
+              {
+                "name": "record_step",
+                "description": "Appends a step to the recording if active, capturing old state, action, next_state, reward, done, and score.",
+                "parameters": [
+                  {
+                    "name": "state",
+                    "type": "list[list[int]]",
+                    "description": "4x4 grid before the action."
+                  },
+                  {
+                    "name": "action",
+                    "type": "str",
+                    "description": "Move direction used."
+                  },
+                  {
+                    "name": "next_state",
+                    "type": "list[list[int]]",
+                    "description": "Grid after the action."
+                  },
+                  {
+                    "name": "reward",
+                    "type": "float",
+                    "description": "Reward from that move."
+                  },
+                  {
+                    "name": "done",
+                    "type": "bool",
+                    "description": "True if this move ended the game."
+                  },
+                  {
+                    "name": "score",
+                    "type": "int",
+                    "description": "Score after this move."
+                  }
+                ],
+                "returns": {
+                  "type": "None",
+                  "description": "Stores step data in self.recording if active."
+                }
+              },
+              {
+                "name": "stop",
+                "description": "Stops the recording process.",
+                "parameters": [],
+                "returns": {
+                  "type": "None",
+                  "description": "Sets active=False."
+                }
+              },
+              {
+                "name": "save_to_json",
+                "description": "Writes the current recording to a JSON file.",
+                "parameters": [
+                  {
+                    "name": "filename",
+                    "type": "str",
+                    "description": "Path for the output JSON file."
+                  }
+                ],
+                "returns": {
+                  "type": "None",
+                  "description": "Creates the JSON file containing recorded steps."
+                }
+              },
+              {
+                "name": "load_from_json",
+                "description": "Loads a recorded session from a JSON file.",
+                "parameters": [
+                  {
+                    "name": "filename",
+                    "type": "str",
+                    "description": "Path to the JSON file."
+                  }
+                ],
+                "returns": {
+                  "type": "list[dict]",
+                  "description": "List of step dictionaries (state, action, etc.)."
+                }
+              }
+            ],
+            "attributes": [
+              {
+                "name": "recording",
+                "type": "list[dict]",
+                "description": "Recorded steps data."
+              },
+              {
+                "name": "active",
+                "type": "bool",
+                "description": "Indicates if recording is in progress."
+              }
+            ]
+          }
+        ],
+        "imports": [
+          {
+            "module": "random",
+            "purpose": "Used to place random tiles in the grid."
+          },
+          {
+            "module": "json",
+            "purpose": "For saving/loading game recordings."
+          }
+        ]
+      },
+      {
+        "path": "game/gameui.py",
+        "description": "Tkinter-based graphical interface for 2048, including training config windows, real-time training graphs, and replay controls.",
+        "functions": [],
+        "classes": [
+          {
+            "name": "Game2048GUI",
+            "description": "Main Tkinter GUI class for playing 2048, supporting manual moves, AI moves, recording, and replay features.",
+            "methods": [],
+            "attributes": []
+          },
+          {
+            "name": "TrainingWindow",
+            "description": "A window that runs DQN training in a separate thread and updates real-time plots (matplotlib).",
+            "methods": [],
+            "attributes": []
+          },
+          {
+            "name": "TrainingConfigWindow",
+            "description": "A configuration dialog to set training hyperparameters before launching the TrainingWindow.",
+            "methods": [],
+            "attributes": []
+          }
+        ],
+        "imports": [
+          {
+            "module": "tkinter",
+            "purpose": "GUI components (Tk, Button, Scale, etc.)."
+          },
+          {
+            "module": "math",
+            "purpose": "Used for tile color logic, e.g., log2 checks."
+          },
+          {
+            "module": "threading",
+            "purpose": "Background training process."
+          },
+          {
+            "module": "queue",
+            "purpose": "Queue for status messages from the training thread."
+          },
+          {
+            "module": "time",
+            "purpose": "Delays for animations or polling intervals."
+          },
+          {
+            "module": "matplotlib",
+            "purpose": "Used for plotting training progress within the GUI."
+          },
+          {
+            "module": "game.game_engine",
+            "purpose": "Imports GameEngine and GameRecorder for game logic and recording."
+          },
+          {
+            "module": "agent.dqn.ai",
+            "purpose": "Imports DQN2048 for AI-based moves."
+          }
+        ]
+      },
+      {
+        "path": "other/game_animation.py",
+        "description": "Alternative implementation of 2048 using Tkinter, featuring animated tile movement.",
+        "functions": [
+          {
+            "name": "main",
+            "description": "Creates a Tk root, initializes the animated Game2048 class, and starts the main loop.",
+            "parameters": [],
+            "returns": {
+              "type": "None",
+              "description": "Runs the animated version of 2048."
+            }
+          }
+        ],
+        "classes": [
+          {
+            "name": "Game2048",
+            "description": "A 2048 game variant that animates tile movements with incremental steps for a smoother visual effect.",
+            "methods": [],
+            "attributes": []
+          }
+        ],
+        "imports": [
+          {
+            "module": "tkinter",
+            "purpose": "Used for building the GUI (canvas, labels, etc.)."
+          },
+          {
+            "module": "random",
+            "purpose": "Randomly placing new tiles on the board."
+          },
+          {
+            "module": "tkinter.messagebox",
+            "purpose": "Showing alerts when the game ends or a 2048 tile is reached."
+          }
+        ]
+      },
+      {
+        "path": "utils/gpu_available.py",
+        "description": "Checks if CUDA is available via PyTorch and prints the device being used (CPU or CUDA).",
+        "functions": [],
+        "classes": [],
+        "imports": [
+          {
+            "module": "torch",
+            "purpose": "Used to detect CUDA availability."
+          }
+        ]
+      }
+    ]
+  }
+}

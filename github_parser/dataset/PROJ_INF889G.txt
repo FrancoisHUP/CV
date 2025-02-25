@@ -1,0 +1,13 @@
+### Directory Structure ###
+Directory structure:
+└── francoishup-proj_inf889g/
+    └── README.md
+
+
+### Code Content ###
+================================================
+File: README.md
+================================================
+# PROJ_INF889G
+
+

@@ -1,0 +1,99 @@
+<prompt>
+I have this 2048.txt file pulled from GitHub. There's a section that describes the architecture at the top, then you have the code.  
+The code is separated with sections for every file:  
+
+================================================  
+File: path/name_file.py  
+================================================  
+
+I want you to extract as much information as possible from this file and organize it in a **hierarchical JSON structure**.  
+The JSON should follow this schema:  
+
+```json
+{
+  "project": {
+    "name": "Project Name",
+    "description": "A high-level summary of what this project does.",
+    "architecture": {
+      "overview": "A description of the overall structure, main modules, and how they interact.",
+      "components": [
+        {
+          "name": "Component Name",
+          "description": "What this component does and how it fits into the project."
+        }
+      ]
+    },
+    "dependencies": [
+      {
+        "name": "Dependency Name",
+        "version": "X.Y.Z",
+        "purpose": "Why this dependency is needed."
+      }
+    ],
+    "files": [
+      {
+        "path": "path/name_file.py",
+        "description": "What this file is responsible for.",
+        "functions": [
+          {
+            "name": "function_name",
+            "description": "A description of what this function does.",
+            "parameters": [
+              {
+                "name": "param_name",
+                "type": "str/int/float/etc.",
+                "description": "What this parameter represents."
+              }
+            ],
+            "returns": {
+              "type": "ReturnType",
+              "description": "What this function returns."
+            }
+          }
+        ],
+        "classes": [
+          {
+            "name": "ClassName",
+            "description": "A description of what this class does.",
+            "methods": [
+              {
+                "name": "method_name",
+                "description": "What this method does.",
+                "parameters": [
+                  {
+                    "name": "param_name",
+                    "type": "str/int/float/etc.",
+                    "description": "What this parameter represents."
+                  }
+                ],
+                "returns": {
+                  "type": "ReturnType",
+                  "description": "What this method returns."
+                }
+              }
+            ],
+            "attributes": [
+              {
+                "name": "attribute_name",
+                "type": "str/int/float/etc.",
+                "description": "What this attribute stores."
+              }
+            ]
+          }
+        ],
+        "imports": [
+          {
+            "module": "module_name",
+            "purpose": "Why this module is imported."
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Here is the file : 
+<file_conten>
+
+
