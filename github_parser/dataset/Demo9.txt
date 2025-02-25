@@ -1,0 +1,383 @@
+### Directory Structure ###
+Directory structure:
+└── francoishup-demo9/
+    └── src/
+        ├── MainFrameIntellij.form
+        ├── MainFrameIntellij.java
+        ├── MainFrameManuel.java
+        └── utils/
+            ├── MyFrame.java
+            └── Style.java
+
+
+### Code Content ###
+================================================
+File: src/MainFrameIntellij.form
+================================================
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="MainFrameIntellij">
+  <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="3" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="586" height="451"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <vspacer id="a1f57">
+        <constraints>
+          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false">
+            <minimum-size width="-1" height="25"/>
+          </grid>
+        </constraints>
+      </vspacer>
+      <hspacer id="5a667">
+        <constraints>
+          <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </hspacer>
+      <vspacer id="4bdb">
+        <constraints>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+        </constraints>
+      </vspacer>
+      <hspacer id="ac762">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false">
+            <preferred-size width="25" height="10"/>
+          </grid>
+        </constraints>
+      </hspacer>
+      <grid id="2bcf6" binding="myPanel" layout-manager="GridLayoutManager" row-count="5" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="415d7" class="javax.swing.JButton" binding="button">
+            <constraints>
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Button"/>
+            </properties>
+          </component>
+          <vspacer id="5985c">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+            </constraints>
+          </vspacer>
+          <component id="c0fcb" class="javax.swing.JTextPane" binding="textPane1" default-binding="true">
+            <constraints>
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                <preferred-size width="150" height="50"/>
+              </grid>
+            </constraints>
+            <properties/>
+          </component>
+          <component id="19d4b" class="javax.swing.JLabel" binding="label">
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Label"/>
+            </properties>
+          </component>
+          <vspacer id="257e0">
+            <constraints>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="1" anchor="1" fill="0" indent="0" use-parent-layout="false">
+                <minimum-size width="-1" height="25"/>
+              </grid>
+            </constraints>
+          </vspacer>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>
+
+
+================================================
+File: src/MainFrameIntellij.java
+================================================
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class MainFrameIntellij extends JFrame {
+    private JPanel mainPanel;
+    private JPanel myPanel;
+    private JTextField textField;
+    private JButton button = new JButton();
+    private JTextPane textPane1;
+    private JLabel label;
+
+    public MainFrameIntellij(String title) {
+        super(title);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setContentPane(mainPanel);
+        this.setVisible(true);
+        this.pack();
+
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(e.getSource() == button) {
+                    System.out.println("le boutton a ete press");
+                    String text = textField.getText();
+                    System.out.println(text);
+                }
+            }
+        });
+    }
+
+    public static void main(String[] args) {
+        JFrame jFrame = new MainFrameIntellij("Demo9");
+    }
+
+
+}
+
+
+================================================
+File: src/MainFrameManuel.java
+================================================
+import utils.MyFrame;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class MainFrameManuel extends JFrame implements ActionListener {
+
+    private JButton button;
+
+    public MainFrameManuel() {
+        MyFrame.buildCustomFrame(this);
+        button = MyFrame.createSmallSizeButton("button !", 100, 50);
+        JLabel label = MyFrame.createStandartLabel("label :", 100, 10);
+
+        this.add(button);
+        this.add(label);
+
+        addListeners();
+    }
+
+    private void addListeners() {
+        button.addActionListener(this);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == button) {
+            System.out.println(button.getText() + " pressed.");
+        }
+    }
+
+    public static void main(String[] args) {
+        JFrame myFrame = new MainFrameManuel();
+
+    }
+}
+
+
+
+================================================
+File: src/utils/MyFrame.java
+================================================
+package utils;
+
+import javax.swing.*;
+import java.awt.*;
+/**
+ * Classe regroupant des utilitaires pour l'affichage de l'interface graphique.
+ */
+Ne pas copier coller entierement, sans changement, le fichier dans votre projet (pour ne pas etre accuse de plagia).
+        Ce fichier sert seulement de code de depart pour tester la librairie swing de java. merci :)
+public class MyFrame {
+
+        /**
+         * Cree une fenetre de taille moyenne
+         * @param title titre de la fenetre
+         * @param frame panneau JFrame
+         */
+        public static void buildSmallSizeFrame(String title, JFrame frame) {
+            frame.setBackground(Style.BACKGROUND_STANDART_COLOR);
+            frame.setResizable(false);
+            frame.setTitle(title);
+            frame.setBounds(500, 350, 500, 250);
+            //frame.setBounds(400, 200, Style.MEDIUM_WIDTH,
+            //        Style.MEDIUM_HEIGHT);
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.getContentPane().setLayout(null);
+            frame.setVisible(true);
+        }
+
+        /**
+         * Cree une fenetre de petite taille
+         * @param frame panneau JFrame
+         */
+        public static void buildSmallSizeFrame (JFrame frame) {
+            frame.setBackground(Style.BACKGROUND_STANDART_COLOR);
+            frame.setResizable(false);
+            frame.setBounds(500, 350, 500, 250);
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.getContentPane().setLayout(null);
+            frame.setVisible(true);
+        }
+
+        /**
+         * Cree un panneau personnalise
+         * @param frame panneau JFrame
+         */
+        public static void buildCustomFrame(JFrame frame) {
+            frame.getContentPane().setBackground(new Color(238,238,238));
+            frame.setBounds(100, 100, 600, 400);
+            //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.getContentPane().setLayout(null);
+            frame.setVisible(true);
+        }
+
+        /**
+         * Cree un bouton de taille normale
+         *	@param x Horizontal position
+         *	@param y Vertical position
+         */
+        public static JButton createNormalSizeButton(String text, int x, int y) {
+            JButton jbutton = new JButton(text);
+            jbutton.setBackground(Style.BACKGROUND_STANDART_COLOR);
+            jbutton.setBounds(x, y, 188, 32);
+            return jbutton;
+        }
+
+        /**
+         * Cree un bouton avec surbrillance de taille normale
+         *	@param x Horizontal position
+         *	@param y Vertical position
+         */
+        public static JButton createNormalSizeHighlightButton(String text,int x,
+                                                              int y) {
+            JButton jbutton = new JButton(text);
+            jbutton.setBackground(SystemColor.controlHighlight);
+            jbutton.setBounds(x, y, 188, 32);
+            return jbutton;
+        }
+
+        /**
+         * Cree un bouton de petite taille
+         *	@param x Horizontal position
+         *	@param y Vertical position
+         */
+        public static JButton createSmallSizeButton(String text,int x, int y) {
+            JButton jbutton = new JButton(text);
+            jbutton.setBackground(Style.BACKGROUND_STANDART_COLOR);
+            jbutton.setBounds(x, y, 120, 25);
+            return jbutton;
+        }
+
+        /**
+         * Cree une etiquette standard
+         *	@param x Horizontal position
+         *	@param y Vertical position
+         */
+        public static JLabel createStandartLabel(String text, int x, int y ) {
+            JLabel jLabel = new JLabel(text);
+            jLabel.setVerticalAlignment(SwingConstants.TOP);
+            jLabel.setFont(Style.LABEL_FONT);
+            jLabel.setBounds(x, y, 600, 50);
+            return jLabel;
+        }
+
+        /**
+         * Cree une etiquette de titre
+         *	@param x Horizontal position
+         *	@param y Vertical position
+         */
+        public static JLabel createTitleLabel(String text, int x, int y ) {
+            JLabel jLabel = new JLabel(text);
+            jLabel.setFont(Style.LABEL_FONT_TITLE);
+            jLabel.setBounds(x, y, 114, 30);
+            return jLabel;
+        }
+
+        /**
+         * Cree le panneau lateral de MainWindow
+         */
+        public static Panel createLeftPanel() {
+            Panel panel = new Panel();
+            panel.setBackground(Style.BACKGROUND_STANDART_COLOR);
+            panel.setBounds(21, 30, 222, 636);
+            panel.setLayout(null);
+            return panel;
+        }
+        /**
+         * Cree un panneau de taille moyenne
+         */
+        public static JPanel createMediumPanel() {
+            JPanel panel = new JPanel();
+            panel.setBackground(Style.BACKGROUND_STANDART_COLOR);
+            panel.setBounds(0, 0, Style.MEDIUM_WIDTH, Style.MEDIUM_HEIGHT);
+            return panel;
+        }
+}
+
+
+
+================================================
+File: src/utils/Style.java
+================================================
+package utils;
+
+import java.awt.*;
+
+Ne pas copier coller entierement, sans changement, le fichier dans votre projet (pour ne pas etre accuse de plagia).
+        Ce fichier sert seulement de code de depart pour tester la librairie swing de java. merci :)
+public class Style {
+
+    public static final Font LABEL_FONT = new Font("Dialog", Font.BOLD, 15);
+    public static final Font LABEL_FONT_TITLE = new Font("Dialog", Font.BOLD, 13);
+    public static final int BUTTON_STANDART_WIDTH = 188;
+    public static final int BUTTON_STANDART_HEIGHT = 32;
+    public static final Color BUTTON_STANDART_COLOR = new Color(245, 245, 245);
+    public static final Color BACKGROUND_STANDART_COLOR = new Color(245, 245, 245);
+    public static final Color BUTTON_STANDART_COLOR_HIGHTLIGHT = SystemColor.controlHighlight;
+
+    public static final int MEDIUM_WIDTH = 750;
+    public static final int MEDIUM_HEIGHT= 400;
+
+    public static Style BUTTON_STYLE = new Style(BUTTON_STANDART_WIDTH,BUTTON_STANDART_HEIGHT,BUTTON_STANDART_COLOR);
+    public static Style BUTTON_STYLE_HIGHTLIGHT = new Style(BUTTON_STANDART_WIDTH,BUTTON_STANDART_HEIGHT,
+            BUTTON_STANDART_COLOR_HIGHTLIGHT);
+
+    private int width;
+    private int height;
+    private int textSize;
+    private Font font;
+    private Color color;
+    private Color hoverColor;
+    private Color notAvailableColor;
+
+    public Style(int width,int height,Color color) {
+        this.width=width;
+        this.height=height;
+        this.color=color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+    public Color getColor() {
+        return color;
+    }
+    public int getWidth() {
+        return width;
+    }
+    public int getHeight() {
+        return height;
+    }
+}
+
+
+

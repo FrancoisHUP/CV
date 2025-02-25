@@ -1,0 +1,1482 @@
+### Directory Structure ###
+Directory structure:
+└── francoishup-cv/
+    ├── docker-compose.yml
+    └── cv-frontend/
+        ├── README.md
+        ├── dockerfile
+        ├── eslint.config.js
+        ├── index.html
+        ├── package-lock.json
+        ├── package.json
+        ├── tsconfig.app.json
+        ├── tsconfig.json
+        ├── tsconfig.node.json
+        ├── vite.config.ts
+        ├── .gitignore
+        ├── public/
+        │   └── logo.webp
+        └── src/
+            ├── App.css
+            ├── App.tsx
+            ├── index.css
+            ├── main.tsx
+            ├── vite-env.d.ts
+            ├── assets/
+            ├── components/
+            │   ├── ChatWindow.tsx
+            │   ├── Connections.tsx
+            │   ├── ControlsOverlay.tsx
+            │   ├── Fairy.tsx
+            │   ├── MagneticLink.tsx
+            │   ├── NeuronScene.tsx
+            │   ├── Node.tsx
+            │   └── Particles.tsx
+            └── pages/
+                ├── About.tsx
+                ├── Blog.tsx
+                ├── Home.tsx
+                └── Projects.tsx
+
+
+### Code Content ###
+================================================
+File: docker-compose.yml
+================================================
+version: '3.8'
+
+services:
+  frontend:
+    build: 
+      context: cv-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    # restart: always
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+================================================
+File: cv-frontend/README.md
+================================================
+# React + TypeScript + Vite
+
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+
+Currently, two official plugins are available:
+
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+
+- Configure the top-level `parserOptions` property like this:
+
+```js
+export default tseslint.config({
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
+```
+
+- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
+- Optionally add `...tseslint.configs.stylisticTypeChecked`
+- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+
+```js
+// eslint.config.js
+import react from 'eslint-plugin-react'
+
+export default tseslint.config({
+  // Set the react version
+  settings: { react: { version: '18.3' } },
+  plugins: {
+    // Add the react plugin
+    react,
+  },
+  rules: {
+    // other rules...
+    // Enable its recommended rules
+    ...react.configs.recommended.rules,
+    ...react.configs['jsx-runtime'].rules,
+  },
+})
+```
+
+
+================================================
+File: cv-frontend/dockerfile
+================================================
+# Use an official Node.js runtime as the base image
+FROM node:18-alpine AS build
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the entire project to the container
+COPY . .
+
+# Build the React app
+RUN npm run build
+
+# Use Nginx to serve the built files
+FROM nginx:alpine
+
+# Copy built files from the build stage
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Expose port 80
+EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
+
+================================================
+File: cv-frontend/eslint.config.js
+================================================
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import tseslint from 'typescript-eslint'
+
+export default tseslint.config(
+  { ignores: ['dist'] },
+  {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      ...reactHooks.configs.recommended.rules,
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+    },
+  },
+)
+
+
+================================================
+File: cv-frontend/index.html
+================================================
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/logo.webp" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FrankHero</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
+
+================================================
+File: cv-frontend/package.json
+================================================
+{
+  "name": "cv-frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.0.0",
+    "@react-three/fiber": "^9.0.4",
+    "@tailwindcss/postcss": "^4.0.8",
+    "@tailwindcss/vite": "^4.0.8",
+    "framer-motion": "^12.4.7",
+    "gsap": "^3.12.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.2.0",
+    "socket.io-client": "^4.8.1",
+    "three": "^0.173.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "@types/node": "^22.13.5",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.19.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.18",
+    "globals": "^15.14.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.0.8",
+    "typescript": "~5.7.2",
+    "typescript-eslint": "^8.22.0",
+    "vite": "^6.1.0"
+  }
+}
+
+
+================================================
+File: cv-frontend/tsconfig.app.json
+================================================
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["src"]
+}
+
+
+================================================
+File: cv-frontend/tsconfig.json
+================================================
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}
+
+
+================================================
+File: cv-frontend/tsconfig.node.json
+================================================
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "target": "ES2022",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["vite.config.ts"]
+}
+
+
+================================================
+File: cv-frontend/vite.config.ts
+================================================
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from "@tailwindcss/vite";
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react(),tailwindcss(),],
+})
+
+
+================================================
+File: cv-frontend/.gitignore
+================================================
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+
+================================================
+File: cv-frontend/src/App.css
+================================================
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+
+================================================
+File: cv-frontend/src/App.tsx
+================================================
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Projects from "./pages/Projects";
+import About from "./pages/About";
+import Blog from "./pages/Blog";
+import MagneticLink from "./components/MagneticLink";
+
+const App = () => {
+  return (
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* Navigation Bar */}
+      <nav className="flex items-center justify-center gap-10 p-4">
+        <MagneticLink to="/">HOME</MagneticLink>
+        {/* <div className="align-center">-</div> */}
+        <MagneticLink to="/projects">PROJECTS</MagneticLink>
+        {/* <div className="align-center">-</div> */}
+        <MagneticLink to="/blog">BLOGS</MagneticLink>
+        {/* <div className="align-center">-</div> */}
+        <MagneticLink to="/about">ABOUT ME</MagneticLink>
+      </nav>
+
+      {/* Route Switching */}
+      <div style={{ flexGrow: 1, width: "100vw", height: "100%" }}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/blog" element={<Blog />} />
+        </Routes>
+      </div>
+    </div>
+  );
+};
+
+export default App;
+
+
+================================================
+File: cv-frontend/src/index.css
+================================================
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Sigmar&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=Sigmar&display=swap");
+
+@import "tailwindcss";
+
+@theme {
+  --font-inconsolata: "Inconsolata", sans-serif; 
+}
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+
+body, canvas {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+canvas {
+  background-color: #242424;
+  outline: none !important;
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* @media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+} */
+
+
+================================================
+File: cv-frontend/src/main.tsx
+================================================
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom"; // Import BrowserRouter
+import "./index.css";
+import App from "./App.tsx";
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </StrictMode>
+);
+
+
+================================================
+File: cv-frontend/src/vite-env.d.ts
+================================================
+/// <reference types="vite/client" />
+
+
+================================================
+File: cv-frontend/src/components/ChatWindow.tsx
+================================================
+import { useState, useRef, useEffect } from "react";
+
+const ChatWindow = ({ onClose }: { onClose: () => void }) => {
+  const [input, setInput] = useState("");
+  const [response, setResponse] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-expand textarea but keep max height with scrolling
+  useEffect(() => {
+    if (textareaRef.current) {
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 50);
+      textareaRef.current.style.height = "40px"; // Reset height
+      textareaRef.current.style.height = `${Math.min(
+        textareaRef.current.scrollHeight,
+        400
+      )}px`; // Expand up to max height
+    }
+  }, [input]);
+  // Listen for key events when the AI response is visible.
+  useEffect(() => {
+    if (response) {
+      const handleResponseKeyDown = (event: KeyboardEvent) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          // Dismiss the AI response and re-enable the text area
+          setResponse(null);
+          setTimeout(() => {
+            textareaRef.current?.focus();
+          }, 0);
+        }
+        if (event.key === "Escape") {
+          onClose();
+        }
+      };
+
+      window.addEventListener("keydown", handleResponseKeyDown);
+      return () => {
+        window.removeEventListener("keydown", handleResponseKeyDown);
+      };
+    }
+  }, [response, onClose]);
+
+  // Handle user input submission
+  const handleSend = () => {
+    if (!input.trim()) {
+      onClose(); // If input is empty, close the chat
+      return;
+    }
+
+    setResponse("I'm thinking..."); // Fake AI response
+    setInput("");
+
+    setTimeout(() => {
+      setResponse("This is a fake AI response."); // Simulate AI response after delay
+    }, 1000);
+  };
+
+  return (
+    <div
+      className="absolute bottom-5 left-1/2 transform -translate-x-1/2 w-2/3 p-3 flex items-center"
+      onKeyDown={(e) => e.stopPropagation()}
+    >
+      {/* If AI response is present, show it. Otherwise, show input box */}
+      {response ? (
+        <div
+          className="text-white px-4 py-2 rounded-3xl max-w-full"
+          onClick={onClose}
+        >
+          {response}
+        </div>
+      ) : (
+        <textarea
+          ref={textareaRef}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            e.stopPropagation();
+            if (e.key === "Escape") {
+              onClose();
+            }
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              if (!input.trim()) {
+                console.log("Should close");
+                onClose(); // Closes chat if input is empty
+              } else {
+                console.log("Should Send", input);
+                handleSend(); // Sends message if input has content
+              }
+            }
+          }}
+          className="flex-grow text-white px-4 py-2 rounded-3xl focus:outline-none resize-none overflow-y-auto"
+          placeholder="Ask me anything..."
+          rows={1}
+          style={{
+            maxHeight: "400px", // Max height for scrolling
+            minHeight: "40px", // Minimum height
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+export default ChatWindow;
+
+
+================================================
+File: cv-frontend/src/components/Connections.tsx
+================================================
+import { useRef, useMemo } from "react";
+import { useFrame } from "@react-three/fiber";
+import { Cylinder } from "@react-three/drei";
+import * as THREE from "three";
+
+const Connection = ({
+  start,
+  end,
+}: {
+  start: [number, number, number];
+  end: [number, number, number];
+}) => {
+  const ref = useRef<THREE.Mesh>(null);
+  const startVec = new THREE.Vector3(...start);
+  const endVec = new THREE.Vector3(...end);
+  const midPoint = startVec.clone().lerp(endVec, 0.5);
+  const direction = endVec.clone().sub(startVec);
+  const length = direction.length();
+  direction.normalize();
+
+  const quaternion = new THREE.Quaternion().setFromUnitVectors(
+    new THREE.Vector3(0, 1, 0),
+    direction
+  );
+
+  const material = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms: {
+          time: { value: 0 },
+        },
+        vertexShader: `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          uniform float time;
+          varying vec2 vUv;
+          void main() {
+            float brightness = abs(sin(vUv.y * 10.0 + time * 3.0)); // Creates moving pulses
+            gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0) * brightness;
+          }
+        `,
+      }),
+    []
+  );
+
+  useFrame(({ clock }) => {
+    if (ref.current) {
+      material.uniforms.time.value = clock.getElapsedTime();
+    }
+  });
+
+  return (
+    <Cylinder
+      ref={ref}
+      args={[0.01, 0.01, length, 16]}
+      position={midPoint.toArray()}
+      quaternion={quaternion}
+    >
+      <primitive attach="material" object={material} />
+    </Cylinder>
+  );
+};
+
+export default Connection;
+
+
+================================================
+File: cv-frontend/src/components/ControlsOverlay.tsx
+================================================
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+
+const ControlsOverlay = () => {
+  const [isVisible, setIsVisible] = useState(true); // Controls visibility
+  const [bubbleVisible, setBubbleVisible] = useState(false); // Bubble visibility
+  const [isDragging, setIsDragging] = useState(false); // Detect if dragging
+  const [pressedKey, setPressedKey] = useState<string | null>(null); // Detect key press
+
+  useEffect(() => {
+    let mouseDown = false;
+    let startX = 0;
+    let startY = 0;
+
+    const handleMouseDown = (event: MouseEvent) => {
+      mouseDown = true;
+      startX = event.clientX;
+      startY = event.clientY;
+    };
+
+    const handleMouseMove = (event: MouseEvent) => {
+      if (mouseDown) {
+        const deltaX = Math.abs(event.clientX - startX);
+        const deltaY = Math.abs(event.clientY - startY);
+
+        if (deltaX > 10 || deltaY > 10) {
+          setIsDragging(true);
+        }
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (isDragging) {
+        setIsVisible(false);
+        setBubbleVisible(true);
+      }
+      setIsDragging(false);
+      mouseDown = false;
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (["w", "a", "s", "d"].includes(event.key.toLowerCase())) {
+        setPressedKey(event.key.toLowerCase());
+      }
+    };
+
+    const handleKeyUp = () => {
+      setPressedKey(null);
+    };
+
+    window.addEventListener("mousedown", handleMouseDown);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("mousedown", handleMouseDown);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [isDragging]);
+
+  return (
+    <>
+      {isVisible && (
+        <div className="absolute bottom-10 right-10 flex  flex-row space-x-6 bg-black p-4 rounded-lg opacity-70 shadow-lg">
+          {/* Close Button */}
+          <button
+            className="relative text-white px-2 py-1 rounded"
+            onClick={() => {
+              setIsVisible(false);
+              setBubbleVisible(true);
+            }}
+          >
+            ✖ Close
+          </button>
+          {/* Mouse Drag Effect - Now on the LEFT */}
+          <div className="relative flex flex-col items-center">
+            <motion.div
+              animate={{
+                x: ["0px", "8px", "0px", "-8px", "0px"],
+                y: ["0px", "4px", "8px", "4px", "0px"],
+                rotate: [0, 5, 0, -5, 0],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="w-16 h-16 bg-white border-2 border-gray-700 rounded-full flex items-center justify-center shadow-md"
+            >
+              🖱️
+            </motion.div>
+            <p className="text-white text-sm mt-2">Drag to Look Around</p>
+          </div>
+
+          {/* WASD Keyboard UI - Now on the RIGHT */}
+          <div className="relative flex flex-col items-center">
+            <motion.div
+              animate={{ scale: pressedKey === "w" ? 1.2 : 1 }}
+              className="w-12 h-12 bg-gray-100 text-black flex items-center justify-center rounded-md"
+            >
+              W
+            </motion.div>
+            <div className="flex space-x-2 mt-1">
+              {["A", "S", "D"].map((key) => (
+                <motion.div
+                  key={key}
+                  animate={{
+                    scale: pressedKey === key.toLowerCase() ? 1.2 : 1,
+                  }}
+                  className="w-12 h-12 bg-gray-100 text-black flex items-center justify-center rounded-md"
+                >
+                  {key}
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bubble Info Button */}
+      {bubbleVisible && (
+        <div className="absolute bottom-10 right-10">
+          <motion.button
+            className="w-12 h-12 text-white rounded-full shadow-lg flex items-center justify-center"
+            onClick={() => {
+              setIsVisible(true);
+              setBubbleVisible(false);
+            }}
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            ❔
+          </motion.button>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default ControlsOverlay;
+
+
+================================================
+File: cv-frontend/src/components/Fairy.tsx
+================================================
+import { useRef, useState, useEffect } from "react";
+import { Sphere } from "@react-three/drei";
+import { useFrame, useThree } from "@react-three/fiber";
+import gsap from "gsap";
+import * as THREE from "three";
+
+// const HEARING_RANGE = 10; // Maximum distance at which the fairy can hear the user
+const WANDER_RADIUS = 5; // How far the fairy can wander from its start position
+const MOVE_SPEED = 0.02; // Slow movement for smooth transitions
+const WANDER_INTERVAL = 3; // Interval for direction change
+const RETURN_SPEED = 1.5; // Speed when returning to wandering position
+const CHAT_DISTANCE = 2; // Distance in front of the camera where the fairy appears
+
+const Fairy = ({
+  onChatOpen,
+  isChatOpen,
+}: {
+  onChatOpen: () => void;
+  isChatOpen: boolean;
+}) => {
+  const ref = useRef<THREE.Mesh>(null);
+  const { camera } = useThree();
+  const [originalPosition] = useState(new THREE.Vector3(3, 2, -3)); // Fairy's start position
+  const [wandering, setWandering] = useState(true);
+  const [wanderDirection, setWanderDirection] = useState(new THREE.Vector3());
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && ref.current && !isChatOpen) {
+        const userPos = new THREE.Vector3().copy(camera.position);
+        const forwardDirection = new THREE.Vector3();
+        camera.getWorldDirection(forwardDirection); // Get where the camera is looking
+
+        // Calculate new position directly in front of the user
+        const targetPos = userPos.add(
+          forwardDirection.multiplyScalar(CHAT_DISTANCE)
+        );
+
+        // Move fairy to this new position
+        setWandering(false);
+        gsap.to(ref.current.position, {
+          x: targetPos.x,
+          y: targetPos.y,
+          z: targetPos.z,
+          duration: 1.5,
+          ease: "power2.out",
+        });
+
+        onChatOpen(); // Open chat
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [camera, onChatOpen, isChatOpen]);
+
+  useEffect(() => {
+    if (!isChatOpen && !wandering) {
+      // ✅ When chat closes, return to original position and resume wandering
+      gsap.to(ref.current && ref.current?.position, {
+        x: originalPosition.x,
+        y: originalPosition.y,
+        z: originalPosition.z,
+        duration: RETURN_SPEED,
+        ease: "power2.out",
+        onComplete: () => setWandering(true),
+      });
+    }
+  }, [isChatOpen]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (wandering && !isChatOpen) {
+        const newDirection = new THREE.Vector3(
+          (Math.random() - 0.5) * MOVE_SPEED,
+          (Math.random() - 0.2) * MOVE_SPEED,
+          (Math.random() - 0.5) * MOVE_SPEED
+        );
+        setWanderDirection(newDirection);
+      }
+    }, WANDER_INTERVAL * 1000);
+
+    return () => clearInterval(interval);
+  }, [wandering, isChatOpen]);
+
+  useFrame(() => {
+    if (wandering && !isChatOpen && ref.current) {
+      ref.current.position.add(wanderDirection);
+
+      if (ref.current.position.distanceTo(originalPosition) > WANDER_RADIUS) {
+        gsap.to(ref.current.position, {
+          x: originalPosition.x,
+          y: originalPosition.y,
+          z: originalPosition.z,
+          duration: 1.5,
+          ease: "power2.out",
+        });
+      }
+    }
+  });
+
+  return (
+    <Sphere ref={ref} args={[0.2, 16, 16]} position={originalPosition}>
+      <meshStandardMaterial
+        color="gold"
+        emissive="yellow"
+        emissiveIntensity={1.5}
+      />
+    </Sphere>
+  );
+};
+
+export default Fairy;
+
+
+================================================
+File: cv-frontend/src/components/MagneticLink.tsx
+================================================
+import { useRef } from "react";
+import { Link } from "react-router-dom";
+import gsap from "gsap";
+
+interface MagneticLinkProps {
+  to: string;
+  children: React.ReactNode;
+}
+
+const MagneticLink: React.FC<MagneticLinkProps> = ({ to, children }) => {
+  const linkRef = useRef<HTMLAnchorElement | null>(null);
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    const link = linkRef.current;
+    if (!link) return;
+
+    const { left, top, width, height } = link.getBoundingClientRect();
+    const x = event.clientX - (left + width / 2);
+    const y = event.clientY - (top + height / 2);
+
+    gsap.to(link, {
+      x: x * 0.2, // Small pull effect
+      y: y * 0.2,
+      scale: 1.2,
+      color: "white",
+      duration: 0.3,
+      ease: "power2.out",
+    });
+  };
+
+  const handleMouseLeave = () => {
+    if (!linkRef.current) return;
+
+    gsap.to(linkRef.current, {
+      x: 0,
+      y: 0,
+      scale: 1,
+      color: "rgba(255, 255, 255, 0.75)",
+      duration: 0.5,
+      ease: "power2.out",
+    });
+  };
+
+  return (
+    <Link
+      to={to}
+      ref={linkRef}
+      className="font-inconsolata tracking-widest text-xl relative"
+      style={{
+        textDecoration: "none",
+        color: "rgba(255, 255, 255, 0.75)",
+        display: "inline-block",
+        transition: "transform 0.2s ease-out",
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {children}
+    </Link>
+  );
+};
+
+export default MagneticLink;
+
+
+================================================
+File: cv-frontend/src/components/NeuronScene.tsx
+================================================
+import { useRef, useState, useEffect } from "react";
+import { Canvas } from "@react-three/fiber";
+import { FlyControls } from "@react-three/drei";
+import ControlsOverlay from "./ControlsOverlay";
+import Particles from "./Particles";
+import Fairy from "./Fairy";
+import ChatWindow from "./ChatWindow";
+import Node from "./Node";
+import Connection from "./Connections";
+
+type Project = {
+  id: number;
+  title: string;
+  position: [number, number, number];
+  link: string;
+};
+
+type Connection = {
+  from: number;
+  to: number;
+};
+
+const projects: Project[] = [
+  { id: 1, title: "Project A", position: [2, 1, 0], link: "/project-a" },
+  { id: 2, title: "Project B", position: [-2, -1, 1], link: "/project-b" },
+  { id: 3, title: "Project C", position: [1, -2, -1], link: "/project-c" },
+  { id: 4, title: "Project D", position: [-1, 2, -1], link: "/project-d" },
+];
+
+const connections: Connection[] = [
+  { from: 1, to: 2 },
+  { from: 2, to: 3 },
+  { from: 3, to: 1 },
+  { from: 1, to: 4 },
+  { from: 2, to: 4 },
+];
+
+const NeuronScene = () => {
+  const [speed, setSpeed] = useState(10); // Default speed
+  const [chatOpen, setChatOpen] = useState(false);
+  const controlsRef = useRef<React.ElementRef<typeof FlyControls> | null>(null);
+  // Reference for FlyControls
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && !chatOpen) {
+        setChatOpen(true);
+      }
+      if (event.key === "Escape") {
+        setChatOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [chatOpen]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (chatOpen) {
+        return;
+      }
+      if (event.shiftKey) {
+        setSpeed(30);
+      }
+    };
+
+    const handleKeyUp = () => {
+      if (!chatOpen) {
+        setSpeed(10);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [chatOpen]);
+
+  useEffect(() => {
+    if (controlsRef.current) {
+      // Force stop movement by resetting velocity
+      if (chatOpen) {
+        controlsRef.current.movementSpeed = 0;
+      } else {
+        controlsRef.current.movementSpeed = speed;
+      }
+    }
+  }, [chatOpen, speed]);
+
+  return (
+    <div
+      style={{ width: "100%", height: "100%" }}
+      // className="relative h-screen w-screen"
+    >
+      <Canvas camera={{ position: [0, 0, 10], fov: 100 }}>
+        {/* Lighting */}
+        <ambientLight intensity={0.5} />
+        <pointLight position={[5, 5, 5]} intensity={1} />
+
+        <Particles count={1000} />
+        <Fairy onChatOpen={() => setChatOpen(true)} isChatOpen={chatOpen} />
+
+        {/* Central Neuron */}
+        {/* <Sphere args={[0.6, 32, 32]}>
+          <meshStandardMaterial
+            color="white"
+            emissive="white"
+            emissiveIntensity={0.5}
+          />
+        </Sphere> */}
+        {/* Project Nodes */}
+        {projects.map((project, index) => (
+          <Node
+            key={index}
+            position={project.position}
+            title={project.title}
+            link={project.link}
+          />
+        ))}
+        {connections.map((conn, index) => {
+          const fromNode = projects.find((p) => p.id === conn.from);
+          const toNode = projects.find((p) => p.id === conn.to);
+
+          return fromNode && toNode ? (
+            <Connection
+              key={index}
+              start={fromNode.position}
+              end={toNode.position}
+            />
+          ) : null;
+        })}
+        {/* Camera Controls */}
+        <FlyControls
+          ref={controlsRef}
+          movementSpeed={speed}
+          rollSpeed={2}
+          dragToLook
+        />
+      </Canvas>
+      {chatOpen && (
+        <ChatWindow
+          onClose={() => {
+            setChatOpen(false);
+          }}
+        />
+      )}
+      <ControlsOverlay />
+    </div>
+  );
+};
+
+export default NeuronScene;
+
+
+================================================
+File: cv-frontend/src/components/Node.tsx
+================================================
+import { useRef, useState, useEffect } from "react";
+import { Sphere, Html } from "@react-three/drei";
+import gsap from "gsap";
+import * as THREE from "three";
+
+const Node = ({
+  position,
+  title,
+  link,
+}: {
+  position: [number, number, number];
+  title: string;
+  link: string;
+}) => {
+  const coreRef = useRef<THREE.Mesh>(null);
+  const shellRef = useRef<THREE.Mesh>(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const hoverTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Animate scale smoothly
+  useEffect(() => {
+    if (coreRef.current) {
+      gsap.to(coreRef.current.scale, {
+        x: isHovered ? 1.4 : 1,
+        y: isHovered ? 1.4 : 1,
+        z: isHovered ? 1.4 : 1,
+        duration: 0.3,
+        ease: "power1.out",
+      });
+    }
+  }, [isHovered]);
+
+  // Handle hover start (with small delay to prevent flickering)
+  const handlePointerOver = () => {
+    if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+    hoverTimeout.current = setTimeout(() => {
+      setIsHovered(true);
+    }, 100);
+  };
+
+  // Handle hover end (with delay to prevent sudden disappearance)
+  const handlePointerOut = () => {
+    if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+    hoverTimeout.current = setTimeout(() => {
+      setIsHovered(false);
+    }, 200);
+  };
+
+  return (
+    <>
+      {/* Glowing Core */}
+      <Sphere
+        ref={coreRef}
+        position={position}
+        args={[0.1, 32, 32]}
+        onPointerOver={handlePointerOver}
+        onPointerOut={handlePointerOut}
+        onClick={() => (window.location.href = link)}
+      >
+        <meshStandardMaterial
+          color="cyan"
+          emissive="cyan"
+          emissiveIntensity={1}
+        />
+      </Sphere>
+
+      {/* Transparent Shell */}
+      <Sphere ref={shellRef} position={position} args={[0.3, 32, 32]}>
+        <meshPhysicalMaterial
+          transparent
+          opacity={0.4}
+          roughness={0.1}
+          clearcoat={1}
+          reflectivity={1}
+          transmission={0.9}
+        />
+      </Sphere>
+
+      {/* Display text when hovered (prevents flicker) */}
+      {isHovered && (
+        <Html position={[position[0], position[1] + 0.5, position[2]]} center>
+          <div
+            className="bg-gray-800 text-white p-2 text-sm rounded shadow-lg opacity-90 transition-opacity duration-200 ease-in-out"
+            style={{ pointerEvents: "none" }}
+          >
+            {title}
+          </div>
+        </Html>
+      )}
+    </>
+  );
+};
+
+export default Node;
+
+
+================================================
+File: cv-frontend/src/components/Particles.tsx
+================================================
+import { useRef, useEffect } from "react";
+import { useFrame } from "@react-three/fiber";
+import * as THREE from "three";
+
+const Particles = ({ count = 100 }) => {
+  const meshRef = useRef<THREE.Points>(null);
+  const particles = useRef(new Float32Array(count * 3)).current;
+  const velocities = useRef(new Float32Array(count * 3)).current;
+
+  // Initialize positions and random movement velocities
+  useEffect(() => {
+    for (let i = 0; i < count * 3; i++) {
+      particles[i] = (Math.random() - 0.5) * 300; // More spread out
+      velocities[i] = (Math.random() - 0.5) * 0.005; // Slow movement
+    }
+
+    // Assign the generated positions to the buffer geometry
+    if (meshRef.current) {
+      meshRef.current.geometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(particles, 3)
+      );
+    }
+  }, []);
+
+  // Animate particles
+  useFrame(() => {
+    if (meshRef.current) {
+      const positions = meshRef.current.geometry.attributes.position
+        .array as Float32Array;
+      for (let i = 0; i < count * 3; i++) {
+        positions[i] += velocities[i]; // Move particles slowly
+
+        // Bounce effect if particles reach a limit
+        if (Math.abs(positions[i]) > 20) velocities[i] *= -1;
+      }
+
+      meshRef.current.geometry.attributes.position.needsUpdate = true;
+    }
+  });
+
+  return (
+    <points ref={meshRef}>
+      <bufferGeometry />
+      <pointsMaterial
+        color="white"
+        size={0.1} // Slightly bigger
+        sizeAttenuation
+        transparent
+        opacity={0.5} // Less opaque
+      />
+    </points>
+  );
+};
+
+export default Particles;
+
+
+================================================
+File: cv-frontend/src/pages/About.tsx
+================================================
+const About = () => {
+  return (
+    <div style={{ padding: "20px" }}>
+      <h1>About Me</h1>
+      <p>Information about me.</p>
+    </div>
+  );
+};
+
+export default About;
+
+
+================================================
+File: cv-frontend/src/pages/Blog.tsx
+================================================
+const Blog = () => {
+  return (
+    <div style={{ padding: "20px" }}>
+      <h1>Blog</h1>
+      <p>My latest blog posts.</p>
+    </div>
+  );
+};
+
+export default Blog;
+
+
+================================================
+File: cv-frontend/src/pages/Home.tsx
+================================================
+import NeuronScene from "../components/NeuronScene"; // Ensure correct import path
+
+const Home = () => {
+  return (
+    <div style={{ width: "100vw", height: "calc(100vh - 100px)" }}>
+      <NeuronScene />
+    </div>
+  );
+};
+
+export default Home;
+
+
+================================================
+File: cv-frontend/src/pages/Projects.tsx
+================================================
+const Projects = () => {
+  return (
+    <div style={{ padding: "20px" }}>
+      <h1>Projects</h1>
+      <p>Here are my projects.</p>
+    </div>
+  );
+};
+
+export default Projects;
+
+
+

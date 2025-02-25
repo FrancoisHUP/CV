@@ -1,0 +1,5191 @@
+### Directory Structure ###
+Directory structure:
+└── francoishup-eps/
+    ├── README.md
+    ├── babel.config.js
+    ├── firebase.json
+    ├── firestore.indexes.json
+    ├── firestore.rules
+    ├── package.json
+    ├── vue.config.js
+    ├── webpack.config.js
+    ├── public/
+    │   └── index.html
+    ├── src/
+    │   ├── App.vue
+    │   ├── main.js
+    │   ├── Router/
+    │   │   └── index.js
+    │   ├── Views/
+    │   │   ├── RecupererPassword.vue
+    │   │   ├── createaccount.vue
+    │   │   ├── login.vue
+    │   │   └── profil.vue
+    │   ├── assets/
+    │   ├── components/
+    │   │   ├── actualite.vue
+    │   │   ├── affichageComment.vue
+    │   │   ├── affichageNotification.vue
+    │   │   ├── affichageProfil.vue
+    │   │   ├── affichageTache.vue
+    │   │   ├── barPhoto.vue
+    │   │   ├── menu.vue
+    │   │   ├── modifierTache.vue
+    │   │   ├── posterIdee.vue
+    │   │   └── toolbar.vue
+    │   ├── images/
+    │   ├── plugins/
+    │   │   └── vuetify.js
+    │   └── scripts/
+    │       ├── abonnement.js
+    │       ├── authentification.js
+    │       ├── commentaire.js
+    │       ├── dictionnaire.js
+    │       ├── favoris.js
+    │       ├── fileManager.js
+    │       ├── firebase.js
+    │       ├── like.js
+    │       ├── notification.js
+    │       ├── profil.js
+    │       ├── tache.js
+    │       └── utils.js
+    └── test/
+        └── fbSecurityRules.test.js
+
+
+### Code Content ###
+================================================
+File: README.md
+================================================
+# my-app
+
+## Project setup
+```
+npm install
+```
+
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
+
+### Compiles and minifies for production
+```
+npm run build
+```
+
+### Lints and fixes files
+```
+npm run lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
+
+### Test login user
+
+login : test@mail.com
+password : password 
+
+================================================
+File: babel.config.js
+================================================
+module.exports = {
+  presets: [
+    '@vue/cli-plugin-babel/preset'
+  ]
+}
+
+
+================================================
+File: firebase.json
+================================================
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "emulators": {
+    "firestore": {
+      "port": 8080
+    },
+    "ui": {
+      "enabled": true
+    }
+  }
+}
+
+
+================================================
+File: firestore.indexes.json
+================================================
+{
+  "indexes": [],
+  "fieldOverrides": []
+}
+
+
+================================================
+File: firestore.rules
+================================================
+rules_version = '2';
+service cloud.firestore {
+  
+  function userIsModerator(){
+    return request.auth.token.isModerator == true;
+  }
+
+  function documentFieldCheckout(requiredFields,optionnalFields) {
+    let allFields = requiredFields.concat(optionnalFields);
+    return request.resource.data.keys().hasAll(requiredFields) && 
+    request.resource.data.keys().hasOnly(allFields);
+  } 
+
+  function editOnlyChangesFields(allowedFields) {
+    let affectedKeys = request.resource.data.diff(resource.data).affectedKeys();
+    return affectedKeys.hasOnly(allowedFields);
+  }
+
+  match /databases/{database}/documents {
+
+    match /{document=**} {
+      allow read, write, update, create : if true;
+    }
+    
+    match /readonly/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /users/{userId} {
+      allow write: if (request.auth.uid == userId);
+    }
+    match /posts/{postId} {
+      
+      function postHasAllRequiredFields() {
+        let requiredFields = ["authorId","visibility", "content", "headline"];
+        return (request.resource.data.keys().hasAll(requiredFields));
+      }
+
+      function postHasOnlyAllowFields() {
+        let requiredFields = ["authorId", "visibility", "content", "headline"];
+        let optionnalFields = [ "photo", "tags", "location"];
+        let allFields = requiredFields.concat(optionnalFields);
+        return request.resource.data.keys().hasOnly(allFields);
+      }
+      
+
+      allow read: if (resource.data.visibility == "public") ||
+      (resource.data.authorId == request.auth.uid);
+      allow update: if (resource.data.authorId == request.auth.uid)
+      //&& editOnlyChangesFields("visibility", "content")
+      ;
+      allow create: if (request.resource.data.authorId == request.auth.uid) &&
+      documentFieldCheckout(["authorId","visibility", "content", "headline"],[ "photo", "tags", "location"]);
+    }
+  }
+}
+
+================================================
+File: package.json
+================================================
+{
+  "name": "package",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "openTestServer": "firebase emulators:start",
+    "test": "mocha --reporter spec --exit",
+    "bundle": "webpack --mode=development",
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^4.15.1",
+    "core-js": "^3.6.5",
+    "firebase": "^9.6.10",
+    "firebase-tools": "^10.4.1",
+    "vue": "^2.6.11",
+    "vue-material-design-icons": "^5.0.0",
+    "vue-router": "^3.2.0",
+    "vue2-editor": "^2.10.3",
+    "vuetify": "^2.4.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.16",
+    "@babel/eslint-parser": "^7.12.16",
+    "@firebase/testing": "^0.20.11",
+    "@vue/cli-plugin-babel": "^5.0.1",
+    "@vue/cli-plugin-eslint": "^5.0.1",
+    "@vue/cli-service": "^5.0.1",
+    "chai": "^4.3.6",
+    "eslint": "^7.32.0",
+    "eslint-plugin-vue": "^8.0.3",
+    "firebase-functions-test": "^0.3.3",
+    "mocha": "^9.2.2",
+    "sass": "~1.32.0",
+    "sass-loader": "^10.0.0",
+    "vue-cli-plugin-vuetify": "^2.4.7",
+    "vue-template-compiler": "^2.6.11",
+    "vuetify-loader": "^1.7.0",
+    "webpack-cli": "^4.9.2"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "@babel/eslint-parser"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "description": "## Project setup ``` npm install ```",
+  "main": "babel.config.js",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlab.info.uqam.ca/adeoti.ibrahim_adedjouma/epsideas.git"
+  },
+  "author": "",
+  "license": "ISC"
+}
+
+
+================================================
+File: vue.config.js
+================================================
+module.exports = {
+  transpileDependencies: [
+    'vuetify'
+  ]
+}
+
+
+================================================
+File: webpack.config.js
+================================================
+const path = require('path');
+
+module.exports = {
+  // The entry point file described above
+  entry: './src/index.js',
+  // The location of the build folder described above
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js'
+  },
+  // Optional and for development only. This provides the ability to
+  // map the built code back to the original source format when debugging.
+  devtool: 'eval-source-map',
+};
+
+================================================
+File: public/index.html
+================================================
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css">
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
+
+
+================================================
+File: src/App.vue
+================================================
+<template>
+   <v-app >
+    <v-main>
+      <router-view />
+    </v-main>
+  </v-app>
+</template>
+
+<script>
+
+
+export default {
+  name: 'App',
+  data: () => ({
+    //
+  }),
+};
+</script>
+
+
+================================================
+File: src/main.js
+================================================
+import Vue from 'vue'
+import App from './App.vue'
+import vuetify from '@/plugins/vuetify'
+import  router from "./Router/index"
+
+Vue.config.productionTip = false
+
+new Vue({
+  el: "#app",
+  router,
+  vuetify,
+  render: h => h(App)
+})
+export default router;
+
+
+================================================
+File: src/Router/index.js
+================================================
+import Vue from 'vue'
+import VueRouter  from 'vue-router'
+import RecupererPassword from "../Views/RecupererPassword.vue"
+import login from "../Views/login.vue"
+import createaccount from "../Views/createaccount.vue"
+import profil from "../Views/profil.vue"
+
+
+Vue.use(VueRouter);
+
+const routes = [
+    {
+      path: "/recupererpassword",
+      name: "recupererpassword",
+      component: RecupererPassword
+    },
+    {
+      path: "/",
+      component: login
+    },
+    {
+      path: "/inscription",
+      component: createaccount
+    },
+    {
+        path: "/profil/:id",
+        component: profil
+      }
+    
+  ];
+  
+  const router = new VueRouter({
+    mode: "history",
+    base: process.env.BASE_URL,
+    routes
+  });
+
+  export default router;
+
+
+
+
+================================================
+File: src/Views/RecupererPassword.vue
+================================================
+<template>
+  <div class="login">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comforter&family=Comforter+Brush&family=IBM+Plex+Sans+Thai+Looped:wght@100;300&family=Mochiy+Pop+P+One&family=Nunito:wght@200&family=Raleway:wght@200&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comforter&family=Comforter+Brush&family=IBM+Plex+Sans+Thai+Looped:wght@100&family=Mochiy+Pop+P+One&family=Nunito:wght@200&family=Raleway:wght@200&display=swap"
+      rel="stylesheet"
+    />
+    <div class="logo-cont">
+      <div>
+        <v-img src="../images/epsideas.png" max-width="100%"></v-img>
+      </div>
+      <div>
+        <p class="slogan">Partagez vos idées en toute simplicité</p>
+      </div>
+    </div>
+    <div class="info-cont">
+     <v-img
+        id="logo"
+        src="../images/epsideas.png"
+        max-height="60"
+        max-width="150"
+        style="margin-bottom: 40px"
+      ></v-img>
+      <div style="height: 100px;"> 
+        <p
+          style="
+            font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+            font-size: 36px;
+          "
+        >
+          Recupérer votre mot de passe
+        </p>
+      </div>
+
+      <div class="attribut">
+        <v-form ref="form" v-model="valid" lazy-validation>
+          <v-text-field
+            v-model="emailConf"
+            :rules="emailRules"
+            label="Adresse électronique, un courriel vous sera envoyé."
+            placeholder="Veuillez saisir votre e-mail"
+            required
+          ></v-text-field>
+           
+     
+        <v-btn class="white--text" :disabled="!confirmer" color="#0F64E2" style="margin-top  : 25px;" @click="resetPassword()">
+            Confirmer
+          </v-btn>          
+          
+        </v-form>
+        <br><br>
+        <div v-if="message" style="background-color : azure; border-radius:10px; text-align: center;">
+        <span style="
+            font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+            font-size: 24px;
+          ">{{error2}}</span>
+        </div>
+        <br>
+        <div style="text-align: center;" @click="displayComponentLogin()">
+        <v-btn style="
+            font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+            font-size: 18px;
+          ">Retour à la page de connexion</v-btn>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+import { resetPassword } from "../scripts/authentification";
+
+export default {
+    name: "RecupererPassword",
+  data: () => ({
+    confirmer: true,
+    dialog: false,
+    error2:"",
+    valid:"",
+    name: "",
+    message: false,
+    checkbox: false,
+    emailConf:"",
+    emailRules: [
+      (v) => !!v || "E-mail is required",
+      (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+    ],
+    
+  }),
+
+  methods: {
+    resetPassword() {
+      if(this.emailConf  === ""){
+        this.error2 = "Le champ est vide";
+        this.message =true;
+        return;
+      } else {
+        this.error2 = "Un courriel de récupération de mot de passe vous sera envoyé"; 
+        this.message=true;
+      }
+      resetPassword(this.emailConf);
+    },
+    displayComponentLogin() {
+      this.message  = true;
+     setTimeout(
+        this.$router.push("/").catch(() => {})
+    , 10000);
+      
+    },
+    validate() {
+      this.$refs.form.validate();
+    },
+    reset() {
+      this.$refs.form.reset();
+    },
+    resetValidation() {
+      this.$refs.form.resetValidation();
+    },
+  },
+};
+</script>
+<style scoped>
+.logo-cont {
+  flex: 50%;
+  align-content: center;
+  padding-top: 150px;
+}
+.slogan {
+  font-family: "Comforter Brush", cursive;
+  max-width: 100%;
+  font-size: 72px;
+  max-height: 10%;
+}
+
+.info-cont {
+  padding-top: 50px;
+  flex: 50%;
+  border-color: #c4c4c4;
+  border-left-style: solid;
+  padding-left: 40px;
+  padding-right: 80px;
+}
+
+.login {
+  display: flex;
+  top: 0;
+left: 0;
+bottom: 0;
+right: 0;
+position: fixed;
+  
+}
+
+.attribut {
+  font-family: "IBM Plex Sans Thai Looped", sans-serif;
+  font-size: 24px;
+  height: 40%;
+}
+.inscrire{
+    font-family: "IBM Plex Sans Thai Looped", sans-serif;
+  font-size: 20px;
+    height: 15%;
+}
+bre:hover{
+color: #0F64E2;
+}
+@media only screen and (min-width: 930px) {
+  #logo {
+    display: none;
+  }
+}
+@media only screen and (max-width: 930px) {
+  .logo-cont {
+    display: none;
+  }
+  #logo {
+    visibility: visible;
+  }
+}
+</style>
+
+
+================================================
+File: src/Views/createaccount.vue
+================================================
+<template>
+  <div class="login">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comforter&family=Comforter+Brush&family=IBM+Plex+Sans+Thai+Looped:wght@100;300&family=Mochiy+Pop+P+One&family=Nunito:wght@200&family=Raleway:wght@200&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comforter&family=Comforter+Brush&family=IBM+Plex+Sans+Thai+Looped:wght@100&family=Mochiy+Pop+P+One&family=Nunito:wght@200&family=Raleway:wght@200&display=swap"
+      rel="stylesheet"
+    />
+    <div class="logo-cont">
+      <div>
+        <v-img src="../images/epsideas.png" max-width="100%"></v-img>
+      </div>
+      <div>
+        <p class="slogan">Partagez vos idées en toute simplicité</p>
+      </div>
+    </div>
+    <div class="info-cont">
+      <v-img
+        id="logo"
+        src="../images/epsideas.png"
+        max-height="60"
+        max-width="150"
+        style="margin-bottom: 40px"
+      ></v-img>
+      <div style="height: 100px;"> 
+        <p
+          style="
+            font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+            font-size: 36px;
+          "
+        >
+          Inscription
+        </p>
+      </div>
+
+      <div class="attribut">
+        <v-form ref="form" v-model="valid" lazy-validation>
+            <v-text-field
+            v-model="nom"
+            label="Nom"
+            placeholder="Veuillez saisir votre nom"
+            required
+          ></v-text-field>
+          <v-text-field
+            v-model="prenom"
+            label="Prénom"
+            placeholder="Veuillez saisir votre prénom"
+            required
+          ></v-text-field>
+          <v-text-field
+            v-model="emailIns"
+            :rules="emailRules"
+            label="Adresse électronique"
+            placeholder="Veuillez saisir votre e-mail"
+            required
+          ></v-text-field>
+        <v-text-field
+            v-model="NewPasswordIns"
+            type="password"
+            autocomplete="on"
+            label="Mot de passe"
+            placeholder="Veuillez saisir votre mot de passe"
+            required
+          ></v-text-field>
+
+          <v-text-field
+            v-model="ConfNewPasswordIns"
+            type="password"
+            autocomplete="on"
+            label="Confirmer le mot de passe"
+            placeholder="Veuillez saisir de nouveau votre mot de passe"
+            required
+          ></v-text-field>
+           
+          <div class="text-center">
+  
+        
+        <v-btn 
+          class="white--text" :disabled="!soumettre" color="#0F64E2" style="margin-top  : 25px;" @click="register()">
+            Soumettre
+          </v-btn>
+           <br /><br />
+          <div
+            v-if="error1"
+            style="
+              background-color: rgba(205, 92, 92, 0.226);
+              border-radius: 10px;
+              text-align: center;
+            "
+          >
+            <span
+              style="
+                font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+                font-size: 24px;
+              "
+              >{{ message }}</span
+            >
+          </div>
+
+          </div>   
+        </v-form>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+import { register } from "../scripts/authentification";
+export default {
+  
+
+    name:"CreateAccount",
+  data: () => ({
+error1:false,
+    dialog: false,
+    soumettre: true,
+    valid:false,
+    message:"",
+    nom:"",
+    prenom:"",
+    name: "",
+    ConfNewPasswordIns:"",
+    NewPasswordIns:"",
+    emailIns:"",
+    emailRules: [
+      (v) => !!v || "E-mail is required",
+      (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+    ],
+    checkbox: false,
+  }),
+
+  methods: {
+    register(){
+        if( this.nom === "" || this.prenom === "" || this.emailIns === ""){
+          this.error1 = true;
+          this.message = "Aucun champ ne doit être vide"
+          return;
+        } else if(this.NewPasswordIns !== this.ConfNewPasswordIns){
+          this.error1 = true;
+          this.message = "Les deux champs mot de passe ne concordent pas"
+          return;
+           // verifier la longueur du password
+        } else if (this.NewPasswordIns.length <= 6){
+          this.error1 = true;
+          this.message = "Mot de passe trop court. Le mode de passe doit avoir plus de 6 carateres.";
+        } else {
+          this.error1=false;
+          register(this.emailIns,this.NewPasswordIns,this.prenom,this.nom).then(()=> {
+            this.displayComponentProfil();
+          }).catch( (error) => {
+              //const errorCode = error.code;
+              //const errorMessage = error.message;
+              console.log(error.message)
+              this.error1=true;
+              this.message = "Adresse courriel est deja inscrite.";
+          }); 
+        }
+        
+    },
+    validate() {
+      this.$refs.form.validate();
+    },
+    reset() {
+      this.$refs.form.reset();
+    },
+    resetValidation() {
+      this.$refs.form.resetValidation();
+    },
+    displayComponentProfil() {
+      console.log("button pressed");
+      this.$router.push({path : `/profil/${this.nom} ${this.prenom}`}).catch(() => {});
+    },
+  },
+};
+</script>
+<style scoped>
+.logo-cont {
+  flex: 50%;
+  align-content: center;
+  padding-top: 150px;
+}
+.slogan {
+  font-family: "Comforter Brush", cursive;
+  max-width: 100%;
+  font-size: 72px;
+  max-height: 10%;
+}
+
+.info-cont {
+  padding-top: 50px;
+  flex: 50%;
+  border-color: #c4c4c4;
+  border-left-style: solid;
+  padding-left: 40px;
+  padding-right: 80px;
+}
+
+.login {
+  display: flex;
+  top: 0;
+left: 0;
+bottom: 0;
+right: 0;
+position: fixed;
+  
+}
+
+.attribut {
+  font-family: "IBM Plex Sans Thai Looped", sans-serif;
+  font-size: 24px;
+  height: 40%;
+}
+.inscrire{
+    font-family: "IBM Plex Sans Thai Looped", sans-serif;
+  font-size: 20px;
+    height: 15%;
+}
+bre:hover{
+color: #0F64E2;
+}
+@media only screen and (min-width: 930px) {
+  #logo {
+    display: none;
+  }
+}
+@media only screen and (max-width: 930px) {
+  .logo-cont {
+    display: none;
+  }
+  #logo {
+    visibility: visible;
+  }
+}
+</style>
+
+
+================================================
+File: src/Views/login.vue
+================================================
+<template>
+  <div class="login">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comforter&family=Comforter+Brush&family=IBM+Plex+Sans+Thai+Looped:wght@100;300&family=Mochiy+Pop+P+One&family=Nunito:wght@200&family=Raleway:wght@200&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comforter&family=Comforter+Brush&family=IBM+Plex+Sans+Thai+Looped:wght@100&family=Mochiy+Pop+P+One&family=Nunito:wght@200&family=Raleway:wght@200&display=swap"
+      rel="stylesheet"
+    />
+    <div class="logo-cont">
+      <div>
+        <v-img src="../images/epsideas.png" max-width="85%"></v-img>
+      </div>
+      <div>
+        <p class="slogan">Partagez vos idées en toute simplicité</p>
+      </div>
+    </div>
+    <div class="info-cont">
+      <v-img
+        id="logo"
+        src="../images/epsideas.png"
+        max-height="60"
+        max-width="150"
+        style="margin-bottom: 40px"
+      >
+      </v-img>
+      <div style="height: 100px">
+        <p
+          style="
+            font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+            font-size: 36px;
+          "
+        >
+          Bienvenue
+        </p>
+      </div>
+
+      <div class="attribut">
+        <v-form ref="form" v-model="valid" lazy-validation>
+          <v-text-field
+            v-model="email"
+            :rules="emailRules"
+            label="Adresse électronique"
+            placeholder="Veuillez saisir votre e-mail"
+            required
+          ></v-text-field>
+          <div style="text-align: right">
+            <v-text-field
+              autocomplete="on"
+              v-model="password"
+              label="Mot de passe"
+              placeholder="Veuillez saisir votre mot de passe"
+              type="password"
+              @keyup.enter="login()"
+              required
+            ></v-text-field>
+            <div style="font-size: 15px">
+              <button @click="displayComponentRecuperer()">
+                <span style="text-decoration: underline"
+                  >Mot de passe oublié?</span
+                ></button
+              ><br />
+            </div>
+          </div>
+
+          <v-btn
+            id="connexion"
+            class="white--text"
+            :disabled="!valid"
+            color="#0F64E2"
+            style="margin-top: 25px"
+            @click="
+              () => {
+                login();
+              }
+            "
+          >
+            Connexion
+          </v-btn>
+          <br /><br />
+          <div
+            v-if="error1"
+            style="
+              background-color: rgba(205, 92, 92, 0.226);
+              border-radius: 10px;
+              text-align: center;
+            "
+          >
+            <span
+              style="
+                font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+                font-size: 24px;
+              "
+              >{{ message }}</span
+            >
+          </div>
+
+          <v-checkbox
+            v-model="checkbox"
+            label="Rester connecté(e)?"
+            required
+          ></v-checkbox>
+        </v-form>
+        <div class="inscrire">
+          <p style="text-align: center">
+            Vous n’avez pas de compte ?
+            <button
+              style="text-decoration: underline"
+              @click="displayComponentInscription()"
+            >
+              S’inscrire
+            </button>
+            <br />
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+import * as fb from "../scripts/firebase.js";
+import { signInWithEmailAndPassword } from "firebase/auth";
+
+export default {
+  name: "LoginVue",
+
+  data: () => ({
+    value: String,
+    username1: "Franck",
+    name: "",
+    error1: false,
+    valid: false,
+    email: "",
+    password: "",
+    message: "",
+    NewPassword: "",
+    ConfNewPassword: "",
+    emailRules: [
+      (v) => !!v || "E-mail is required",
+      (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+    ],
+    checkbox: false,
+  }),
+
+  methods: {
+    login() {
+      if (this.email === "" || this.password === "") {
+        this.error1 = true;
+        this.message = "Aucun champ ne doit pas être vide";
+      }
+      signInWithEmailAndPassword(fb.auth, this.email, this.password)
+        .then(() => {
+          // Signed in
+          this.displayComponentProfil();
+          console.log("reussi");
+        })
+        .catch((error) => {
+          console.log("user not auth");
+          this.error1 = true;
+          if (this.email !== "" || this.password !== "") {
+            this.message = "Votre identifiant ou votre mot est incorrect";
+          }
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(errorCode, errorMessage);
+        });
+    },
+
+    reset() {
+      this.$refs.form.reset();
+    },
+    resetValidation() {
+      this.$refs.form.resetValidation();
+    },
+    displayComponentRecuperer() {
+      this.$router.push("/recupererpassword").catch(() => {});
+    },
+    displayComponentInscription() {
+      this.$router.push("/inscription").catch(() => {});
+    },
+    displayComponentProfil() {
+      this.username = this.email;
+      this.$router
+        .push({ path: `/profil/${"connected"}` })
+        .catch(() => {});
+    },
+  },
+};
+</script>
+<style scoped>
+.logo-cont {
+  flex: 50%;
+  align-content: center;
+  padding-top: 150px;
+}
+.slogan {
+  font-family: "Comforter Brush", cursive;
+  font-size: 72px;
+  max-height: 10%;
+}
+
+.info-cont {
+  padding-top: 50px;
+  flex: 50%;
+  border-color: #c4c4c4;
+  border-left-style: solid;
+  padding-left: 40px;
+  padding-right: 80px;
+}
+
+.login {
+  display: flex;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: fixed;
+}
+
+.attribut {
+  font-family: "IBM Plex Sans Thai Looped", sans-serif;
+  font-size: 24px;
+  height: 40%;
+}
+.inscrire {
+  font-family: "IBM Plex Sans Thai Looped", sans-serif;
+  font-size: 20px;
+  height: 20px;
+  margin-top: 70px;
+}
+bre:hover {
+  color: #0f64e2;
+}
+
+@media only screen and (min-width: 930px) {
+  #logo {
+    display: none;
+  }
+}
+@media only screen and (max-width: 930px) {
+  .logo-cont {
+    display: none;
+  }
+  #logo {
+    visibility: visible;
+  }
+}
+</style>
+
+
+================================================
+File: src/Views/profil.vue
+================================================
+<template>
+  <div>
+    <toolbar
+      @estResultat="ComponentResult()"
+      @result="getResult"
+      @mesIdees="ComponentMesIdees()"
+      :avatar="avatarMoi"
+      :couleur="couleurMoi"
+      :nom="nomMoi"
+      @voirNotification="voirNotification"
+      :couleurNotification="couleurNotification"
+    />
+
+    <div
+      v-if="estMesIdees || estFavoris || estModif || autre"
+      style="width: 100%; height: 170px"
+    >
+      <barPhoto
+        @profil="ComponentProfil()"
+        :avatar="avatar"
+        :couleur="couleur"
+        :nom="nom"
+        :autreUid="uidAutre"
+        :moi="estmoi"
+        style="
+          width: 100%;
+          height: 170px;
+          position: fixed;
+          top: 86px;
+          mask: linear-gradient(black 7rem, transparent);
+          -webkit-mask: linear-gradient(black 7rem, transparent);
+          z-index: 1;
+        "
+      />
+    </div>
+    <div style="display: flex; position: relative; top: 86px">
+      <div class="menu2" style="flex: 15%">
+        <div class="menu" style="position: fixed">
+          <link
+            href="https://fonts.googleapis.com/css2?family=Comforter&family=Comforter+Brush&family=IBM+Plex+Sans+Thai+Looped:wght@100;300&family=Mochiy+Pop+P+One&family=Nunito:wght@200&family=Raleway:wght@200&display=swap"
+            rel="stylesheet"
+          />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Comforter&family=Comforter+Brush&family=IBM+Plex+Sans+Thai+Looped:wght@100&family=Mochiy+Pop+P+One&family=Nunito:wght@200&family=Raleway:wght@200&display=swap"
+            rel="stylesheet"
+          />
+          <div
+            class="Rubriques"
+            style="height: 60px"
+            @click="ComponentProfil()"
+          >
+            <v-icon style="margin-right: 10px; color: #b71c1c">
+              mdi-home-city</v-icon
+            >
+            <button class="text">Profil</button>
+          </div>
+          <div
+            class="Rubriques"
+            style="height: 60px"
+            @click="ComponentMesIdees()"
+          >
+            <v-icon style="margin-right: 10px; color: #ffcc80">
+              mdi-lightbulb-on</v-icon
+            >
+            <button class="text">Mes idées</button>
+          </div>
+          <div
+            class="Rubriques"
+            style="height: 60px"
+            @click="ComponentFavoris()"
+          >
+            <v-icon style="margin-right: 10px; color: #ffd700">
+              mdi-star-shooting</v-icon
+            >
+            <button class="text">Mes favoris</button>
+          </div>
+          <div
+            class="Rubriques"
+            style="height: 60px"
+            @click="ComponentActualites()"
+          >
+            <v-icon style="margin-right: 10px; color: #0f64e2">
+              mdi-newspaper-variant-multiple-outline
+            </v-icon>
+            <button class="text">Actualités</button>
+          </div>
+          <div
+            class="Rubriques"
+            style="height: 60px"
+            @click="ComponentAbonnement()"
+          >
+            <v-icon style="margin-right: 10px; color: #8a2be2">
+              mdi-account
+            </v-icon>
+            <button class="text">Abonnements</button>
+          </div>
+          <div class="Rubriques" style="height: 60px" @click="ComponentTop()">
+            <v-icon size="30" style="margin-right: 10px; color: #228b22">
+              mdi-arrow-up-bold</v-icon
+            >
+            <button class="text">Idées au top</button>
+          </div>
+        </div>
+      </div>
+      <div style="flex: 45%; margin-top: 60px">
+        <div v-if="!seen && !estprofil && estMesIdees">
+          <div style="margin-rigt: 20px; margin-left: 20px">
+            <v-icon
+              size="45"
+              style="margin-right: 10px; margin-bottom: 10px; color: #ffcc80"
+            >
+              mdi-lightbulb-on</v-icon
+            >
+            <span
+              style="
+                font-weight: bold;
+                font-size: 28px;
+                font-family: IBM Plex Sans Thai Looped, sans-serif;
+              "
+              >Mes idées</span
+            >
+            <br />
+            <hr style="margin-bottom: 40px" />
+
+            <div
+              v-if="message"
+              style="
+                margin: auto;
+                width: 300px;
+                background-color: azure;
+                border-radius: 10px;
+                text-align: center;
+              "
+            >
+              <span
+                style="
+                  font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+                  font-size: 24px;
+                "
+                >Cette liste est vide</span
+              >
+            </div>
+          </div>
+          <affichage-tache
+            @modifier="modifier"
+            @supprimer="afficherTachesMesIdees"
+            @reload="afficherTachesMesIdees"
+            :canSuppress="true"
+            v-for="{
+              title,
+              des,
+              visibilite,
+              avatar,
+              couleur,
+              niveau,
+              discipline,
+              nomComplet,
+              date,
+              id,
+              uid,
+              document,
+              like,
+              dislike,
+            } of tachesMesIdees"
+            :id="id"
+            :visibilite="visibilite"
+            :nomComplet="nomComplet"
+            :key="title"
+            :date="date"
+            :avatar="avatar"
+            :couleur="couleur"
+            :niveau="niveau"
+            :discipline="discipline"
+            :titreTache="title"
+            :description="des"
+            :uid="uid"
+            :document="document"
+            :likedNumber="like"
+            :unlikedNumber="dislike"
+          />
+        </div>
+        <div v-if="notification">
+          <v-icon
+            size="45"
+            style="
+              margin-right: 10px;
+              margin-left: 10px;
+              margin-bottom: 10px;
+              color: #ffcc80;
+            "
+          >
+            mdi-bell-ring</v-icon
+          >
+          <span
+            style="
+              font-weight: bold;
+              font-size: 28px;
+              font-family: IBM Plex Sans Thai Looped, sans-serif;
+            "
+            >Notifications de {{ nomMoi }}</span
+          >
+          <br />
+          <hr
+            style="margin-bottom: 20px; margin-left: 10px; margin-right: 10px"
+          />
+          <div
+            v-if="notifDispo"
+            style="
+              margin: auto;
+              width: 300px;
+              background-color: azure;
+              border-radius: 10px;
+              text-align: center;
+            "
+          >
+            <span
+              style="
+                font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+                font-size: 24px;
+              "
+              >Aucune notification disponible</span
+            >
+          </div>
+          <affichage-notification
+            v-for="{ idTache, notification, date } of notifications"
+            :idTache="idTache"
+            :date="date"
+            :key="idTache"
+            :notification="notification"
+          />
+        </div>
+        <div v-if="estprofil">
+          <affichage-profil />
+        </div>
+        <div v-if="seen && !estprofil">
+          <poster-idee @annulerIdee="seenView()" @publieIdee="seenView()" />
+        </div>
+        <div v-if="!seen && !estprofil && estActualite && !estMesIdees">
+          <div style="margin-rigt: 20px; margin-left: 20px">
+            <v-icon
+              size="45"
+              style="margin-right: 10px; margin-bottom: 10px; color: #0f64e2"
+            >
+              mdi-newspaper-variant-multiple-outline
+            </v-icon>
+            <span
+              style="
+                font-weight: bold;
+                font-size: 28px;
+                font-family: IBM Plex Sans Thai Looped, sans-serif;
+              "
+              >Fil d'actualité</span
+            >
+            <br />
+            <hr style="margin-bottom: 40px; margin-right: 20px" />
+          </div>
+
+          <affichage-tache
+            @autreUtilisateur="afficherTachesAutreUtilisateur"
+            @reload="afficherTachesActualite"
+            :canSuppress="false"
+            v-for="{
+              title,
+              des,
+              avatar,
+              couleur,
+              niveau,
+              discipline,
+              nomComplet,
+              date,
+              uid,
+              id,
+              document,
+              like,
+              dislike,
+            } of tachesActualite"
+            :id="id"
+            :uid="uid"
+            :nomComplet="nomComplet"
+            :date="date"
+            :key="title"
+            :avatar="avatar"
+            :couleur="couleur"
+            :niveau="niveau"
+            :discipline="discipline"
+            :titreTache="title"
+            :description="des"
+            :document="document"
+            :likedNumber="like"
+            :unlikedNumber="dislike"
+          />
+        </div>
+        <div
+          v-if="
+            !seen &&
+            !estprofil &&
+            !estActualite &&
+            !estMesIdees &&
+            estAbonnement
+          "
+        >
+          <div style="margin-rigt: 20px; margin-left: 20px">
+            <v-icon
+              size="45"
+              style="margin-right: 10px; margin-bottom: 10px; color: #8a2be2"
+            >
+              mdi-account
+            </v-icon>
+            <span
+              style="
+                font-weight: bold;
+                font-size: 28px;
+                font-family: IBM Plex Sans Thai Looped, sans-serif;
+              "
+              >Abonnements</span
+            >
+            <br />
+            <hr style="margin-bottom: 40px; margin-right: 20px" />
+          </div>
+          <div
+            v-if="messageAbonne"
+            style="
+              margin: auto;
+              max-width: 640px;
+              background-color: azure;
+              border-radius: 10px;
+              text-align: center;
+            "
+          >
+            <span
+              style="
+                font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+                font-size: 24px;
+              "
+              >Cette liste est vide car vous n'avez aucun abonnement</span
+            >
+          </div>
+          <affichage-tache
+            @autreUtilisateur="afficherTachesAutreUtilisateur"
+            @reload="ComponentAbonnement"
+            :canSuppress="false"
+            v-for="{
+              title,
+              des,
+              avatar,
+              couleur,
+              niveau,
+              discipline,
+              nomComplet,
+              date,
+              uid,
+              id,
+              document,
+              like,
+              dislike,
+            } of tachesAbonnements"
+            :id="id"
+            :uid="uid"
+            :nomComplet="nomComplet"
+            :date="date"
+            :key="title"
+            :avatar="avatar"
+            :couleur="couleur"
+            :niveau="niveau"
+            :discipline="discipline"
+            :titreTache="title"
+            :description="des"
+            :document="document"
+            :likedNumber="like"
+            :unlikedNumber="dislike"
+          />
+        </div>
+        <div v-if="estTop">
+          <div style="margin-rigt: 20px; margin-left: 20px">
+            <v-icon
+              size="45"
+              style="margin-right: 10px; margin-bottom: 10px; color: #228b22"
+            >
+              mdi-arrow-up-bold
+            </v-icon>
+            <span
+              style="
+                font-weight: bold;
+                font-size: 28px;
+                font-family: IBM Plex Sans Thai Looped, sans-serif;
+              "
+              >Idées au top</span
+            >
+            <br />
+            <hr style="margin-bottom: 40px; margin-right: 20px" />
+          </div>
+          <div
+            v-if="messageTop"
+            style="
+              margin: auto;
+              max-width: 640px;
+              background-color: azure;
+              border-radius: 10px;
+              text-align: center;
+            "
+          >
+            <span
+              style="
+                font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+                font-size: 24px;
+              "
+              >Cette liste est vide</span
+            >
+          </div>
+          <affichage-tache
+            @autreUtilisateur="afficherTachesAutreUtilisateur"
+            @reload="afficherTachesTop"
+            :canSuppress="true"
+            v-for="{
+              title,
+              des,
+              avatar,
+              couleur,
+              niveau,
+              discipline,
+              nomComplet,
+              date,
+              uid,
+              id,
+              document,
+              like,
+              dislike,
+            } of tachesTopIdees"
+            :id="id"
+            :uid="uid"
+            :nomComplet="nomComplet"
+            :date="date"
+            :key="title"
+            :avatar="avatar"
+            :couleur="couleur"
+            :niveau="niveau"
+            :discipline="discipline"
+            :titreTache="title"
+            :description="des"
+            :document="document"
+            :likedNumber="like"
+            :unlikedNumber="dislike"
+          />
+        </div>
+        <div v-if="estModif">
+          <modifier-tache
+            @annuler="annuler"
+            :id="idModification"
+            @confirmer="confirmer"
+          />
+        </div>
+        <div
+          v-if="
+            !seen && !estprofil && !estActualite && !estMesIdees && estResultat
+          "
+        >
+          <div style="margin-rigt: 20px; margin-left: 20px">
+            <v-icon size="45" style="margin-right: 10px; margin-bottom: 10px">
+              mdi-magnify</v-icon
+            >
+            <span
+              style="
+                font-weight: bold;
+                font-size: 28px;
+                font-family: IBM Plex Sans Thai Looped, sans-serif;
+              "
+              >Résultats de la recherche pour "{{ resultat }}"</span
+            >
+            <br />
+            <hr style="margin-bottom: 40px; margin-right: 20px" />
+          </div>
+          <div
+            v-if="messageRecherche"
+            style="
+              margin: auto;
+              width: 300px;
+              background-color: azure;
+              border-radius: 10px;
+              text-align: center;
+            "
+          >
+            <span
+              style="
+                font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+                font-size: 24px;
+              "
+              >Aucun résultat pour cette recherche</span
+            >
+          </div>
+          <affichage-tache
+            @autreUtilisateur="afficherTachesAutreUtilisateur"
+            :canSuppress="false"
+            v-for="{
+              title,
+              des,
+              avatar,
+              couleur,
+              niveau,
+              discipline,
+              nomComplet,
+              date,
+              id,
+              uid,
+              document,
+              like,
+              dislike,
+            } of tachesRecherche"
+            :nomComplet="nomComplet"
+            :date="date"
+            :key="title"
+            :avatar="avatar"
+            :couleur="couleur"
+            :niveau="niveau"
+            :discipline="discipline"
+            :titreTache="title"
+            :description="des"
+            :id="id"
+            :uid="uid"
+            :document="document"
+            :likedNumber="like"
+            :unlikedNumber="dislike"
+          />
+        </div>
+        <div
+          v-if="
+            !seen && !estprofil && !estActualite && !estMesIdees && estFavoris
+          "
+        >
+          <div style="margin-rigt: 20px; margin-left: 20px">
+            <v-icon size="45" style="margin-right: 10px; color: #ffd700">
+              mdi-star-shooting</v-icon
+            >
+            <span
+              style="
+                font-weight: bold;
+                font-size: 28px;
+                font-family: IBM Plex Sans Thai Looped, sans-serif;
+              "
+              >Mes Favoris</span
+            >
+            <br />
+            <hr style="margin-bottom: 40px; margin-right: 20px" />
+            <div
+              v-if="messageFavoris"
+              style="
+                margin: auto;
+                width: 300px;
+                background-color: azure;
+                border-radius: 10px;
+                text-align: center;
+              "
+            >
+              <span
+                style="
+                  font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+                  font-size: 24px;
+                "
+                >Cette liste est vide</span
+              >
+            </div>
+          </div>
+          <affichage-tache
+            @autreUtilisateur="afficherTachesAutreUtilisateur"
+            @reload="ComponentFavoris"
+            :canSuppress="false"
+            v-for="{
+              title,
+              des,
+              avatar,
+              couleur,
+              niveau,
+              discipline,
+              nomComplet,
+              date,
+              id,
+              uid,
+              document,
+              like,
+              dislike,
+            } of tachesMesFavoris"
+            :nomComplet="nomComplet"
+            :date="date"
+            :key="title"
+            :avatar="avatar"
+            :couleur="couleur"
+            :niveau="niveau"
+            :discipline="discipline"
+            :titreTache="title"
+            :description="des"
+            :id="id"
+            :uid="uid"
+            :document="document"
+            :likedNumber="like"
+            :unlikedNumber="dislike"            
+          />
+        </div>
+        <div v-if="autre && !estActualite">
+          <v-icon
+            size="45"
+            style="margin-right: 10px; margin-bottom: 10px; color: #ffcc80"
+          >
+            mdi-lightbulb-on</v-icon
+          >
+          <span
+            style="
+              font-weight: bold;
+              font-size: 28px;
+              font-family: IBM Plex Sans Thai Looped, sans-serif;
+            "
+            >Les idées de {{ nom }}</span
+          >
+          <br />
+          <hr style="margin-bottom: 40px" />
+          <affichage-tache
+            :canSuppress="false"
+            @reload="afficherTachesAutreUtilisateur"
+            v-for="{
+              title,
+              des,
+              avatar,
+              niveau,
+              discipline,
+              nomComplet,
+              date,
+              id,
+              uid,
+              couleur,
+              document,
+              like,
+              dislike,
+            } of tachesAutreUtilisateur"
+            :nomComplet="nomComplet"
+            :date="date"
+            :key="title"
+            :avatar="avatar"
+            :niveau="niveau"
+            :discipline="discipline"
+            :titreTache="title"
+            :description="des"
+            :id="id"
+            :uid="uid"
+            :couleur="couleur"
+            :document="document"
+            :likedNumber="like"
+            :unlikedNumber="dislike"
+          />
+        </div>
+      </div>
+      <div
+        class="menu2"
+        style="flex: 20%; padding-top: 40px; text-align: center"
+      >
+        <v-btn
+          id="posterMini"
+          v-if="!seen && !estprofil"
+          class="white--text"
+          color="#0F64E2"
+          @click="seenView()"
+          style="
+            height: 50px;
+            width: 50px;
+            font-family: IBM Plex Sans Thai Looped, sans-serif;
+            font-weight: bold;
+          "
+        >
+          <v-icon size="40" style="color: white; padding: 20px"
+            >mdi-lightbulb-on</v-icon
+          >
+        </v-btn>
+        <v-btn
+          v-if="!seen && !estprofil && !estModif"
+          id="posterMax"
+          class="white--text"
+          color="#0F64E2"
+          @click="seenView()"
+          style="
+            font-family: IBM Plex Sans Thai Looped, sans-serif;
+            font-weight: bold;
+          "
+        >
+          Poster une idée
+        </v-btn>
+        <div v-if="estprofil == true">
+          <v-btn
+            class="white--text"
+            color="#0F64E2"
+            @click="retour()"
+            style="
+              font-family: IBM Plex Sans Thai Looped, sans-serif;
+              font-weight: bold;
+              width: 50%;
+              margin-bottom: 40px;
+            "
+          >
+            Retour
+          </v-btn>
+          <br />
+
+          <v-row justify="center">
+            <v-btn
+              id="supMini"
+              class="white--text"
+              color="#0F64E2"
+              @click.stop="dialog = true"
+              style="
+                height: 50px;
+                width: 50px;
+                font-family: IBM Plex Sans Thai Looped, sans-serif;
+                font-weight: bold;
+                margin-bottom: 40px;
+              "
+            >
+              <span><v-icon color="white">mdi-trash-can-outline</v-icon></span>
+            </v-btn>
+            <v-btn
+              id="supMax"
+              class="white--text"
+              color="#0F64E2"
+              @click.stop="dialog = true"
+              style="
+                font-family: IBM Plex Sans Thai Looped, sans-serif;
+                font-weight: bold;
+                margin-bottom: 40px;
+              "
+            >
+              <span>Supprimer mon compte</span>
+            </v-btn>
+
+            <v-dialog v-model="dialog" max-width="290">
+              <v-card style="padding-top: 20px">
+                <v-card-text
+                  style="
+                    font-family: IBM Plex Sans Thai Looped, sans-serif;
+                    font-size: 24px;
+                    margin-bottom: 40px;
+                  "
+                >
+                  Êtes-vous sûr de vouloir supprimer votre compte?
+                </v-card-text>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+
+                  <v-btn color="blue darken-1" text @click="supprimerCompte()">
+                    Oui
+                  </v-btn>
+
+                  <v-btn color="red darken-1" text @click="dialog = false">
+                    Non
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </v-row>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import toolbar from "../components/toolbar.vue";
+import barPhoto from "../components/barPhoto.vue";
+import posterIdee from "../components/posterIdee.vue";
+import affichageTache from "../components/affichageTache.vue";
+import PosterIdee from "../components/posterIdee.vue";
+import affichageProfil from "../components/affichageProfil.vue";
+import modifierTache from "../components/modifierTache.vue";
+import affichageNotification from "../components/affichageNotification.vue";
+
+import { getUserInfoByUid } from "../scripts/authentification"
+import { getAuth, deleteUser } from "firebase/auth";
+import * as fb from "../scripts/firebase";
+import * as utils from "../scripts/utils";
+import * as favoris from "../scripts/favoris";
+import { rechercherDictionnaire } from "../scripts/dictionnaire";
+import { getAbonnement } from "../scripts/abonnement";
+
+
+export default {
+  name: "HelloWorld",
+
+  data: () => {
+    return {
+      notifications: [
+        {
+          idTache: "1",
+          notification: "a aimé votre publication",
+          date: "Avril 2002",
+        },
+        {
+          idTache: "1",
+          notification: "a aimé votre tache",
+          date: "Avril 2002",
+        },
+        { idTache: "1", notification: "a aimé votre idée", date: "Avril 2002" },
+        {
+          idTache: "1",
+          notification: "a aimé votre publication",
+          date: "Avril 2002",
+        },
+      ],
+      tachesMesIdees: [],
+      tachesTopIdees: [],
+      tachesActualite: [],
+      tachesRecherche: [],
+      tachesMesFavoris: [],
+      tachesAbonnements: [],
+      tachesAutreUtilisateur: [],
+      nom: "",
+      seen: false,
+      estResultat: false,
+      estprofil: false,
+      estMesIdees: false,
+      estActualite: true,
+      estAbonnement: false,
+      dialog: false,
+      resultat: "",
+      estFavoris: false,
+      estModif: false,
+      couleur: String,
+      avatar: String,
+      message: false,
+      messageAbonne: false,
+      messageFavoris: false,
+      idModification: String,
+      autre: false,
+      uidAutre: "",
+      avatarAutre: "",
+      couleurAutre: "",
+      nomAutre: "",
+      estmoi: true,
+      avatarMoi: "",
+      couleurMoi: "",
+      nomMoi: "",
+      notifDispo: false,
+      notification: false,
+      estTop: false,
+      messageTop: false,
+    };
+  },
+
+  components: {
+    toolbar,
+    // MeNu,
+    barPhoto,
+    posterIdee,
+    affichageTache,
+    PosterIdee,
+    affichageProfil,
+    modifierTache,
+    affichageNotification,
+  },
+  methods: {
+    afficherTachesTop() {
+      fb.getTopIdees().then((listTache) => {
+        this.tachesTopIdees = [];
+        const listDocuments = listTache.docs;
+        const dataDocuments = utils.getDatasFromDocument(listDocuments);
+        for (let i = 0; i < dataDocuments.length; i++) {
+          if(dataDocuments[i].delete == false && dataDocuments[i].like != 0 )
+          this.updateTache(dataDocuments[i], this.tachesTopIdees);
+        }
+        if (this.tachesTopIdees.length == 0) this.messageTop = true;
+        else this.messageTop = false;
+        this.UserMoi();
+      });
+    },
+    ComponentTop() {
+      this.estTop = true;
+      this.estAbonnement = false;
+      this.estModif = false;
+      this.notification = false;
+      this.estprofil = false;
+      this.estActualite = false;
+      this.estResultat = false;
+      this.estMesIdees = false;
+      this.estFavoris = false;
+      this.autre = false;
+      this.afficherTachesTop();
+      this.scrollToTop();
+    },
+    ComponentAbonnement() {
+      this.afficherTachesAbonnement();
+      this.estTop = false;
+      this.estAbonnement = true;
+      this.estModif = false;
+      this.notification = false;
+      this.estprofil = false;
+      this.estActualite = false;
+      this.estResultat = false;
+      this.estMesIdees = false;
+      this.estFavoris = false;
+      this.autre = false;
+      if (this.tachesAbonnements.length == 0) this.messageAbonne = true;
+      else this.messageAbonne = false;
+      this.scrollToTop();
+    },
+    async afficherTachesMesIdees() {
+      fb.getAllUserTache(fb.auth.currentUser.uid).then((listTache) => {
+        const listDocuments = listTache.docs;
+        const dataDocuments = utils.getDatasFromDocument(listDocuments);
+        const sortedData = utils.sortByTime(dataDocuments);
+
+        if (sortedData.length == 0) this.message = true;
+        else this.message = false;
+        this.tachesMesIdees = [];
+        for (let i = 0; i < sortedData.length; i++) {
+          this.updateTache(sortedData[i], this.tachesMesIdees);
+        }
+      });
+    },
+    async afficherTachesAutreUtilisateur(value) {
+      this.estmoi = false;
+      this.estResultat = false;
+      this.estAbonnement = false;
+      this.estTop = false;
+      this.UserMoi();
+      this.uidAutre = value;
+      getUserInfoByUid(this.uidAutre).then((userInfo) => {
+        this.couleur = userInfo.data().color;
+        this.avatar = userInfo.data().initial;
+        this.nom = userInfo
+          .data()
+          .name.concat(" ")
+          .concat(userInfo.data().lastName);
+
+        this.autre = true;
+      });
+      fb.getAllUserAutre(this.uidAutre).then((listTache) => {
+        const listDocuments = listTache.docs;
+        const dataDocuments = utils.getDatasFromDocument(listDocuments);
+        const sortedData = utils.sortByTime(dataDocuments);
+        if (sortedData.length == 0) this.message = true;
+        else this.message = false;
+        //console.log(this.message);
+        this.tachesAutreUtilisateur = [];
+        for (let i = 0; i < sortedData.length; i++) {
+          this.updateTache(sortedData[i], this.tachesAutreUtilisateur);
+        }
+      });
+      this.estActualite = false;
+      this.notification = false;
+      this.scrollToTop();
+    },
+    async afficherTachesActualite() {
+      fb.getAllPublicTache().then((listTache) => {
+        this.tachesActualite = [];
+        const listDocuments = listTache.docs;
+        const dataDocuments = utils.getDatasFromDocument(listDocuments);
+        const sortedData = utils.sortByTime(dataDocuments);
+        for (let i = 0; i < sortedData.length; i++) {
+          const uid = fb.auth.currentUser.uid;
+          if (sortedData[i].uid != uid) {
+            this.updateTache(sortedData[i], this.tachesActualite);
+          }
+        }
+        this.UserMoi();
+      });
+    },
+    async afficherTachesFavoris() {
+      this.tachesMesFavoris = [];
+      const snapShotTaches = await fb.getAllPublicTache();
+      const favorisTacheId = await favoris.getFavoris(fb.auth.currentUser.uid);
+
+      if(favorisTacheId.length != 0) {
+        const sortedData = utils.getDatasFromDocumentSortedByTime(snapShotTaches.docs);
+        for(let data of sortedData) {
+          if(favorisTacheId.includes(data.id)) {
+            this.updateTache(data, this.tachesMesFavoris);
+          }
+        }
+      }
+      if(this.tachesMesFavoris.length == 0) { this.messageFavoris = true;}
+      else { this.messageFavoris = false ;}
+    },
+    async afficherTachesAbonnement() {
+      this.tachesAbonnements = [];
+      const snapShotTaches = await fb.getAllPublicTache();
+      const abonnementUid = await getAbonnement(fb.auth.currentUser.uid);
+      if(abonnementUid.length != 0) {
+        const sortedData = utils.getDatasFromDocumentSortedByTime(snapShotTaches.docs);
+        for(let data of sortedData) {
+          if(abonnementUid.includes(data.uid)) {
+            this.updateTache(data, this.tachesAbonnements);
+          }
+        }
+        if(this.tachesAbonnements.length == 0) { this.messageAbonne = true;}
+        else { this.messageAbonne = false ;}
+      }
+     
+    },
+    updateTache(data, container) {
+      const date = utils.getDateFromTimestamp(data.timestamp);
+      container.push({
+        dislike: data.dislike,
+        like: data.like,
+        uid: data.uid,
+        id: data.id,
+        visibilite: data.visibilite,
+        title: data.titreTache,
+        des: data.description,
+        avatar: data.initial,
+        couleur: data.couleur,
+        niveau: data.niveauTache,
+        discipline: data.disciplineTache,
+        nomComplet: data.nom,
+        date: date,
+        document: data.document,
+      });
+    },
+    confirmer() {
+      this.estModif = false;
+      this.estMesIdees = true;
+      this.ComponentMesIdees();
+    },
+    annuler() {
+      this.estModif = false;
+      this.estMesIdees = true;
+    },
+    getResult(value) {
+      this.resultat = value;
+    },
+    supprimerCompte() {
+      this.displayComponentEditSupprimer();
+      const auth = getAuth();
+      const user = auth.currentUser;
+      deleteUser(user)
+        .then(() => {
+          console.log("User deleted.");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    displayComponentEditSupprimer() {
+      this.$router.push("/");
+    },
+    seenView() {
+      //console.log(this.seen);
+      this.estModif = false;
+      this.notification = false;
+      this.estTop = false;
+      this.seen = !this.seen;
+      this.estprofil = false;
+      this.estActualite = true;
+      this.estResultat = false;
+      this.estMesIdees = false;
+      this.estFavoris = false;
+      this.autre = false;
+      this.estAbonnement = false;
+      this.afficherTachesActualite();
+    },
+    modifier(value) {
+      this.findUser();
+      this.UserMoi();
+      this.seen = false;
+      this.estMesIdees = false;
+      this.estTop = false;
+      this.notification = false;
+      this.estprofil = false;
+      this.estActualite = false;
+      this.estResultat = false;
+      this.estFavoris = false;
+      this.estModif = true;
+      this.autre = false;
+      this.idModification = value;
+      this.estAbonnement = false;
+      //console.log(this.estModif);
+    },
+    ComponentProfil() {
+      this.findUser();
+      this.UserMoi();
+      this.estMesIdees = false;
+      this.estTop = false;
+      this.estFavoris = false;
+      this.estAbonnement = false;
+      this.estModif = false;
+      this.notification = false;
+      this.estprofil = true;
+      this.scrollToTop();
+    },
+    ComponentMesIdees() {
+      this.findUser();
+      this.UserMoi();
+      this.estmoi = true;
+      this.estAbonnement = false;
+      this.estTop = false;
+      this.notification = false;
+      this.afficherTachesMesIdees();
+      //console.log("button pressed");
+      this.estprofil = false;
+      this.estModif = false;
+      this.estMesIdees = true;
+      this.seen = false;
+      this.estActualite = false;
+      this.estResultat = false;
+      this.estFavoris = false;
+      this.autre = false;
+      this.scrollToTop();
+    },
+    displayComponentFavoris() {
+      //console.log("button pressed");
+      this.$router.push("/profil").catch(() => {});
+    },
+    retour() {
+      this.estprofil = false;
+      this.estModif = false;
+      this.seen = false;
+      this.estAbonnement = false;
+      this.estTop = false;
+      this.notification = false;
+      this.estActualite = true;
+      this.estFavoris = false;
+      this.autre = false;
+      this.scrollToTop();
+    },
+    ComponentActualites() {
+      this.seen = false;
+      this.estMesIdees = false;
+      this.estModif = false;
+      this.estTop = false;
+      this.estprofil = false;
+      this.estActualite = true;
+      this.estResultat = false;
+      this.notification = false;
+      this.estFavoris = false;
+      this.estAbonnement = false;
+      this.autre = false;
+      this.scrollToTop();
+    },
+    ComponentResult() {
+      this.tachesRecherche = [];
+      rechercherDictionnaire(this.resultat).then((listTache) => {
+        //const listDocuments = listTache.docs;
+        //console.log(listTache)
+        for (let i = 0; i < listTache.length; i++) {
+          this.updateTache(listTache[i], this.tachesRecherche);
+        }
+      });
+      this.UserMoi();
+      this.seen = false;
+      this.estMesIdees = false;
+      this.estprofil = false;
+      this.estActualite = false;
+      this.estResultat = true;
+      this.estTop = false;
+      this.estModif = false;
+      this.estAbonnement = false;
+      this.notification = false;
+      this.estFavoris = false;
+      this.autre = false;
+      this.scrollToTop();
+    },
+    ComponentFavoris() {
+      this.findUser();
+      this.afficherTachesFavoris();
+      this.estmoi = true;
+      this.seen = false;
+      this.estMesIdees = false;
+      this.estprofil = false;
+      this.estActualite = false;
+      this.estTop = false;
+      this.estResultat = false;
+      this.estFavoris = true;
+      this.notification = false;
+      this.estAbonnement = false;
+      this.estModif = false;
+      this.autre = false;
+      this.scrollToTop();
+    },
+    scrollToTop() {
+      window.scrollTo(0, 0);
+    },
+    findUser() {
+      this.UserMoi();
+      const uid = fb.auth.currentUser.uid;
+      if (uid != null)
+        getUserInfoByUid(uid).then((userInfo) => {
+          this.couleur = userInfo.data().color;
+          this.avatar = userInfo.data().initial;
+          this.nom = userInfo
+            .data()
+            .name.concat(" ")
+            .concat(userInfo.data().lastName);
+
+          this.autre = false;
+        });
+    },
+    UserMoi() {
+      const uid = fb.auth.currentUser.uid;
+      if (uid != null)
+        getUserInfoByUid(uid).then((userInfo) => {
+          this.couleurMoi = userInfo.data().color;
+          this.avatarMoi = userInfo.data().initial;
+          this.nomMoi = userInfo
+            .data()
+            .name.concat(" ")
+            .concat(userInfo.data().lastName);
+        });
+    },
+    voirNotification() {
+      if (this.notifications.length === 0) {
+        this.notifDispo = true;
+      } else this.notifDispo = false;
+      this.notification = true;
+      this.estmoi = true;
+      this.estprofil = false;
+      this.estModif = false;
+      this.estMesIdees = false;
+      this.seen = false;
+      this.estActualite = false;
+      this.estTop = false;
+      this.estResultat = false;
+      this.estFavoris = false;
+      this.estAbonnement = false;
+      this.autre = false;
+      this.scrollToTop();
+      this.UserMoi();
+    },
+  },
+
+  beforeMount() {
+    this.afficherTachesActualite();
+    this.findUser();
+  },
+  computed: {
+    couleurNotification() {
+      if (this.notifications.length !== 0) return "red";
+      else return "";
+    },
+    avatarColor() {
+      return "#" + Math.floor(Math.random() * 16777215).toString(16);
+    },
+    messageRecherche() {
+      if (this.tachesRecherche.length == 0) return true;
+      else return false;
+    },
+  },
+};
+</script>
+
+<style scoped>
+.menu2 {
+  background-color: rgba(211, 211, 211, 0.103);
+}
+.menu {
+  font-family: "IBM Plex Sans Thai Looped", sans-serif;
+  font-size: 24px;
+  margin-top: 3px;
+  margin-left: 3px;
+  padding: 10px;
+  height: 100%;
+}
+.Rubriques:hover {
+  color: #0f64e2;
+  background-color: azure;
+}
+
+@media only screen and (max-width: 930px) {
+  .text {
+    display: none;
+  }
+  .menu2 {
+    width: 12%;
+  }
+  #posterMini {
+    visibility: visible;
+  }
+  #posterMax {
+    display: none;
+  }
+  #supMax {
+    display: none;
+  }
+  #supMini {
+    visibility: visible;
+  }
+}
+@media only screen and (min-width: 930px) {
+  #posterMini {
+    display: none;
+  }
+  #supMini {
+    display: none;
+  }
+}
+@media only screen and (max-width: 660px) {
+  #posterMini {
+    display: none;
+  }
+}
+</style>
+
+
+================================================
+File: src/components/affichageComment.vue
+================================================
+<template>
+  <div style="display: flex">
+    <v-avatar
+      :color="couleur"
+      size="40"
+      style="margin-left: 10px; margin-right: 10px"
+      ><span style="color: black; font-size: 18px">
+        {{ avatar }}</span
+      ></v-avatar
+    >
+    <div>
+      <div
+        style="
+          background-color: azure;
+          margin-right: 10px;
+          border: 1px solid azure;
+          border-radius: 15px;
+          padding: 10px;
+          margin-bottom: 10px;
+        "
+      >
+       <p style="font-weight: bold;font-size: 16px">
+        {{ nom }}
+      </p>
+        <p style="font-size: 16px">
+          {{ comment }}
+        </p>
+        <div style="text-align: right;">
+        <span style="font-weight: normal;font-size: 12px">{{date}}</span>
+        </div>
+      </div>
+    </div>
+    <div v-if="authorized" style="margin-top: 35px">
+      <button @click="dialog = true"><v-icon color="red">mdi-close</v-icon></button>
+      <v-dialog v-model="dialog" max-width="290">
+              <v-card style="padding-top: 20px">
+                <v-card-text
+                  style="
+                    font-family: IBM Plex Sans Thai Looped, sans-serif;
+                    font-size: 24px;
+                    margin-bottom: 40px;
+                  "
+                >
+                  Êtes-vous sûr de vouloir supprimer ce commentaire?
+                </v-card-text>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+
+                  <v-btn color="blue darken-1" text @click="supprimerCommentaire()">
+                    Oui
+                  </v-btn>
+
+                  <v-btn color="red darken-1" text @click="dialog = false">
+                    Non
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+    </div>
+  </div>
+</template>
+
+<script>
+import * as fb from "../scripts/firebase";
+import { supprimerComment }  from "../scripts/commentaire" 
+export default {
+  name: "affichageComment",
+  data:() =>{
+    return {
+      dialog : false,
+    }
+  },
+  props: {
+    idCom:String,
+    uidComment:String,
+    uidMessager:String,
+    avatar: String,
+    comment: String,
+    nom: String,
+    couleur: String,
+    date:String
+  },
+  methods:{
+    supprimerCommentaire(){
+      this.dialog  = false;
+      supprimerComment(this.idCom);
+      this.$emit('refresh');
+    }
+  },
+  computed: {
+    authorized() {
+      if(this.uidComment == fb.auth.currentUser.uid ||this.uidMessager == fb.auth.currentUser.uid)
+      return true;
+      else 
+      return false;
+
+    },
+  },
+};
+</script>
+
+<style scoped></style>
+
+
+================================================
+File: src/components/affichageNotification.vue
+================================================
+<template>
+<div>
+  <div style="display: flex;font-family: 'IBM Plex Sans Thai Looped', sans-serif;">
+      <link
+            href="https://fonts.googleapis.com/css2?family=Comforter&family=Comforter+Brush&family=IBM+Plex+Sans+Thai+Looped:wght@100;300&family=Mochiy+Pop+P+One&family=Nunito:wght@200&family=Raleway:wght@200&display=swap"
+            rel="stylesheet"
+          />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Comforter&family=Comforter+Brush&family=IBM+Plex+Sans+Thai+Looped:wght@100&family=Mochiy+Pop+P+One&family=Nunito:wght@200&family=Raleway:wght@200&display=swap"
+            rel="stylesheet"
+          />
+    <div style="flex:1%">
+    <v-avatar
+      :color="couleur"
+      size="40"
+      style="margin-left: 10px; margin-right: 10px"
+      ><span style="color: black; font-size: 18px">
+        {{ avatar }}</span
+      ></v-avatar
+    >
+    </div>
+    <div style="flex:80%">
+      <p style="font-weight: bold; margin-top: 8px; font-size: 16px">
+        {{ nom }} {{notification}} "{{titreTache}}"
+      </p>
+    </div>
+    <div style="margin-right:15px; margin-top:8px;">
+        <button>
+        <v-icon color="red" size="25">mdi-close</v-icon>
+        </button>
+    </div>
+  </div>
+  <hr style="margin-top: 10px; margin-bottom: 10px;margin-left:10px; margin-right:10px;" />
+</div>
+</template>
+
+<script>
+import * as fb from "../scripts/firebase";
+import { getUserInfoByUid } from "../scripts/authentification"
+
+export default {
+  name: "affichageNotification",
+  data: () => {
+    return {
+        nom:String,
+        avatar:String,
+        couleur:String,
+        titreTache:"Sport"
+    };
+  },
+  props: {
+    idTache: String,
+    notification: String,
+    date: String,
+  },
+  methods: {
+      UserMoi() {
+      const uid = fb.auth.currentUser.uid;
+      if (uid != null)
+        getUserInfoByUid(uid).then((userInfo) => {
+          this.couleur = userInfo.data().color;
+          this.avatar = userInfo.data().initial;
+          this.nom = userInfo
+            .data()
+            .name.concat(" ")
+            .concat(userInfo.data().lastName);
+        });
+    },
+  },
+  beforeMount(){
+      this.UserMoi();
+  }
+};
+</script>
+
+<style scoped></style>
+
+
+================================================
+File: src/components/affichageProfil.vue
+================================================
+<template>
+  <div class="profi">
+    <div>
+      <v-icon style="margin-right: 10px; margin-bottom: 7px; color: #b71c1c">
+        mdi-home-city</v-icon
+      >
+      <span style="font-weight: bold; font-size: 28px">Mon profil</span>
+      <br />
+      <hr style="margin-bottom: 40px" />
+    </div>
+    <v-avatar size="130" style="flex: 10%" :color="couleur">
+      <span style="font-size: 40px">{{avatar}}</span></v-avatar
+    ><br /><br />
+    <div style="display: flex">
+      <span style="flex: 10%; padding-top: 20px">Nom:</span>
+      <v-text-field
+        style="flex: 70%"
+        v-model="nom"
+        :disabled="!edit"
+      ></v-text-field>
+    </div>
+    <br /><br />
+    <div style="display: flex">
+      <span style="flex: 15%; padding-top: 20px">Prénom:</span>
+      <v-text-field
+        style="flex: 70%"
+        v-model="prenom"
+        :disabled="!edit"
+      ></v-text-field>
+    </div>
+    <br /><br />
+    <div style="display: flex">
+      <span style="flex: 10%; padding-top: 20px">Email:</span>
+      <v-text-field
+        style="flex: 70%"
+        v-model="email"
+        :disabled="true"
+      ></v-text-field>
+    </div>
+    <br /><br />
+    <v-btn
+      v-if="!edit"
+      class="white--text"
+      color="#0F64E2"
+      @click="edit = true"
+    >
+      <span style="font-weight: bold">Éditer le profil</span>
+    </v-btn>
+    <v-btn
+      v-if="edit"
+      class="white--text"
+      color="#0F64E2"
+      @click=" modifierProfil()"
+    >
+      <span style="font-weight: bold">Valider</span>
+    </v-btn>
+  </div>
+</template>
+
+<script>
+//import { useDeviceLanguage } from '@firebase/auth';
+import * as fb from "../scripts/firebase";
+import { modifierProfil } from "../scripts/profil"
+import { getUserInfoByUid } from "../scripts/authentification"
+
+export default {
+  name: "afficheProfil",
+  edit: true,
+  data: () => {
+    return {
+      edit: false,
+      nom: "",
+      prenom: "",
+      email: "",
+      couleur:"",
+      avatar:"",
+    };
+  },
+  methods: {
+    async modifierProfil(){
+      this.edit = false;
+      modifierProfil(this.nom,this.prenom,this.nom.charAt(0).concat(this.prenom.charAt(0)).toUpperCase(),fb.auth.currentUser.uid);
+      this.getUserInfo();
+    },
+    getUserInfo() {
+      getUserInfoByUid(fb.auth.currentUser.uid).then((user) => {
+        this.nom = user.data().name;
+        this.prenom = user.data().lastName;
+        this.email = user.data().email;
+        this.avatar = user.data().initial;
+        this.couleur = user.data().color;
+      });
+    },
+  },
+  beforeMount() {
+    this.getUserInfo();
+  },
+};
+</script>
+
+<style scoped>
+.profi {
+  font-family: "IBM Plex Sans Thai Looped", sans-serif;
+  font-size: 24px;
+  margin-top: 3px;
+  margin-left: 3px;
+  padding: 30px;
+  height: 100%;
+  align-content: center;
+  text-align: center;
+  border-style: ridge;
+  margin-bottom: 40px;
+}
+</style>
+
+
+================================================
+File: src/components/affichageTache.vue
+================================================
+<template>
+  <div class="affTache">
+    <div style="display: flex">
+      <div style="flex: 20%; text-align: center">
+        <button @click="autreUtilisateur()">
+          <v-avatar :color="this.couleur" size="56"
+            ><span style="color: black; font-size: 20px">
+              {{ avatar }}</span
+            ></v-avatar
+          ><br />
+          <span style="margin-bottom: 50px">{{ nomComplet }}</span></button
+        ><br />
+        <button @click="addFavoris()">
+          <v-icon
+            v-if="!estFavoris"
+            background-color="orange lighten-3"
+            color="orange"
+            hover
+            size="64"
+            >mdi-star-outline</v-icon
+          >
+        </button>
+        <button @click="removeFavoris()">
+          <v-icon
+            v-if="estFavoris"
+            background-color="orange lighten-3"
+            color="orange"
+            hover
+            size="64"
+            >mdi-star</v-icon
+          >
+        </button>
+
+        <br />
+        <span> Favoris</span>
+      </div>
+
+      <div style="flex: 80%">
+        <div>
+          <span
+            style="
+              font-weight: bold;
+              font-size: 24px;
+              margin-right: 10px;
+              margin-top: 20px;
+            "
+            >{{ titreTache }}
+          </span>
+          <button
+            style="padding-bottom: 10px"
+            v-if="visible && canSuppress && estMoi"
+            @click="setPrivateTache()"
+          >
+            <v-icon style="color: #4285f4">mdi-lock-open-variant</v-icon>
+          </button>
+
+          <button
+            style="padding-bottom: 10px"
+            v-if="!visible && canSuppress && estMoi"
+            @click="setPublicTache()"
+          >
+            <v-icon style="color: red"> mdi-lock-open</v-icon>
+          </button>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <button
+                style="padding-bottom: 10px"
+                v-bind="attrs"
+                v-on="on"
+                @click="downloadDocument()"
+              >
+                <a style="text-decoration: none" v-if="getDocument">
+                  <v-icon color="primary">mdi-paperclip</v-icon>
+                </a>
+              </button>
+            </template>
+            <span>Une pièce jointe est disponible</span>
+          </v-tooltip>
+        </div>
+
+        <div v-if="voir">
+          <span style="font-size: 16px">{{ discipline }} </span><br />
+          <span style="font-size: 12px">{{ niveau }} </span><br />
+          <span style="font-size: 10px">{{ date }} </span><br />
+        </div>
+        <div v-if="!voir" @click="voir = true" style="font-size: 12px">
+          <button>Afficher les détails...</button>
+        </div>
+        <div v-if="voir" @click="voir = false" style="font-size: 12px">
+          <button>Masquer les détails...</button>
+        </div>
+        <div
+          id="father"
+          style="
+            background-color: #fbf4f4;
+            margin-top: 40px;
+            text-align: justify;
+            padding: 8px;
+            max-width: 550px;
+          "
+          v-html="description"
+        ></div>
+        <div>
+          <v-row
+            style="
+              margin-top: 40px;
+              margin-bottom: 40px;
+              padding-right: 60px;
+              justify-content: end;
+            "
+          >
+            <v-btn
+              v-if="canSuppress && estMoi"
+              style="margin-right: 20px"
+              hover
+              icon
+              color="blue"
+              @click="modifier"
+            >
+              <v-icon>mdi-pencil-plus</v-icon>
+            </v-btn>
+
+            <v-btn
+              v-if="canSuppress && estMoi"
+              color="red"
+              style="margin-right: 20px"
+              hover
+              @click="dialog = true"
+              icon
+            >
+              <v-icon>mdi-trash-can-outline</v-icon>
+            </v-btn>
+
+            <v-dialog v-model="dialog" max-width="290">
+              <v-card style="padding-top: 20px">
+                <v-card-text
+                  style="
+                    font-family: IBM Plex Sans Thai Looped, sans-serif;
+                    font-size: 24px;
+                    margin-bottom: 40px;
+                  "
+                >
+                  Êtes-vous sûr de vouloir supprimer cette tâche?
+                </v-card-text>
+
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+
+                  <v-btn color="blue darken-1" text @click="supprimerTache()">
+                    Oui
+                  </v-btn>
+
+                  <v-btn color="red darken-1" text @click="dialog = false">
+                    Non
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+
+            <v-btn hover icon color="blue" @click="comment()">
+              <v-icon>mdi-comment-processing-outline</v-icon>
+            </v-btn>
+            <div
+              style="
+                text-align: center;
+                margin-left: 25px;
+                display: flex;
+                flex-direction: column;
+              "
+            >
+              <div>
+                <v-btn
+                  v-if="!disliked"
+                  hover
+                  background-color="orange lighten-3"
+                  icon
+                  color="deep-orange"
+                  id="dislikeFalse"
+                  @click="addDislike()"
+                  :disabled="liked"
+                >
+                  <v-icon>mdi-thumb-down-outline</v-icon>
+                </v-btn>
+                <v-btn
+                  v-if="disliked"
+                  hover
+                  background-color="orange lighten-3"
+                  icon
+                  id="dislikeTrue"
+                  color="deep-orange"
+                  @click="removeDislike()"
+                  :disabled="liked"
+                >
+                  <v-icon>mdi-thumb-down</v-icon>
+                </v-btn>
+              </div>
+              <div>
+                <span style="padding: 3px">{{ dislikeNumber }}</span>
+              </div>
+            </div>
+            <div
+              style="
+                text-align: center;
+                margin-left: 25px;
+                display: flex;
+                flex-direction: column;
+              "
+            >
+              <div>
+                <v-btn
+                  v-if="!liked"
+                  hover
+                  icon
+                  color="blue"
+                  id="likeFalse"
+                  @click="addLike()"
+                  :disabled="disliked"
+                >
+                  <v-icon>mdi-thumb-up-outline</v-icon>
+                </v-btn>
+                <v-btn
+                  v-if="liked"
+                  hover
+                  icon
+                  color="blue"
+                  id="likeTrue"
+                  @click="removeLike()"
+                  :disabled="disliked"
+                >
+                  <v-icon>mdi-thumb-up</v-icon>
+                </v-btn>
+              </div>
+              <div>
+                <span style="padding: 3px">{{ likeNumber }}</span>
+              </div>
+            </div>
+          </v-row>
+        </div>
+
+        <div v-if="wantComment">
+          <div>
+            <hr style="margin-top: 10px; margin-bottom: 10px" />
+
+            <div v-if="!voirComment" style="font-size: 12px">
+              <button
+                @click="
+                  () => {
+                    voirComment = true;
+                    this.afficherComments();
+                  }
+                "
+              >
+                Afficher les commentaires...
+              </button>
+            </div>
+            <div v-if="voirComment" style="font-size: 12px">
+              <affichage-comment
+                @refresh="refresh"
+                v-for="{
+                  avatar,
+                  comment,
+                  nom,
+                  couleur,
+                  uidComment,
+                  idCom,
+                  date,
+                } in comments"
+                :key="couleur"
+                :uidComment="uidComment"
+                :avatar="avatar"
+                :comment="comment"
+                :nom="nom"
+                :couleur="couleur"
+                :uidMessager="uid"
+                :idCom="idCom"
+                :date="date"
+              />
+
+              <button @click="voirComment = false" style="margin-top: 10px">
+                Masquer les commentaires...
+              </button>
+            </div>
+            <hr style="margin-top: 10px; margin-bottom: 10px" />
+          </div>
+          <v-text-field
+            v-model="commentaire"
+            label="Commentaire"
+            placeholder="Saisir votre commentaire.."
+            filled
+            rounded
+            dense
+            @keyup.enter="send()"
+          ></v-text-field>
+        </div>
+      </div>
+    </div>
+    <hr />
+  </div>
+</template>
+
+<script>
+import affichageComment from "../components/affichageComment.vue";
+import * as utils from "../scripts/utils";
+import * as fb from "../scripts/firebase";
+import * as like from "../scripts/like";
+import * as favoris from "../scripts/favoris";
+import { sendComment,getComments } from "../scripts/commentaire"
+import { getFile } from "../scripts/fileManager"
+import { setPrivate,setPublic,supprimerTacheSoft } from "../scripts/tache"
+import { getUserInfoByUid } from "../scripts/authentification"
+//import * as notification from "../notification";
+
+export default {
+  data: () => {
+    return {
+      voir: false,
+      voirComment: false,
+      rating: 0,
+      wantComment: false,
+      visible: Boolean,
+      commentaire: "",
+      dialog: false,
+      liked: false,
+      disliked: false,
+      estFavoris: false,
+      couleurMoi: String,
+      avatarMoi: String,
+      nomMoi: String,
+      monUid: String,
+      likes: [],
+      dislikes: [],
+      comments: [],
+      likeNumber: 0,
+      dislikeNumber: 0,
+      estMoi: false,
+    };
+  },
+  components: {
+    affichageComment,
+  },
+  props: {
+    uid: String,
+    id: String,
+    visibilite: String,
+    titreTache: String,
+    description: String,
+    discipline: String,
+    niveau: String,
+    avatar: String,
+    couleur: String,
+    nomComplet: String,
+    date: String,
+    document: String,
+    canSuppress: {
+      type: Boolean,
+      default: false,
+    },
+    dislikedNumber: {
+      default: 0,
+    },
+    likedNumber: {
+      default: 0,
+    },
+  },
+  computed: {
+    generateLightColorHex() {
+      let color = "#";
+      for (let i = 0; i < 3; i++)
+        color += (
+          "0" +
+          Math.floor(((1 + Math.random()) * Math.pow(16, 2)) / 2).toString(16)
+        ).slice(-2);
+      return color;
+    },
+    getDocument() {
+      //console.log(this.id)
+      //console.log(this.document);
+      if (this.document === "") {
+        //console.log("document undifined");
+        return false;
+      } else {
+        //console.log("document defined");
+        return true;
+      }
+    },
+  },
+  methods: {
+    async getLikes() {
+      this.likeNumber = this.likedNumber;
+      const idTacheLiked = await like.getLikes(fb.auth.currentUser.uid);
+      if (
+        typeof idTacheLiked !== "undefined" &&
+        idTacheLiked.includes(this.id)
+      ) {
+        this.liked = true;
+      } else this.liked = false;
+    },
+    async getDislikes() {
+      this.dislikeNumber = this.dislikedNumber;
+      const idTacheDisliked = await like.getDislikes(fb.auth.currentUser.uid);
+      if (
+        typeof idTacheDisliked !== "undefined" &&
+        idTacheDisliked.includes(this.id)
+      ) {
+        this.disliked = true;
+      } else this.disliked = false;
+    },
+    async getFavoris() {
+      const idTacheDisliked = await favoris.getFavoris(fb.auth.currentUser.uid);
+      if (
+        typeof idTacheDisliked !== "undefined" &&
+        idTacheDisliked.includes(this.id)
+      ) {
+        this.estFavoris = true;
+      } else this.estFavoris = false;
+    },
+    async addLike() {
+      this.liked = true;
+      like.addLike(this.id, this.monUid, this.uid);
+      //notification.addLikeNotification(this.id, this.monUid,this.uid);
+      this.likeNumber++;
+    },
+    removeLike() {
+      this.liked = false;
+      like.removeLike(this.id, this.monUid);
+      this.likeNumber--;
+    },
+    addDislike() {
+      this.disliked = true;
+      like.addDisLike(this.id, this.monUid);
+      this.dislikeNumber++;
+    },
+    removeDislike() {
+      this.disliked = false;
+      like.removeDislike(this.id, this.monUid);
+      this.dislikeNumber--;
+    },
+
+    refresh() {
+      this.voirComment = true;
+      this.afficherComments();
+    },
+    async downloadDocument() {
+      const documentUrl = await getFile(this.document);
+      window.open(documentUrl, "_blank");
+    },
+    removeFavoris() {
+      this.estFavoris = false;
+      favoris.removeFavori(this.id, this.monUid);
+      this.$emit("reload");
+    },
+    addFavoris() {
+      this.estFavoris = true;
+      favoris.addFavori(this.id, this.monUid);
+      this.$emit("reload");
+    },
+    autreUtilisateur() {
+      this.$emit("autreUtilisateur", this.uid);
+    },
+    lock() {
+      //console.log(this.visibilite);
+      if (this.visibilite == "Public") {
+        this.visible = true;
+      } else if (this.visibilite == "Privée") {
+        this.visible = false;
+      }
+    },
+    setPrivateTache() {
+      this.visible = false;
+      setPrivate(this.id);
+    },
+    setPublicTache() {
+      this.visible = true;
+      setPublic(this.id);
+    },
+    modifier() {
+      this.$emit("modifier", this.id);
+    },
+    supprimerTache() {
+      this.dialog = false;
+      //console.log(this.id);
+      supprimerTacheSoft(this.id)
+        .then(() => {
+          this.$emit("supprimer");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    async send() {
+      this.voirComment = true;
+      sendComment(
+        this.avatarMoi,
+        this.commentaire,
+        this.nomMoi,
+        this.id,
+        fb.auth.currentUser.uid,
+        this.couleurMoi
+      ).then(this.afficherComments());
+
+      this.commentaire = "";
+    },
+    comment() {
+      this.wantComment = !this.wantComment;
+      this.commentaire = "";
+    },
+    rate() {
+      if (this.rating == 1) this.rating = 0;
+      else this.rating == 1;
+    },
+    async afficherComments() {
+      getComments(this.id).then((listTache) => {
+        const listDocuments = listTache.docs;
+        const data = utils.getDatasFromDocument(listDocuments)
+        const sortedInvertData = utils.sortByTimeInvert(data);
+        this.comments = [];
+        for (let i = 0; i < sortedInvertData.length; i++) {
+          this.updateTache(sortedInvertData[i], this.comments);
+        }
+      });
+    },
+    updateTache(data, container) {
+      const date = utils.getDateFromTimestamp(data.timestamp);
+      container.push({
+        idCom: data.id,
+        uidComment: data.uid,
+        avatar: data.initial,
+        comment: data.comment,
+        nom: data.name,
+        couleur: data.couleur,
+        date: date,
+      });
+    },
+    UserMoi() {
+      this.monUid = fb.auth.currentUser.uid;
+      if (this.monUid != null)
+        getUserInfoByUid(this.monUid).then((userInfo) => {
+          this.couleurMoi = userInfo.data().color;
+          this.avatarMoi = userInfo.data().initial;
+          this.nomMoi = userInfo
+            .data()
+            .name.concat(" ")
+            .concat(userInfo.data().lastName);
+        });
+      if (this.monUid == this.uid) this.estMoi = true;
+    },
+  },
+
+  beforeMount() {
+    /* TODO optimiation a faire ici, pour linstant ca appel nombreTacheAffiche * nombreLike. 
+    Alors que ca pourrait appele 1*nombreLike (recuperer 1 fois au serveur et mettre dans un tab) */
+    this.getLikes();
+    this.getDislikes();
+    this.getFavoris();
+    /* ---------- */ 
+
+    this.lock();
+    this.UserMoi();
+    this.afficherComments();
+  },
+
+  name: "affichageTache",
+};
+</script>
+
+<style scoped>
+::v-deep #father > p >img{
+    max-width: 100%;
+    height: auto;
+}
+::v-deep #father > p{
+    max-width: 100%;
+    height: auto;
+    word-wrap: break-word;
+}
+::v-deep #father >iframe{
+    width: 100%;
+    height: 300px;
+}
+::v-deep #father >pre{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+}
+.affTache {
+  font-family: IBM Plex Sans Thai Looped, sans-serif;
+  margin-top: 60px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+</style>
+
+
+================================================
+File: src/components/barPhoto.vue
+================================================
+<template>
+  <div class="menu">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comforter&family=Comforter+Brush&family=IBM+Plex+Sans+Thai+Looped:wght@100;300&family=Mochiy+Pop+P+One&family=Nunito:wght@200&family=Raleway:wght@200&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comforter&family=Comforter+Brush&family=IBM+Plex+Sans+Thai+Looped:wght@100&family=Mochiy+Pop+P+One&family=Nunito:wght@200&family=Raleway:wght@200&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap"
+      rel="stylesheet"
+    />
+    <div style="color: white; margin-left: 10px">
+      <v-avatar size="100" :color="couleur">
+        <span
+          style="
+            color: black;
+            font-size: 40px;
+            font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+          "
+        >
+          {{ avatar }}</span
+        >
+      </v-avatar>
+    </div>
+    <div style="margin-left: 20px">
+      <div style="color: white; padding-top: 10px; font-weight: bold">
+        <span style="font-weight: bold"> {{ nom }}</span> <v-icon v-if="suivi && !moi" color="#00FF00">mdi-check-outline</v-icon>
+      </div>
+      <div style="padding-top: 10px" v-if="moi">
+        <v-btn
+          class="white--text"
+          color="#0F64E2"
+          @click="displayComponentEditProfil()"
+        >
+          <span style="font-weight: bold">Éditer le profil</span>
+        </v-btn>
+      </div>
+      <div style="padding-top: 10px" v-if="!moi">
+        <v-btn
+          v-if="!suivi"
+          class="white--text"
+          color="#0F64E2"
+          @click="suivre()"
+        >
+          <span style="font-weight: bold">Suivre</span>
+        </v-btn>
+        <v-btn
+          v-if="suivi"
+          class="white--text"
+          color="#0F64E2"
+          @click="nePlusSuivre()"
+        >
+          <span style="font-weight: bold">Ne plus Suivre</span>
+        </v-btn>
+      </div>
+    </div>
+  </div>
+</template>
+<script>
+import { checkAbonnement,removeAbonnement,addAbonnement } from "../scripts/abonnement"
+
+export default {
+  name: "barPhoto",
+
+  data: () => ({
+    suivi: false,
+  }),
+  props: {
+    couleur: String,
+    avatar: String,
+    nom: String,
+    autreUid:String,
+    moi: {
+      type: Boolean,
+      default: true,
+    },
+  },
+
+  methods: {
+    displayComponentEditProfil() {
+      this.$emit("profil");
+    },
+    suivre() {
+      addAbonnement(this.autreUid);
+      this.suivi = true;
+    },
+    nePlusSuivre() {
+      removeAbonnement(this.autreUid);
+      this.suivi = false;
+    },
+    async setBoutonSuivre() {
+      this.suivi = await checkAbonnement(this.autreUid);
+    },
+  }, 
+  beforeMount() {
+    this.setBoutonSuivre();
+  },
+};
+</script>
+<style scoped>
+.menu {
+  font-family: "IBM Plex Sans Thai Looped", sans-serif;
+  font-size: 24px;
+  background-color: #5468ad;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  justify-content: flex-start;
+  font-weight: bold;
+}
+.pointeur:hover {
+  color: #0f64e2;
+}
+</style>
+
+
+================================================
+File: src/components/menu.vue
+================================================
+<template>
+  <div class= "menu">
+      <link
+      href="https://fonts.googleapis.com/css2?family=Comforter&family=Comforter+Brush&family=IBM+Plex+Sans+Thai+Looped:wght@100;300&family=Mochiy+Pop+P+One&family=Nunito:wght@200&family=Raleway:wght@200&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Comforter&family=Comforter+Brush&family=IBM+Plex+Sans+Thai+Looped:wght@100&family=Mochiy+Pop+P+One&family=Nunito:wght@200&family=Raleway:wght@200&display=swap"
+      rel="stylesheet"
+    />
+<div class="Rubriques" style="height: 60px;">
+    <button @click="displayComponentProfil()">Profil</button>
+
+</div>
+  <div class="Rubriques"  style="height: 60px;">
+    <button @click="displayComponentMesIdees()">Mes idées</button>
+
+</div> 
+  <div class="Rubriques"  style="height: 60px;">
+    <button @click="displayComponentFavoris()">Mes favoris</button>
+
+  </div>
+  
+  </div>
+  
+</template>
+<script>
+//import * as fb from "../index.js";
+//import { onAuthStateChanged } from 'firebase/auth';
+
+export default {
+  name: "MeNu",
+
+  data: () => ({
+   
+  }),
+
+  methods: {
+    
+ 
+    displayComponentProfil() {
+      this.$router.push("/recupererpassword").catch(() => {});
+    },
+    displayComponentMesIdees() {
+      this.$router.push("/inscription").catch(() => {});
+    },
+    displayComponentFavoris() {
+      this.$router.push("/profil").catch(() => {});
+    },
+  },
+};
+</script>
+<style scoped>
+.menu {
+  font-family: "IBM Plex Sans Thai Looped", sans-serif;
+  font-size: 24px;
+  margin-top: 3px;
+  margin-left: 3px;
+  padding: 10px;
+  height: 100%;
+}
+.Rubriques:hover {
+  color:#0f64e2;
+  background-color:azure;
+}
+</style>
+
+================================================
+File: src/components/modifierTache.vue
+================================================
+<template>
+  <div class="creer">
+    <div>
+      <v-icon
+        color="blue"
+        size="35"
+        style="margin-bottom: 10px; margin-right: 10px"
+        >mdi-pencil-plus</v-icon
+      >
+      <span style="font-weight: bold; font-size: 28px">Modifier la tâche</span>
+      <br />
+      <hr style="margin-bottom: 40px" />
+    </div>
+    <div style="display: flex">
+      <v-icon style="margin-right: 10px">mdi-lock-open</v-icon>
+      <v-select
+        :items="items"
+        label="Visibilité"
+        v-model="visibilite"
+        placeholder="Sélectionner la visibité de la tache"
+      ></v-select>
+    </div>
+    <v-text-field
+      label="Titre de la tâche"
+      v-model="titreTache"
+      placeholder="Veuillez saisir le titre de l'idée"
+      type="text"
+      required
+    ></v-text-field>
+    <v-text-field
+      label="Description de la discipline"
+      v-model="disciplineTache"
+      placeholder="Veuillez saisir la discipline sportive"
+      type="text"
+      required
+    >
+    </v-text-field
+    ><v-text-field
+      label="Niveau d'apprentissage"
+      :value="niveauTache"
+      placeholder="Veuillez saisir le niveau d'apprentissage"
+      type="text"
+      required
+    ></v-text-field>
+    <v-file-input
+      style="margin-bottom: 40px"
+      label="téléverser un fichier"
+      v-model="image"
+      @change="imgNullFunc()"
+    ></v-file-input>
+    <div v-if="imgNull">
+      <v-img :src="url" style="max-height: 200px" />
+      <pdf :src="url"></pdf>
+    </div>
+    <v-container fluid>
+      <vue-editor
+        counter
+        :rules="rules"
+        v-model="description"
+        placeholder="Saisir une description de la tâche.."
+        style="background-color:rgba(255, 182, 193, 0.192;margin-bottom: 40px;"
+      ></vue-editor>
+    </v-container>
+    <v-row align="center" style="margin-bottom: 60px">
+      <v-btn @click="updateTache()" color="primary" style="margin-left: 45px">
+        Confirmer
+      </v-btn>
+      <v-spacer></v-spacer>
+      <v-btn @click.native="retour()" color="error" style="margin-right: 45px">
+        Annuler
+      </v-btn>
+    </v-row>
+  </div>
+</template>
+
+<script>
+import * as fb from "../scripts/firebase";
+import { VueEditor } from "vue2-editor";
+import { modifierTache } from "../scripts/tache";
+
+//import pdf from 'vue-pdf'
+export default {
+  components: {
+    VueEditor,
+  },
+
+  data: () => ({
+    visibilite: "",
+    rules: [(v) => v.length <= 100000 || "Max 25 characters"],
+    description: "",
+    niveauTache: "",
+    titreTache: "",
+    disciplineTache: "",
+    imgNull: false,
+    image: "",
+    items: ["Privée", "Public"],
+  }),
+  name: "modifierTache",
+  methods: {
+    async getTache() {
+      const document = await fb.getTache(this.id);
+      const data = document.data();
+      this.titreTache = data.titreTache;
+      this.niveauTache = data.niveauTache;
+      this.visibilite = data.visibilite;
+      this.description = data.description;
+      this.disciplineTache = data.disciplineTache;
+    },
+    updateTache() {
+      modifierTache(
+        this.id,
+        this.titreTache,
+        this.description,
+        this.niveauTache,
+        this.disciplineTache,
+        this.visibilite,
+        this.document
+      )
+        .then(() => {
+          this.$emit("confirmer");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    retour() {
+      this.$emit("annuler");
+    },
+    imgNullFunc() {
+      if (this.image !== "") {
+        this.imgNull = true;
+      } else {
+        this.imgNull = false;
+      }
+    },
+  },
+  computed: {
+    url() {
+      if (!this.image) return;
+      return URL.createObjectURL(this.image);
+    },
+  },
+  props: {
+    id: String,
+  },
+  beforeMount() {
+    this.getTache();
+  },
+};
+</script>
+
+<style scoped>
+.creer {
+  font-family: IBM Plex Sans Thai Looped, sans-serif;
+  margin-top: 60px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+</style>
+
+
+================================================
+File: src/components/posterIdee.vue
+================================================
+<template>
+  <div class="creer">
+    <div >
+      <v-icon size="35" style="margin-right:10px;margin-bottom:10px;color:#DEB887">  mdi-cookie</v-icon>
+      
+      <span style="font-weight: bold; font-size: 28px">Créer une tâche</span>
+      <br />
+      <hr style="margin-bottom: 40px;"/>
+    </div>
+    <div style="display:flex;">
+   <v-icon style="margin-right: 10px;">mdi-lock-open</v-icon>
+    <v-select
+          :items="items"
+          label="Visibilité"
+          v-model="visibilite"
+          placeholder="Sélectionner la visibité de la tache"
+        ></v-select>
+    </div>
+    <v-text-field
+      label="Titre de la tâche"
+      v-model="titreTache"
+      placeholder="Veuillez saisir le titre de l'idée"
+              type="text"
+              required
+    ></v-text-field>
+    <v-text-field 
+    label="Discipline"
+      v-model="DisciplineTache"
+      placeholder="Veuillez saisir la discipline sportive"
+              type="text"
+              required>
+              </v-text-field
+    ><v-text-field
+      label="Niveau d'apprentissage"
+      v-model="niveauTache"
+      placeholder="Veuillez saisir le niveau d'apprentissage"
+              type="text"
+              required
+    ></v-text-field>
+    <v-file-input
+    style="margin-bottom: 40px;"
+    label="téléverser un fichier"
+    v-model="document"
+    @change="imgNullFunc()"
+  ></v-file-input>
+  <div v-if ="imgNull">
+  <v-img :src="url" style = "max-height : 200px" />
+  <pdf :src="url"></pdf>
+  </div>
+    <v-container fluid>
+    <vue-editor
+      counter
+      :rules="rules"
+      v-model="description"
+      placeholder="Saisir une description de la tâche.."
+      style="background-color:rgba(255, 182, 193, 0.192;margin-bottom: 40px;max-width:700px"
+    ></vue-editor>
+    <v-row align="center" style="margin-bottom: 60px">
+      <v-btn :disabled="empty"
+        @click="publish()"
+        color="primary"
+        style="margin-left: 45px"
+      >
+        Publier
+      </v-btn>
+      <v-spacer></v-spacer>
+      <v-btn
+        @click.native="annuler()"
+        color="error"
+        style="margin-right: 45px"
+      >
+        Annuler
+      </v-btn>
+    </v-row>
+  </v-container>
+  </div>
+</template>
+
+<script>
+//import pdf from 'vue-pdf'
+import { VueEditor } from "vue2-editor";
+import { publish } from "../scripts/tache";
+
+export default {
+ components: {
+    VueEditor
+  },
+
+    titreTache: "",
+    data: () => ({
+      visibilite: "",
+      rules: [v => v.length <= 100000 || 'Max 25 characters'],
+      description: "",
+      niveauTache:"",
+      DisciplineTache: "",
+      imgNull: false,
+      titreTache: "",
+      document:"",
+      items: ['Privée', 'Public'],
+    }),
+  name: "posterIdee",
+methods:{
+
+  async publish(){
+    try {
+      await publish(this.titreTache,this.description,this.niveauTache,this.DisciplineTache,this.visibilite,this.document);
+      this.seenView();
+      // update/refresh
+      this.$emit('publieIdee');
+
+    } catch (error) {
+      console.log(error);
+      // TODO gerer les cas derreur ici
+    }
+  },
+  annuler() {
+    this.$emit('annulerIdee');
+  },
+  async seenView() {
+    this.estModif = false;
+    this.seen = !this.seen;
+    this.estprofil = false;
+    this.estActualite = true;
+    this.estResultat = false;
+    this.estMesIdees =false;
+    this.estFavoris = false;
+  },
+imgNullFunc() {
+      if(this.image !==""){
+        this.imgNull = true;
+      }else {
+        this.imgNull = false;
+      }
+    }
+},
+  computed: {
+      empty(){
+   if(this.titreTache.length == 0 || this.visibilite.length == 0 ||this.description.length == 0 || this.niveauTache.length == 0 || this.DisciplineTache.length ==0)
+   return true;
+   else return false;
+ },
+    url() {
+      if (!this.image) return;
+      return URL.createObjectURL(this.image);
+    },
+    
+  },
+  
+};
+</script>
+
+<style scoped>
+.creer {
+  font-family: IBM Plex Sans Thai Looped, sans-serif;
+  margin-top: 60px;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+</style>
+
+
+================================================
+File: src/components/toolbar.vue
+================================================
+<template>
+  <v-toolbar id="tool" height="90" dense fixed>
+    <button @click="actuality()">
+      <div>
+        <v-img src="../images/epsideas.png" max-height="60" max-width="150">
+        </v-img>
+      </div>
+    </button>
+    <v-spacer></v-spacer>
+
+    <v-text-field
+      id="searchBar"
+      style="margin-top: 24px; width: 30%"
+      placeholder="Rechercher une idée.."
+      v-model="result"
+      @keyup.enter="search()"
+      type="text"
+      solo
+    >
+    </v-text-field>
+
+    <v-spacer></v-spacer>
+    <button @click="mesIdees()">
+      <v-avatar :color="couleur" style="margin-right: 20px">
+        <span
+          style="
+            color: black;
+            font-family: 'IBM Plex Sans Thai Looped', sans-serif;
+          "
+        >
+          {{ avatar }}</span
+        >
+      </v-avatar>
+      <span
+        id="name"
+        class="font-weight-regular"
+        style="
+          margin-right: 20px;
+          font-family: IBM Plex Sans Thai Looped, sans-serif;
+          font-size: 18px;
+        "
+        >{{ nom }}</span
+      >
+    </button>
+    <v-spacer></v-spacer>
+
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          v-bind="attrs"
+          v-on="on"
+          @click="voirNotification()"
+          icon
+          style="margin-right: 20px; width: 20px"
+        >
+          <v-icon :color="couleurNotification">mdi-message-badge</v-icon>
+        </v-btn>
+      </template>
+      <span>{{ message }}</span>
+    </v-tooltip>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <button v-bind="attrs" v-on="on">
+          <v-btn icon style="width: 20px; margin-right: 20px">
+            <v-icon>mdi-help-circle-outline </v-icon>
+          </v-btn>
+        </button>
+      </template>
+      <span>Aide</span>
+    </v-tooltip>
+
+    <div id="deconMax" style="margin-right: 20px; width: 80px">
+      <button
+        style="
+          text-decoration: underline;
+          font-family: IBM Plex Sans Thai Looped, sans-serif;
+        "
+        @click="logout()"
+      >
+        Déconnexion
+      </button>
+    </div>
+    <div id="deconMini" style="margin-right: 20px; width: 20px">
+      <button @click="logout()"><v-icon>mdi-logout-variant</v-icon></button>
+    </div>
+  </v-toolbar>
+</template>
+
+<script>
+import { getAuth, signOut } from "firebase/auth";
+
+export default {
+  name: "ToolBar",
+  data: () => {
+    return {
+      result: "",
+    };
+  },
+  props: {
+    nom: String,
+    avatar: String,
+    couleur: String,
+    couleurNotification: String,
+  },
+  methods: {
+    actuality() {
+      this.$router.go();
+    },
+    mesIdees() {
+      this.$emit("mesIdees");
+    },
+    logout() {
+      const auth = getAuth();
+      signOut(auth)
+        .then(() => {
+          // Sign-out successful.
+          this.$router.push("/").catch(() => {});
+        })
+        .catch((error) => {
+          // An error happened.
+          console.log(error);
+        });
+    },
+    displayComponentDeconnexion() {
+      this.$router.push("/").catch(() => {});
+    },
+    search() {
+      this.$emit("result", this.result);
+      this.$emit("estResultat");
+    },
+    voirNotification() {
+      this.$emit("voirNotification");
+    },
+  },
+  computed: {
+    message() {
+      if (this.couleurNotification === "red")
+        return "Nouvelles notifications disponibles";
+      else return "Aucune notification disponible";
+    },
+  },
+};
+</script>
+
+<style scoped>
+#tool {
+  width: 100%;
+  mask: linear-gradient(black 7rem, transparent);
+  -webkit-mask: linear-gradient(black 7rem, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1;
+}
+@media only screen and (max-width: 930px) {
+  #name {
+    display: none;
+  }
+  #searchBar {
+    width: 60px;
+  }
+  #deconMini {
+    visibility: visible;
+  }
+  #deconMax {
+    display: none;
+  }
+}
+@media only screen and (min-width: 930px) {
+  #name {
+    visibility: visible;
+  }
+  #deconMini {
+    display: none;
+  }
+  #deconMax {
+    visibility: visible;
+  }
+}
+</style>
+
+
+================================================
+File: src/plugins/vuetify.js
+================================================
+import Vue from 'vue';
+import Vuetify from 'vuetify/lib/framework';
+
+Vue.use(Vuetify);
+
+export default new Vuetify({
+});
+
+
+================================================
+File: src/scripts/abonnement.js
+================================================
+import { doc,setDoc,getDoc,updateDoc,arrayRemove,arrayUnion } from 'firebase/firestore/lite'; 
+import { db,auth } from "./firebase"
+
+export async function checkAbonnement(otherUid) {
+  const docRef = doc(db, 'abonnement',auth.currentUser.uid);
+  const docSnap = await getDoc(docRef);
+
+  let abonne=false;
+  if (docSnap.exists()) {
+    if(docSnap.data().abonnement.includes(otherUid)) {
+      abonne=true;
+    }
+  } 
+  return abonne;
+}
+
+export async function removeAbonnement(otherUid) {
+  const docRef = doc(db, 'abonnement',auth.currentUser.uid);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    updateDoc(docRef,{"abonnement":arrayRemove(otherUid)})
+  } 
+}
+
+export async function addAbonnement(otherUid) {
+  const docRef = doc(db, 'abonnement',auth.currentUser.uid);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    //console.log("Document data:", docSnap.data());
+    updateDoc(docRef,{"abonnement":arrayUnion(otherUid)})
+  } else {
+    //console.log("No such document!");
+    setDoc(docRef,{"abonnement" : [otherUid]});
+  }
+}
+
+export async function getAbonnement(monUid) {
+  const docRef = doc(db, 'abonnement',monUid);
+  const docSnap = await getDoc(docRef);
+
+  let adonnementList=[];
+  if (docSnap.exists()) {
+    adonnementList = await docSnap.data().abonnement;
+  } 
+  return adonnementList;
+}
+
+================================================
+File: src/scripts/authentification.js
+================================================
+import { doc,setDoc,getDoc } from 'firebase/firestore/lite'; // orderBy
+import { createUserWithEmailAndPassword,sendPasswordResetEmail } from 'firebase/auth';
+import { generateLightColorHex } from "./utils"
+import { db,auth } from "./firebase"
+
+export async function getUserInfoByUid(uid) {
+  const docRef = doc(db, "userInfo", uid);
+  return getDoc(docRef).then(userInfo => {
+    return userInfo;
+  });
+}
+
+export async function register(email,password,name,lastName) {
+  return createUserWithEmailAndPassword(auth, email, password).then(() => {
+      return addingUserInfoToUserTable(name,lastName,email)});
+}
+
+async function addingUserInfoToUserTable(name,lastName,email) {
+const color = generateLightColorHex();
+const initial = (name.charAt(0).concat(lastName.charAt(0))).toUpperCase();
+const docRef = doc(db, "userInfo", auth.currentUser.uid)
+const payload = {name: name, lastName: lastName, email: email, color:color, initial:initial};
+  await setDoc(docRef, payload);
+}
+
+export function resetPassword(email){
+sendPasswordResetEmail(auth, email)
+      .then(() => {
+      console.log("Password reset email sent!");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode,errorMessage);
+});  
+}
+
+
+================================================
+File: src/scripts/commentaire.js
+================================================
+import { doc,updateDoc,collection,addDoc,serverTimestamp,where,query,getDocs } from 'firebase/firestore/lite'; 
+import { db } from "./firebase"
+
+export async function supprimerComment(idComment) {
+  const tacheRef = doc(db, "commentaires", idComment);
+  await updateDoc(tacheRef, { "deleted":true});
+}
+
+export async function sendComment(avatar,commentaire,nomComplet,id,uid,couleur) {
+  const collectionRef = collection(db,"commentaires");
+  addDoc(collectionRef,{initial :  avatar, comment: commentaire,name : nomComplet, idMessage : id,couleur :couleur,uid :uid,timestamp:serverTimestamp(),deleted:false}).then( () => {
+  });
+}
+
+export async function getComments(id) {
+  const q = query(collection(db,"commentaires"), where("idMessage", "==" , id),where("deleted", "==" , false) );
+  return getDocs(q);
+}
+
+
+================================================
+File: src/scripts/dictionnaire.js
+================================================
+import { doc,setDoc,getDoc, collection, getDocs,query, where,updateDoc,arrayUnion,documentId, } from 'firebase/firestore/lite'; 
+import { db } from "./firebase";
+import * as utils  from './utils';
+
+export function insererDictionnaire(tache) {
+  const mots = perpRechercheMot(tache.titreTache,tache.niveauTache,tache.disciplineTache,tache.nom,tache.initial,tache.description);
+  insertRechercheMot(tache.id,mots)
+  insertMotDictionnaire(mots)
+} 
+
+export async function rechercherDictionnaire(resquest) {
+  const motsPretraitement1 = parse(resquest)  
+  const motsPretraitement2 = trimAndLowerCase(motsPretraitement1)
+  const RechercheAugmente = await rechercheAugmente(motsPretraitement2)
+  //console.log("RechercheAugmente : ", RechercheAugmente)
+  
+  // fouille dans la table de rechercheMot
+  const ids = []
+  await getContentById(RechercheAugmente,"rechercheMot").then(querySnapshot => {
+    querySnapshot.forEach((doc) => {
+      //console.log(doc.id, " => ", doc.data());
+      //console.log("idsTache ajouter : ", doc.data().idsTache);
+      for(const idTache of  doc.data().idsTache){
+        ids.push(idTache)
+      }
+    });
+  })
+
+  //console.log(ids)
+  
+  let docs = []
+   
+  // Chercher les taches a partir des ids
+  await getContentById(ids,"tache")
+  .then(querySnapshot => {
+    querySnapshot.forEach((doc) => {
+      let data = doc.data()
+      data["id"] = doc.id 
+      docs.push(data)
+    });
+  })
+  //console.log("docs : ", docs)
+  return docs
+}
+
+ export async function getContentById(ids, path) {
+   
+  // don't run if there aren't any ids or a path for the collection
+  if (!ids || !ids.length || !path) return [];
+
+  const collectionPath = collection(db, path)
+  
+  const batches = [];
+
+  while (ids.length) {
+    // firestore limits batches to 10
+    const batch = ids.splice(0, 10);
+
+    // add the batch request to to a queue
+    const q = query(collectionPath, where(documentId(), 'in', batch ))
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      batches.push(doc)
+      //console.log(doc.id, " => ", doc.data());
+    });
+  }
+  //console.log("first element : ", batches[0].data())
+  //console.log("length : ", batches.length)
+  // after all of the data is fetched, return it
+  return batches
+}
+
+async function rechercheAugmente(mots) {
+  // get Dictionnaire 
+  const docRef = doc(db,"DictionnaireColl","DictionnaireDoc");
+  const document = await getDoc(docRef);
+
+  const dataDictionnaire = document.data();
+  //console.log("dataDictionnaire : ", dataDictionnaire)
+  let RechercheAugmente = [] 
+  for(let mot of mots) {
+    for(let motcle of Object.keys(dataDictionnaire)) {
+      // si la difference de longueur des mots est plus grand que 2 alor on analyse pas 
+      if(Math.abs(mot.length-motcle.length) < 3) {
+        let distance = utils.getEditDistance(mot,motcle)
+        //console.log("mot : ", mot, " & motcle : ",motcle," d=",distance)
+        if(distance < 3) {
+          RechercheAugmente.push(motcle);
+        }
+      }  
+    }
+  }
+  return RechercheAugmente
+}
+
+async function insertMotDictionnaire(mots) {
+  const docRef = doc(db,"DictionnaireColl","DictionnaireDoc");
+  const dictionnaireData = (await getDoc(docRef)).data(); 
+  //console.log(dictionnaireData.ballon.length);
+
+  for(let i=0; i < mots.length; i++) {
+    //console.log(Object.keys(dictionnaireData))
+    const mot = mots[i];
+    if(mot in dictionnaireData) {
+      // TODO 
+      let nombreOccurence = ++dictionnaireData[mot];
+      updateDoc(docRef,{[mot]:nombreOccurence})
+    } else {
+      updateDoc(docRef,{[mot]:1})
+    }
+    //updateDoc(docRef,{[mot]:arrayUnion(idTache)})
+  }
+}
+
+function perpRechercheMot(titreTache,niveauTache,disciplineTache,nom,initial,description) {
+  let motsRecherche = {mots:[]} 
+  pushWords(titreTache,motsRecherche);
+  pushWords(niveauTache,motsRecherche);
+  pushWords(disciplineTache,motsRecherche);
+  pushWords(nom,motsRecherche); 
+  pushWords(initial,motsRecherche); 
+  pushWords(description,motsRecherche);
+  return motsRecherche.mots;
+} 
+
+function pushWords(field, motsRecherche) {
+  const determinants = ['le','les','la', ' ' , '', 'ma', 'mon','mes','ta','ton','tes','ses','nos','vos','leur',
+  'son','notre','votre','leur', 'un', 'une','des','ce','cet','cette','ces']; 
+  const pronom = ['je','tu','il','nous','vous', 'il', 'moi','toi','ils','elles','eux','on','en']
+  const preposition = ['avec', 'dans','a','après','avant','chez','concernant','contre','dans','dès','durant','hormis','malgré','moyennant','pour' ]
+  const conjonction = ['mais','ou','et','donc','car','ni','or']
+
+  const blackList = determinants.concat(pronom).concat(preposition).concat(conjonction);
+  const motsPreTraitement1 = parse(field);
+  const motsPreTraitement2 = verifLongueur(motsPreTraitement1); // verifie la longueur 
+  const motsPreTraitement3 = trimAndLowerCase(motsPreTraitement2); 
+  const motsPreTraitement4 = retirerAccent(motsPreTraitement3);
+  const mots = motContientRatioVoyelleConsonne(motsPreTraitement4); // si le mot contient un nombre raissonnable de voyelle
+
+  
+  //console.log("pre-trie : ", mots);
+  for(let i =0; i < mots.length; i++) {
+    const mot = mots[i].toLowerCase();
+
+    // console.log("mot traiter : ",mot);
+    if(mot.length < 2) { 
+      //console.log(mot, " est ignore, car le mot est trop cours");
+    } else if(blackList.includes(mot)) { 
+      //console.log(mot, " est ignore, car il fait partie de la blacklist");
+    } else if(motsRecherche.mots.includes(mot)) { 
+      //console.log(mot, " apparait deja dans la liste.");
+    } else {
+      motsRecherche.mots.push(mot);   
+    }
+  }
+}
+
+function verifLongueur(mots) {
+  const longueurMaxMot = 25 // anticonstitutionnellement 
+  let motsValide = [];
+  for(let mot of mots) {
+    if(mot.length < longueurMaxMot) { 
+      motsValide.push(mot);
+    }
+  }
+  return motsValide;
+}
+ 
+function motContientRatioVoyelleConsonne(mots) {
+  const voyelles = ["a","e","i","o","u","y"]
+  let voyelle = 0;
+  let consonne = 0;
+
+  let motValide = [];
+  for(let mot of mots) {
+    for(let lettre of mot) {
+      if(voyelles.includes(lettre)) {
+        voyelle++;
+      } else {
+        consonne++;
+      }
+    }
+    const ratio = voyelle/consonne; 
+    if(ratio > 0.20) {
+      motValide.push(mot);
+    }
+  }
+  return motValide;
+}
+
+
+function retirerAccent(mots) {
+  const aAccent = [ "à", "â", "ä" ] 
+  const eAccent = [ "é", "è", "ê", "ë"] 
+  const iAccent = [ "ï", "î"]
+  const oAccent = [ "ô", "ö" ]
+  const uAccent = [ "ù", "û", "ü" ]
+  const yAccent = ["ÿ"]
+  const cAccent = ["ç"]
+
+  let motsSansAccent = []
+  for(let mot of mots) {
+    let motSansAccent = ""
+    for(let i = 0 ; i < mot.length; i++) {
+      let lettre = mot.charAt(i)
+      
+      if(aAccent.includes(lettre)) {
+        lettre = "a"
+      } else if(eAccent.includes(lettre)) {
+        lettre = "e"
+      } else if(iAccent.includes(lettre)) {
+        lettre = "i"
+      } else if(oAccent.includes(lettre)) {
+        lettre = "o"
+      } else if(uAccent.includes(lettre)) {
+        lettre = "u"
+      } else if(yAccent.includes(lettre)) {
+        lettre = "y"
+      } else if(cAccent.includes(lettre)) {
+        lettre = "c"
+      } 
+      motSansAccent = motSansAccent+lettre
+    }
+    motsSansAccent.push(motSansAccent)
+  }
+  return motsSansAccent;
+}
+/*
+String.prototype.replaceAt = function(index,replacement) {
+  return this.substring(0,index) + replacement + this.substring(index+1);
+}
+*/
+
+function trimAndLowerCase(mots){
+  let motsResult = [] 
+  for(let mot of mots) {
+      let motPrep = mot.trim().toLowerCase();
+      if(motPrep.length !== 0 ) {
+          motsResult.push(motPrep);
+      }
+  }
+  return motsResult;
+}
+
+function parse(field) {
+  let mots = []
+  if(typeof field === "string" || field instanceof String) {
+    mots = field.split(/[., -!?,':\\<>/"[\]()’;]/);
+  }
+  return mots;
+}
+
+async function insertRechercheMot(idTache,motsRecherche) {
+  const dictionnaireMot = await getDictionnaireMot();
+
+  for(let i=0; i < motsRecherche.length; i++) {
+    const mot = motsRecherche[i];
+    const docRef = doc(db,"rechercheMot",mot);
+
+    if(dictionnaireMot.includes(mot)) {
+      await updateDoc(docRef,{
+        idsTache:arrayUnion(idTache)
+      })
+    } else {
+      await setDoc(docRef,{
+        idsTache:[idTache],
+        mot:mot
+      })
+    }
+  }
+}
+
+async function getDictionnaireMot() {
+  let set = []
+  const docRef = collection(db,"rechercheMot");
+  const querySnapshot = await getDocs(docRef);
+  querySnapshot.forEach((doc) => {
+    set.push(doc.id)
+  })
+  return set;
+}
+
+
+
+================================================
+File: src/scripts/favoris.js
+================================================
+import {doc,setDoc,getDoc, updateDoc,arrayUnion,arrayRemove } from 'firebase/firestore/lite'; 
+import { db } from "./firebase"
+
+
+export async function addFavori(tacheId,Uid) {
+  const docRef = doc(db, 'favori', Uid);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    //console.log("Document data:", docSnap.data());
+    updateDoc(docRef,{"favoris":arrayUnion(tacheId)})
+  } else {
+    //console.log("No such document!");
+      setDoc(docRef,{"favoris" : [tacheId]});
+    }
+}
+
+export async function removeFavori(tacheId,Uid) {
+  const docRef = doc(db, 'favori',Uid);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    updateDoc(docRef,{"favoris":arrayRemove(tacheId)})
+  } 
+}
+
+export async function getFavoris(monUid) {
+  const docRef = doc(db, 'favori',monUid);
+  const docSnap = await getDoc(docRef);
+
+  let favoris=[];
+  if (docSnap.exists()) {
+    favoris = docSnap.data().favoris;
+  } 
+  return favoris;
+}
+
+
+
+
+================================================
+File: src/scripts/fileManager.js
+================================================
+import { getStorage,ref,uploadBytes,getDownloadURL } from "firebase/storage";
+import { auth } from "./firebase"
+
+const storage = getStorage();
+
+export async function uploadFile(file,tacheId) {
+  if(file.name != "" && file.name != undefined) {
+    const uid = auth.currentUser.uid;
+    // taches/uid/idTache/nomFichier.pdf
+    const path = "taches/".concat(uid,"/",tacheId,"/",file.name)
+    const storageRef = ref(storage, path);
+
+    let pathFile = ""
+    await uploadBytes(storageRef, file).then((snapshot) => {
+      pathFile = snapshot.ref.fullPath
+    });
+    return pathFile;
+  }
+  return "";
+}
+
+export async function getFile(document) {
+  // Create a reference to the file we want to download
+  if(document!=undefined) {
+    const starsRef = ref(storage, document);
+    
+    // Get the download URL
+    let returnUrl = ""
+    await getDownloadURL(starsRef)
+      .then((url) => {
+        returnUrl= url;
+    })
+    .catch((error) => {
+      // A full list of error codes is available at
+      // https://firebase.google.com/docs/storage/web/handle-errors
+      switch (error.code) {
+        case 'storage/object-not-found':
+          console.log("File doesn't exist")
+          break;
+        case 'storage/unauthorized':
+          console.log("User doesn't have permission to access the object")
+          break;
+        case 'storage/canceled':
+          console.log("User canceled the upload")
+          break;
+        case 'storage/unknown':
+          console.log("Unknown error occurred, inspect the server response")
+          break;
+      }
+    });
+    return returnUrl;
+  }
+}
+
+
+================================================
+File: src/scripts/firebase.js
+================================================
+import { initializeApp } from 'firebase/app';
+import { getFirestore,doc,getDoc, collection, getDocs, query, where, limit,orderBy } from 'firebase/firestore/lite'; // orderBy
+import { getAuth } from 'firebase/auth';
+
+const firebaseApp = initializeApp({   
+    apiKey: "AIzaSyBMWJCj8Hzx5hE5w2qcuwyMTo63IuGiXK4",
+    authDomain: "epsdb-c2130.firebaseapp.com",
+    projectId: "epsdb-c2130",
+    storageBucket: "epsdb-c2130.appspot.com",
+    messagingSenderId: "99140231547",
+    appId: "1:99140231547:web:234c03260a7e8f0bd35dde",
+    measurementId: "G-4GD8PGGR3D"});
+
+export const db = getFirestore(firebaseApp);
+export const auth = getAuth();
+
+// fonction pratique pour compiler sans avoir a enlever les imports
+export function doNothing() {}
+
+export async function getTopIdees(){
+  const q = query(collection(db,"tache"), orderBy("like", "desc"), limit(5));
+  return getDocs(q);
+}
+
+export async function getTache(idTache) {
+  const docRef = doc(db,"tache", idTache);
+  const document = await getDoc(docRef)
+  return document
+}
+
+export async function getAllUserTache(uid) {
+  //console.log(uid);
+  const q = query(collection(db,"tache"), where("delete", "==" , false), where("uid", "==", uid));
+  return getDocs(q);
+}
+
+export async function getAllUserAutre(uid) {
+  //console.log(uid);
+  const q = query(collection(db,"tache"), where("delete", "==" , false),where("visibilite", "==", "Public"), where("uid", "==", uid));
+  return getDocs(q);
+}
+
+export async function getAllPublicTache() { 
+    const q = query(collection(db,"tache")
+      ,where("visibilite", "==", "Public"), where("delete", "==" , false),limit(100)
+      );
+      const querySnapshot = await getDocs(q);
+    return querySnapshot;
+  }
+  
+  export async function getAllTache() {
+    return getDocs(collection(db,"tache"));
+  }
+
+
+  
+
+
+
+================================================
+File: src/scripts/like.js
+================================================
+import { doc,setDoc,getDoc,updateDoc,arrayUnion,arrayRemove } from 'firebase/firestore/lite'; 
+import { db } from "./firebase"
+
+export async function addLike(idTache,monUid) {
+  addLikeToUser(idTache,monUid);
+  addLikeTache(idTache);
+  //updateNotifCollection(); // TODO
+}
+
+async function addLikeToUser(idTache,monUid) {
+  const docRef = doc(db, 'like',monUid);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    updateDoc(docRef,{"likes":arrayUnion(idTache)})
+  } else {
+    setDoc(docRef,{"likes" : [idTache]});
+  }
+}
+
+async function addLikeTache(idTache) {
+  
+  const tacheRef = doc(db, "tache", idTache);
+  const docSnap = await getDoc(tacheRef);
+  
+  if (docSnap.exists()) {
+    // get like number 
+    let likeCount = docSnap.data().like
+    if(typeof likeCount === "undefined") {
+      likeCount=1;
+    } else {
+      likeCount = likeCount+1;
+    }
+    updateDoc(tacheRef, {"like":likeCount});
+  }
+}
+
+export async function removeLike(idTache,monUid) {
+  removeLikeToUser(idTache,monUid);
+  removeLikeTache(idTache);
+  //updateNotifCollection(); // TODO
+}
+
+async function removeLikeToUser(idTache,monUid) {
+  const docRef = doc(db, 'like',monUid);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    updateDoc(docRef,{"likes":arrayRemove(idTache)})
+  } 
+}
+
+async function removeLikeTache(idTache) {
+  
+  const tacheRef = doc(db, "tache", idTache);
+  const docSnap = await getDoc(tacheRef);
+  
+  if (docSnap.exists()) {
+    // get like number 
+    let likeCount = docSnap.data().like-1;
+    updateDoc(tacheRef, { "like":likeCount});
+  } 
+}
+
+export async function addDisLike(idTache,monUid) {
+  addDisLikeToUser(idTache,monUid);
+  addDisLikeTache(idTache);
+  //updateNotifCollection(); // TODO
+}
+
+async function addDisLikeToUser(idTache,monUid) {
+  const docRef = doc(db, 'like',monUid);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    updateDoc(docRef,{"dislikes":arrayUnion(idTache)})
+  } else {
+    setDoc(docRef,{"dislikes" : [idTache]});
+  }
+}
+
+async function addDisLikeTache(idTache) {
+  
+  const tacheRef = doc(db, "tache", idTache);
+  const docSnap = await getDoc(tacheRef);
+  
+  if (docSnap.exists()) {
+    // get like number 
+    let dislikeCount = docSnap.data().dislike
+    if(typeof dislikeCount === "undefined") {
+      dislikeCount=1;
+    } else {
+      dislikeCount = dislikeCount+1;
+    }
+    updateDoc(tacheRef, {"dislike":dislikeCount});
+  }
+  
+}
+
+export async function removeDislike(idTache,monUid) {
+  removeDislikeToUser(idTache,monUid);
+  removeDislikeTache(idTache);
+  //updateNotifCollection(); // TODO
+}
+
+async function removeDislikeToUser(idTache,monUid) {
+  
+  const docRef = doc(db, 'like',monUid);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    updateDoc(docRef,{"dislikes":arrayRemove(idTache)})
+  } 
+}
+
+async function removeDislikeTache(idTache) {
+  
+  const tacheRef = doc(db, "tache", idTache);
+  const docSnap = await getDoc(tacheRef);
+  
+  if (docSnap.exists()) {
+    // get like number 
+    let dislikeCount = docSnap.data().dislike-1;
+    updateDoc(tacheRef, { "dislike":dislikeCount});
+  } 
+}
+
+export async function getLikes(monUid) {
+  const docRef = doc(db, 'like',monUid);
+  const docSnap = await getDoc(docRef);
+
+  let likedList=[];
+  if (docSnap.exists()) {
+    likedList = await docSnap.data().likes;
+  } 
+  return likedList;
+}
+
+export async function getDislikes(monUid) {
+  const docRef = doc(db, 'like',monUid);
+  const docSnap = await getDoc(docRef);
+
+  let dislikedList=[];
+  if (docSnap.exists()) {
+    dislikedList = docSnap.data().dislikes;
+  } 
+  //console.log(dislikedList);
+  return dislikedList;
+}
+
+================================================
+File: src/scripts/notification.js
+================================================
+//import { doc,setDoc,getDoc,updateDoc,arrayUnion,arrayRemove  } from 'firebase/firestore/lite'; 
+ import { doc,setDoc } from 'firebase/firestore/lite';
+import { db } from "./firebase"
+
+export async function addLikeNotification(idTache,monUid,otherId) {
+  
+  const notifRef = doc(db, "notification", monUid, "userNotification");
+  const docSnap = await setDoc(notifRef,);
+
+  console.log("idTache : ", idTache,"monUid : ",monUid,"otherId : ",otherId);
+  console.log(idTache,monUid,docSnap);
+}
+
+================================================
+File: src/scripts/profil.js
+================================================
+import { doc, collection, getDocs, query, where, updateDoc } from 'firebase/firestore/lite'; // orderBy
+import { db } from "./firebase"
+
+export async function modifierProfil(nom,prenom,initial,id) {
+  // update userInfo
+  const userRef = doc(db, "userInfo", id);
+  await updateDoc(userRef, { "name":nom , "lastName":prenom, "initial":initial});
+
+  // update Tache
+  const tacheCollRef = collection(db, "tache");
+  const qTache = query(tacheCollRef, where("uid", "==", id)) 
+  const snapshotQueryTache = await getDocs(qTache);
+
+  snapshotQueryTache.forEach((document) => {
+    const concatNomPrenom = nom.concat(" ").concat(prenom)
+    const docRef = doc(db,"tache",document.id)
+    updateDoc(docRef, { "nom":concatNomPrenom, "initial":initial } );
+  })
+
+  // update commentaire
+  const commentaireCollRef = collection(db, "commentaires");
+  const qCommentaire = query(commentaireCollRef, where("uid", "==", id)) 
+  const snapshotQueryCommentaire = await getDocs(qCommentaire);
+
+  snapshotQueryCommentaire.forEach((document) => {
+    const concatNomPrenom = nom.concat(" ").concat(prenom)
+    const docRef = doc(db,"commentaires",document.id)
+    updateDoc(docRef, { "name":concatNomPrenom, "initial":initial } );
+  })
+}
+
+
+
+
+================================================
+File: src/scripts/tache.js
+================================================
+import { doc, addDoc, updateDoc,collection,serverTimestamp } from 'firebase/firestore/lite'; // orderBy
+import { db,auth } from "./firebase"
+import { insererDictionnaire } from "./dictionnaire"
+import { uploadFile } from "./fileManager"
+import { getUserInfoByUid } from "./authentification"
+ 
+export async function publish(titreTache,description,niveauTache,disciplineTache,visibilite,document) {
+  const uid = auth.currentUser.uid;
+  const userInfo = await getUserInfoByUid(uid);
+
+  const userData = userInfo.data();
+  const nom = userData.name.concat(" ").concat(userData.lastName);
+  const initial = userData.initial;
+  const couleur = userData.color;
+  const collectionRef = collection(db,"tache");
+    
+  // TODO verification des entres 
+
+  const payload = {titreTache,description,niveauTache,disciplineTache,visibilite,document:"",uid,timestamp:serverTimestamp(),
+                    nom:nom,initial:initial,couleur:couleur, delete:false};
+
+  const docRef = await addDoc(collectionRef,payload);
+
+  // actualiser le champ document
+  if(document.name !== undefined) {
+    const pathFile = "taches/".concat(uid,"/",docRef.id,"/",document.name)
+    updateDoc(docRef, { document:pathFile })
+    uploadFile(document,docRef.id);
+  }
+
+  // entree pour la collection recherche
+  let tache = new Tache(titreTache,niveauTache,disciplineTache,nom,initial,description,docRef.id);
+  insererDictionnaire(tache);
+}  
+
+// TODO mettre a jour le dictionnaire
+export async function modifierTache(idTache,titreTache,description,niveauTache,disciplineTache,visibilite,document) {
+  const tacheRef = doc(db,"tache", idTache);
+  let payload = {titreTache,description,niveauTache,disciplineTache,visibilite,timestamp:serverTimestamp()};
+  if(document != undefined) {
+    console.log("document", document, "== undifined ? should not appear");
+    payload = {titreTache,description,niveauTache,disciplineTache,visibilite,document,timestamp:serverTimestamp()};
+  }
+  return updateDoc(tacheRef,payload);
+}
+
+export async function setPrivate(idTache) {
+  const tacheRef = doc(db, "tache", idTache);
+    await updateDoc(tacheRef, { visibilite:"Privée" });
+}
+export async function setPublic(idTache) {
+  const tacheRef = doc(db, "tache", idTache);
+    await updateDoc(tacheRef, { visibilite:"Public" });
+}
+
+// modifie la valeur delete a true
+export async function supprimerTacheSoft(idTache) {
+  const tacheRef = doc(db, "tache", idTache);
+    await updateDoc(tacheRef, { delete:true });
+}
+
+class Tache {
+  constructor(titreTache,niveauTache,disciplineTache,nom,initial,description,id){
+    this.titreTache = titreTache;
+    this.niveauTache = niveauTache;
+    this.disciplineTache = disciplineTache;
+    this.nom = nom;
+    this.initial = initial;
+    this.description = description;
+    this.id = id;
+  }
+}
+
+
+
+
+================================================
+File: src/scripts/utils.js
+================================================
+
+
+export function generateLightColorHex() {
+    let color = "#";
+    for (let i = 0; i < 3; i++)
+        color += (
+        "0" +
+        Math.floor(((1 + Math.random()) * Math.pow(16, 2)) / 2).toString(16)
+        ).slice(-2);
+    return color;
+}
+
+// Compute the edit distance between the two given strings
+export function getEditDistance(a, b) {
+    if (a.length === 0) return b.length; 
+    if (b.length === 0) return a.length;
+
+    var matrix = [];
+
+    // increment along the first column of each row
+    var i;
+    for (i = 0; i <= b.length; i++) {
+        matrix[i] = [i];
+    }
+
+    // increment each column in the first row
+    var j;
+    for (j = 0; j <= a.length; j++) {
+        matrix[0][j] = j;
+    }
+
+    // Fill in the rest of the matrix
+    for (i = 1; i <= b.length; i++) {
+        for (j = 1; j <= a.length; j++) {
+        if (b.charAt(i-1) == a.charAt(j-1)) {
+            matrix[i][j] = matrix[i-1][j-1];
+        } else {
+            matrix[i][j] = Math.min(matrix[i-1][j-1] + 1, // substitution
+                                    Math.min(matrix[i][j-1] + 1, // insertion
+                                            matrix[i-1][j] + 1)); // deletion
+        }
+        }
+    }
+
+    return matrix[b.length][a.length];
+}
+
+export function getDateFromTimestamp(timestamp) {
+    const months = ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jun', 'Jui', 'Aou', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const date = new Date(timestamp.seconds * 1000);
+    const secondes = addZeroIfLessThenTen(date.getSeconds());
+    const minutes = addZeroIfLessThenTen(date.getMinutes());
+    const heures = addZeroIfLessThenTen(date.getHours());
+    const jours= date.getDate();
+    const mois= date.getMonth();
+    const annee= date.getFullYear();
+    const dateFormat = `${jours} ${months[mois]} ${annee}, ${heures}h${minutes}:${secondes}`
+    return dateFormat;
+}
+
+function addZeroIfLessThenTen(number) {
+    let finalNumber = number;
+    if(number<2) {
+        finalNumber = "0".concat(number);
+    }
+    return finalNumber;
+}
+
+function compare( a, b ) {
+    if ( a.timestamp < b.timestamp ){
+      return 1;
+    }
+    if ( a.timestamp > b.timestamp ){
+      return -1;
+    }
+    return 0;
+}
+  
+export function getDatasFromDocument(listDocuments) {
+    let datas = []
+    if(listDocuments.length>0){
+        for(let i=0; i < listDocuments.length; i++) {
+            let data = listDocuments[i].data()
+            data["id"] = listDocuments[i].id
+            datas.push(data)
+        }
+    }
+    return datas;
+}
+
+export function sortByTime(dataDocuments) {
+
+    let sortedList = []
+    if(dataDocuments.length>0){
+        for(let i=0; i < dataDocuments.length; i++) {
+                sortedList.push(dataDocuments[i])
+        }
+        sortedList.sort(compare);
+    }
+    return sortedList;
+}
+
+function compareInvert( a, b ) {
+    if ( a.timestamp > b.timestamp ){
+      return 1;
+    }
+    if ( a.timestamp < b.timestamp ){
+      return -1;
+    }
+    return 0;
+}
+
+export function sortByTimeInvert(dataDocuments) {
+
+    let sortedList = []
+    if(dataDocuments.length>0){
+        for(let i=0; i < dataDocuments.length; i++) {
+                sortedList.push(dataDocuments[i])
+        }
+        sortedList.sort(compareInvert);
+    }
+    return sortedList;
+}
+
+/* Prend une liste de document, trie par date et retourne dans une liste */
+export function getDatasFromDocumentSortedByTime(listDocuments) {
+    const data = getDatasFromDocument(listDocuments);
+    const sortedData = sortByTime(data);
+    return sortedData;
+}
+
+================================================
+File: test/fbSecurityRules.test.js
+================================================
+/*
+Serie de test unitaire pour la securite de la base de donnees
+
+pour lancer : 
+- Dans le repertoir principale lance : 
+- $ firebase emulators:start
+    - si ca foncitonne pas il faut installer firebase : 
+    - $ npm install -g firebase-tools
+    - $ firebase --version
+    - et puis il faut se login a firebase : 
+    - $ firebase login 
+- aller dans le repertoire epsideas/test
+- $ npm test firebaseTest
+*/
+
+const assert = require('assert');
+const firebase = require('@firebase/testing')
+
+//const assert = require('chai').assert;
+//const index = require('../src/index')
+
+const EPS_ID = "epsdb-c2130";
+const myId = "user_abc";
+const theirId = "user_xyz";
+const modId= "user_mod";
+const myAuth = {uid:myId, email:"abc@gmail.com"};
+//const modAuth = {uid:modId, email:"mod@gmail.com", isModerador:true};
+
+
+function getFirestore(auth) {
+    return firebase.initializeTestApp({projectId: EPS_ID, auth: auth}).firestore();
+}
+function getAdminFirestore() {
+    return firebase.initializeAdminApp({projectId:EPS_ID}).firestore();
+}
+
+beforeEach(async ()=> {
+    await firebase.clearFirestoreData({projectId: EPS_ID});
+});
+
+describe("Security rules", ()=> {
+
+    it("Can read items in the read-only colleciton", async ()=> {
+        const db = getFirestore(null);
+        const testDoc = db.collection("readonly").doc("testDoc");
+        await firebase.assertSucceeds(testDoc.get()); 
+    });
+    it("Can write items in the read-only colleciton", async ()=> {
+        const db = getFirestore(null);
+        const testDoc = db.collection("readonly").doc("testDoc2");
+        await firebase.assertFails(testDoc.set({foo:"bar"}));
+        
+    });
+    it("Can write document with same ID as our user", async ()=> {
+        const db = getFirestore(myAuth);
+        const testDoc = db.collection("users").doc(myId);
+        await firebase.assertSucceeds(testDoc.set({foo:"bar"}));
+        
+    });
+    it("Can write document with different ID as our user", async ()=> {
+        const db = getFirestore(myAuth);
+        const testDoc = db.collection("users").doc(theirId);
+        await firebase.assertFails(testDoc.set({foo:"bar"}));
+        
+    });
+    it("Can read posts marked public", async ()=> {
+        const db = getFirestore(null);
+        const testQuery = db.collection("posts").where("visibility", "==", "public");
+        await firebase.assertSucceeds(testQuery.get());
+        
+    })
+    it("Can query personal posts", async ()=> {
+        const db = getFirestore(myAuth);
+        const testQuery = db.collection("posts").where("authorId", "==", myId);
+        await firebase.assertSucceeds(testQuery.get());
+        
+    });
+    it("Can't query all posts", async ()=> {
+        const db = getFirestore(myAuth);
+        const testQuery = db.collection("posts");
+        await firebase.assertFails(testQuery.get());  
+    });
+    it("Can read a single public post", async ()=> {
+        const admin = getAdminFirestore();
+        const postId = "public_post";
+        const setupDoc = admin.collection("posts").doc(postId);
+        await setupDoc.set({authorId: theirId, visibility: "public"});
+
+        const db = getFirestore(null);
+        const testRead = db.collection("posts").doc(postId);
+        await firebase.assertSucceeds(testRead.get());
+    });
+    it("Can read a single private post belonging to the user", async ()=> {
+        const admin = getAdminFirestore();
+        const postId = "private_post";
+        const setupDoc = admin.collection("posts").doc(postId);
+        await setupDoc.set({authorId: myId, visibility: "private"});
+
+        const db = getFirestore(myAuth);
+        const testRead = db.collection("posts").doc(postId);
+        await firebase.assertSucceeds(testRead.get());
+    });
+    it("Can't read a private post belonging to anthoer user", async ()=> {
+        const admin = getAdminFirestore();
+        const postId = "private_post";
+        const setupDoc = admin.collection("posts").doc(postId);
+        await setupDoc.set({authorId: theirId, visibility: "private"});
+
+        const db = getFirestore(myAuth);
+        const testRead = db.collection("posts").doc(postId);
+        await firebase.assertFails(testRead.get());
+    });
+    it("Allows a user to edit thier own post", async ()=> {
+        const postId = "post_123";
+        const admin = getAdminFirestore();
+        await admin.collection("posts").doc(postId).set({content:"before", authorId:myId});
+
+        const db = getFirestore(myAuth);
+        const testDoc = db.collection("posts").doc(postId);
+        await firebase.assertSucceeds(testDoc.update({content:"after"}));
+    });
+    it("Doesn't allows a user to edit somebody else's post", async ()=> {
+        const postId = "post_123";
+        const admin = getAdminFirestore();
+        await admin.collection("posts").doc(postId).set({content:"before", authorId:theirId});
+
+        const db = getFirestore(myAuth);
+        const testDoc = db.collection("posts").doc(postId);
+        await firebase.assertFails(testDoc.update({content:"after"}));
+    });
+    it("Allows a user to create a post when they list themselves as author", async ()=> {
+        const postPath = "posts/post_123";
+        const db = getFirestore(myAuth);
+        const testDoc = db.doc(postPath);
+        await firebase.assertSucceeds(testDoc.set({authorId:myId, content:"content",visibility:"public", 
+        headline:"headline"}));
+    });
+    it("Doesn't Allows a user to create a post when they list themselves as author", async ()=> {
+        const postPath = "posts/post_123";
+        const db = getFirestore(myAuth);
+        const testDoc = db.doc(postPath);
+        await firebase.assertFails(testDoc.set({authorId:theirId, content:"content",visibility:"public",
+        headline:"headline"}));
+    });
+    it("Can create a post with all required field", async ()=> {
+        const postPath = "posts/post_123";
+        const db = getFirestore(myAuth);
+        const testDoc = db.doc(postPath);
+        await firebase.assertSucceeds(testDoc.set({authorId:myId, content:"content", 
+        visibility:"public", headline:"headline"}));
+    });
+    it("Can't create a post with missing some riquered fields", async ()=> {
+        const postPath = "posts/post_123";
+        const db = getFirestore(myAuth);
+        const testDoc = db.doc(postPath);
+        await firebase.assertFails(testDoc.set({authorId:myId, content:"content", visibility:"public"}));
+    });
+    it("Can't create a post with an unnapproved fields", async ()=> {
+        const postPath = "posts/post_123";
+        const db = getFirestore(myAuth);
+        const testDoc = db.doc(postPath);
+        await firebase.assertFails(testDoc.set({authorId:myId, content:"content", visibility:"public", not_allowd:true}));
+    });
+    /*
+    it("can edit a post with allowd fields", async()=> {
+        const postPath = "posts/post_123";
+        const admin = getAdminFirestore();
+        await admin.doc(postPath).set({content: "before_content", authorId: myId,
+        headline: "headline", visibility: "public"});
+        
+        const db = getFirestore(myAuth);
+        const testDoc = db.doc(postPath);
+        await firebase.assertSucceeds(testDoc.update({content:"after_content"}));
+    });
+    */
+});
+
+after(async ()=> {
+    await firebase.clearFirestoreData({projectId: EPS_ID});
+});
+
+

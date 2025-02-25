@@ -1,0 +1,553 @@
+### Directory Structure ###
+Directory structure:
+└── francoishup-calculquebec_parallele/
+    └── miniblog1.ipynb
+
+
+### Code Content ###
+================================================
+File: miniblog1.ipynb
+================================================
+# Jupyter notebook converted to Python script.
+
+"""
+# 5 easy tips to run python code faster  
+"""
+
+!pip install numpy scipy
+
+"""
+## 1. Contiguous Arrays access
+"""
+
+"""
+### Naive
+Here’s the Python code for the naive matrix multiplication algorithm:
+"""
+
+import numpy as np
+
+def naive_matrix_multiplication(A, B):
+    N = A.shape[0]
+    C = np.zeros((N, N))
+    
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                C[i, j] += A[i, k] * B[k, j]
+    
+    return C
+
+"""
+Explanation
+
+In the inner loop where the operation ```C[i, j] += A[i, k] * B[k, j]``` is performed, the iteration occurs over the indices 𝑖,𝑗 and 𝑘. The access patterns for ```C[i, j]``` and ```A[i, k]``` are efficient since the iterations proceed row-wise first, followed by column-wise access, aligning well with memory layout.
+
+However, the access pattern for ```B[k, j]``` is problematic. Here, memory is accessed column-wise instead of row-wise. This access pattern is inefficient because it requires the program to load data from different rows into memory, which can lead to a significant number of cache misses, thereby degrading performance.
+"""
+
+"""
+<img src="contiguous.png" style="width:80vw; max-width:1200px"/>
+"""
+
+"""
+### Solution 1 
+
+This solution involves transposing the content of 
+𝐵 to improve cache locality when accessing elements of 
+𝐵.
+"""
+
+import numpy as np
+
+# Assuming A and B are already defined as numpy arrays of shape (N, N)
+def matrix_multiplication_solution1(A, B):
+    N = A.shape[0]
+    C = np.zeros((N, N))
+    B_T = B.T  # Transpose of B
+    
+    for i in range(N):
+        for j in range(N):
+            for k in range(N):
+                C[i, j] += A[i, k] * B_T[j, k]
+    
+    return C
+
+"""
+Solution 1: Transposing 𝐵: 
+- Cache Locality: Transposing 
+𝐵 ensures that elements of 
+𝐵 are accessed in a row-major order (which is how they are stored in memory), thus improving cache performance.
+- Loop Structure: The innermost loop accesses elements of 
+𝐵𝑇 contiguously, which helps in reducing cache misses.
+"""
+
+"""
+### Solution 2
+This solution exchanges the inner for loops to access elements of 
+𝐵 contiguously.
+"""
+
+import numpy as np
+
+# Assuming A and B are already defined as numpy arrays of shape (N, N)
+def matrix_multiplication_solution2(A, B):
+    N = A.shape[0]
+    C = np.zeros((N, N))
+    
+    for i in range(N):
+        for k in range(N):
+            for j in range(N):
+                C[i, j] += A[i, k] * B[k, j]
+    
+    return C
+
+"""
+Solution 2: Exchanging Inner Loops:
+
+- Cache Locality: By iterating over 
+𝑘 before 
+𝑗, elements of 
+𝐵 are accessed contiguously. This helps in leveraging cache lines efficiently because once a cache line is loaded, it can be reused multiple times.
+- Loop Structure: This structure also improves cache performance by ensuring that elements of 
+𝐴 and 
+𝐵 are accessed in a cache-friendly manner.
+"""
+
+"""
+Performance Comparison
+
+Memory Access Patterns: Both solutions improve memory access patterns compared to a naive matrix multiplication, but Solution 2 tends to have better cache performance in practice because it avoids the need for explicitly transposing 
+𝐵. Cache Misses: Solution 2 generally results in fewer cache misses since it directly accesses elements of 
+𝐵 in a contiguous manner without needing to create a transposed matrix.
+
+Conclusion
+
+Solution 2 is likely to run faster in practice. This is because it avoids the overhead of transposing matrix 
+𝐵 and directly ensures that elements of 
+𝐵 are accessed in a cache-friendly manner by iterating over 
+𝑘 before 𝑗.
+"""
+
+N1=250
+A = np.random.rand(N1, N1) # image
+B = np.random.rand(N1, N1) # convolution
+
+%%time 
+C_naive = naive_matrix_multiplication(A, B)
+# Output:
+#   CPU times: total: 8.19 s
+
+#   Wall time: 8.21 s
+
+
+%%time 
+C1 = matrix_multiplication_solution1(A, B)
+# Output:
+#   CPU times: total: 8.14 s
+
+#   Wall time: 8.14 s
+
+
+%%time
+C2 = matrix_multiplication_solution2(A, B)
+# Output:
+#   CPU times: total: 8.09 s
+
+#   Wall time: 8.1 s
+
+
+if C_naive.all() == C1.all() == C2.all():
+    print("Matrices are equal")
+    print(f"Gain for solution 1: {(7.08 - 6.98) / 7.08 * 100:.2f}%")
+    print(f"Gain for solution 2: {(7.08 - 6.89) / 7.08 * 100:.2f}%")
+else: 
+    print("Oups! Matrices are not equal")
+
+# Output:
+#   Matrices are equal
+
+#   Gain for solution 1: 1.41%
+
+#   Gain for solution 2: 2.68%
+
+
+"""
+** EXTRA DEBBUG TIPS : 
+
+- You can delete variables that take alot of space in memory with ```del var_name```  if you see your perfomance slowing down. 
+
+- You can use profile library to check memory leaks or excessive memory usage. 
+
+- You can use cProfile to see where the time is being spent in your code. 
+"""
+
+"""
+## 2. Using a Structure of Vectors instead of Vectors of structure
+"""
+
+"""
+### Vectors of structure (BAD) 
+"""
+
+class Point3D:
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def multiply(self, N):
+        self.x *= N
+        self.y *= N
+        self.z *= N
+
+# Create an array of Point3D objects
+N2 = 1_000_000
+points = [Point3D(x, y, z) for x, y, z in zip(range(N2), range(N2), range(N2))]
+
+"""
+### Structure of Vectors (GOOD)
+"""
+
+class Ptr3D:
+    def __init__(self):
+        self.x = []
+        self.y = []
+        self.z = []
+    
+    def resize(self, N):
+        self.x = [0] * N
+        self.y = [0] * N
+        self.z = [0] * N
+        
+    def multiply(self, N):
+        self.x = [x * N for x in self.x]
+        self.y = [y * N for y in self.y]
+        self.z = [z * N for z in self.z]
+
+# Create a Ptr3D object and resize it
+N2 = 1_000_000
+ptr3d = Ptr3D()
+ptr3d.resize(N2)
+
+# Populate the coordinates
+for i in range(N2):
+    ptr3d.x[i] = i
+    ptr3d.y[i] = i
+    ptr3d.z[i] = i
+
+"""
+#### Explanation
+
+In the first version, the point class is use to encapsulate the value for the 3 dimensions. Then we can create a list containing multiple objects of point. In the second version, only one object is created and the object contain all the coordinate of the points.
+
+#### Advantages and Disadvantages:
+
+**Approach 1:**
+
+- Pros: Encapsulation of point coordinates in a single object.
+
+- Cons: Potentially higher memory overhead due to object overhead and possibly less cache-friendly.
+
+**Approach 2:**
+
+- Pros: More cache-friendly since coordinates are stored in contiguous arrays, potentially leading to better performance for some operations.
+
+- Cons: Less encapsulation, can be less intuitive to manage as the relationship between x, y, and z is implicit rather than explicit.
+
+"""
+
+"""
+Let's try to resize 
+"""
+
+%%time
+for point in points:
+    point.multiply(2)
+# Output:
+#   CPU times: total: 219 ms
+
+#   Wall time: 214 ms
+
+
+%%time
+ptr3d.multiply(2)
+# Output:
+#   CPU times: total: 172 ms
+
+#   Wall time: 166 ms
+
+
+# Check if all points are equal
+comparison_results = all(
+    ptr3d.x[i] == points[i].x and ptr3d.y[i] == points[i].y and ptr3d.z[i] == points[i].z
+    for i in range(N2)
+)
+
+# Print the result
+if comparison_results:
+    print("All points are equal")
+    print(f"Gain: {(297 - 172) / 297 * 100:.2f}%")
+else:
+    print("Oops! points are not equal")
+# Output:
+#   All points are equal
+
+#   Gain: 42.09%
+
+
+"""
+## 3. Remove computation from the a loop 
+"""
+
+"""
+Removing cumpute from an inner loop can be easy as removing a if statement or calculating a constant outside the loop.  
+
+Here Let's take a more complexe example. Let's build tree lists of random number and see if there is a combination of number addition gives our secret number. 
+"""
+
+import random
+
+N3=250
+list1=[random.randint(0, 100) for _ in range(N3)]
+list2=[random.randint(0, 100) for _ in range(N3)]
+list3=[random.randint(0, 100) for _ in range(N3)]
+
+# Naive approach
+def find_combinations_naive(list1, list2, list3, target_sum):
+    combinations = set()  # Use a set to store unique combinations
+    for a in list1:
+        for b in list2:
+            for c in list3:
+                if a + b + c == target_sum:
+                    combinations.add((a, b, c))  # Add tuple to set
+    return combinations  # Convert set to list for final output
+
+def find_combinations_optimized(list1, list2, list3, target_sum):
+    combinations = set()  # Use a set to store unique combinations
+    pair_sums = {}
+    
+    # Precompute the sum of pairs from list1 and list2
+    for a in list1:
+        for b in list2:
+            pair_sum = a + b
+            if pair_sum not in pair_sums:
+                pair_sums[pair_sum] = []
+            pair_sums[pair_sum].append((a, b))
+    
+    # For each element in list3, check if the complement exists in the precomputed sums
+    for c in list3:
+        required_sum = target_sum - c
+        if required_sum in pair_sums:
+            for (a, b) in pair_sums[required_sum]:
+                combinations.add((a, b, c))  # Add tuple to set
+    
+    return combinations  # Convert set to list for final output
+
+"""
+The optimized approach reduces the time complexity from 𝑂(𝑛3) to 𝑂(𝑛2) by precomputing sums of pairs from list1 and list2 and storing these in a hash map for fast lookups. Here's how it works:
+
+**Precompute Pair Sums:** Iterate over list1 and list2 to compute all possible sums and store these in a dictionary (pair_sums), which takes 
+𝑂(𝑛2) time.
+
+**Fast Lookup:** Iterate over list3 and for each element c, compute the required complement (target_sum - c). Check if this complement exists in pair_sums using fast dictionary lookups (𝑂(1) on average).
+
+**Efficiency:** The algorithm immediately returns the first valid combination found, eliminating unnecessary computations.
+
+This approach is faster because it significantly reduces the number of combinations to check by leveraging precomputed values and efficient lookups.
+"""
+
+%%time
+result_naive = find_combinations_naive(list1, list2, list3, 42)
+# Output:
+#   CPU times: total: 578 ms
+
+#   Wall time: 586 ms
+
+
+%%time
+result_optimal = find_combinations_optimized(list1, list2, list3, 42)
+# Output:
+#   CPU times: total: 46.9 ms
+
+#   Wall time: 42.1 ms
+
+
+if result_naive== result_optimal:
+    print("Results are equals")
+    print(f"Gain: {(625 - 15.6) / 625 * 100:.2f}%")
+else:
+    print("Oops! points are not equal")
+# Output:
+#   Results are equals
+
+#   Gain: 97.50%
+
+
+"""
+## 4. Use math !
+"""
+
+"""
+You can short cut compute time with a little bit of math. You can 1) factorise the equation to its minimum, 2) if its possible you can change the equation to be lighter comptationnally to do or you can use technique that shortcut some compute 
+
+For example : 
+
+1\) Instead of this sum : $ \sum_{k=0}^{n} k = \frac{n(n+1)}{2}$ , consider using the short form : $ n * (n + 1) // 2 $
+
+2\) Instead of using the eucledien distance : $d_E = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$, use the Manthan distance which is alot faster to compute $d_M = |x_2 - x_1| + |y_2 - y_1|$
+
+3\) Let's see an exemple of computationnal shortcut with a convolution :
+"""
+
+import numpy as np
+
+def naive_convolution(image, kernel):
+    image_height, image_width = image.shape
+    kernel_height, kernel_width = kernel.shape
+    output_height = image_height - kernel_height + 1
+    output_width = image_width - kernel_width + 1
+    output = np.zeros((output_height, output_width))
+    
+    for i in range(output_height):
+        for j in range(output_width):
+            region = image[i:i+kernel_height, j:j+kernel_width]
+            output[i, j] = np.sum(region * kernel)
+    
+    return output
+
+import numpy as np
+
+def fft_convolution(image, kernel):
+    # Pad the kernel to be the same size as the image
+    padded_kernel = np.zeros_like(image)
+    kernel_height, kernel_width = kernel.shape
+    padded_kernel[:kernel_height, :kernel_width] = kernel
+    
+    # Perform FFT on both the image and the padded kernel
+    image_fft = np.fft.fft2(image)
+    kernel_fft = np.fft.fft2(padded_kernel)
+    
+    # Element-wise multiplication in the frequency domain
+    convolved_fft = image_fft * kernel_fft
+    
+    # Inverse FFT to get the convolved image
+    convolved_image = np.fft.ifft2(convolved_fft)
+    
+    # Taking the real part and cropping the image to the original size
+    convolved_image = np.real(convolved_image)
+    
+    return convolved_image
+
+"""
+#### Explanation
+
+The fast fourrier transform the image into the frequency domain. One this is done you can do the convolution, but since all the frequency are in a signle 2D matrix, you only need to do a matrix multiplpication. With a normal convolution in the spatial doamine, the complexity is the order of 𝑂(𝑁2⋅𝐾2), the FFT-based approach reduces this to 𝑂(𝑁2 log 𝑁).
+"""
+
+image = np.random.rand(500, 500)
+kernel = np.array([[1, 0, 0], [0, -1, 0], [0, 0, 1]])
+
+%%time
+result_naive = naive_convolution(image, kernel)
+# Output:
+#   CPU times: total: 1.55 s
+
+#   Wall time: 1.59 s
+
+
+%%time
+result_fft = fft_convolution(image, kernel)
+# Output:
+#   CPU times: total: 46.9 ms
+
+#   Wall time: 24 ms
+
+
+if result_naive.all()==result_fft.all():
+    print("Results are equals")
+    print(f"Gain: {(1520 - 31.2) / 1520 * 100:.2f}%")
+else:
+    print("Oops! convolution are not equal")
+# Output:
+#   Results are equals
+
+#   Gain: 97.95%
+
+
+"""
+## 5. Use libraries
+"""
+
+"""
+Finally, the rule of thumb is : if you are thinking about optimizing a function, you are probably not the first one. Plenty of librairy allready exists with optimize code for GPU, multithreaded on CPU and multiprocessing. Library like numpy, numba, openACC, OpenMP, MPI, and more, are build by a little army of developper. 
+
+Here's yet another version of a convolution using scipy : 
+"""
+
+import numpy as np
+from scipy.ndimage import convolve
+
+def optimized_convolution(image, kernel):
+    return convolve(image, kernel, mode='constant', cval=0.0)
+
+image = np.random.rand(500, 500)
+kernel = np.array([[1, 0, 0], [0, -1, 0], [0, 0, 1]])
+
+%%time
+result_naive = naive_convolution(image, kernel)
+# Output:
+#   CPU times: total: 1.55 s
+
+#   Wall time: 1.55 s
+
+
+%%time
+result_optimized = optimized_convolution(image, kernel)
+# Output:
+#   CPU times: total: 0 ns
+
+#   Wall time: 2 ms
+
+
+if result_naive.all()==result_optimized.all():
+    print("Results are equals")
+    print(f"Gain: {(1520 - 2) / 1520 * 100:.2f}%")
+else:
+    print("Oops! convolution are not equal")
+# Output:
+#   Results are equals
+
+#   Gain: 99.87%
+
+
+"""
+## Bonus 
+
+With compile language, dont try to beat the compiler. These days compiler are pretty good at optimizing your for loop. When you compile the compiler turn you code into assembly and by doing so they can use specials instructions to make the code run faster. If you try to be more sofiticated, there's a risk the compiler might give you worst perfomance. The key is put simple easy to understand code in your for loop.      
+
+**Amdahl’s law** (max gain with parallelization)
+$$ \begin{equation}
+S = \frac{1}{(1 - P) + \frac{P}{N}}
+\end{equation} $$
+
+Where,
+
+$S$ : Theorical speedup.
+
+$P$ : Proportion of the program that can be parallelized.
+
+$N$ : is the number of processors.
+
+If 50% of a program can be parallelized (𝑃=0.5), and you run it on 4 processors (𝑁=4):
+
+$$ S = \frac{1}{(1 - 0.5) + \frac{0.5}{4}} = \frac{1}{0.5 + 0.125} = \frac{1}{0.625} \approx 1.6 $$
+
+So, the maximum speedup in this case would be 1.6 times faster than the original program. This shows that even with an infinite number of processors, the speedup is limited by the portion of the program that cannot be parallelized.
+
+Amdahl's Law highlights the diminishing returns of adding more processors to a task that has parts which cannot be parallelized.
+
+"""
+
+
+

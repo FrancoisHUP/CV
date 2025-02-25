@@ -1,0 +1,739 @@
+### Directory Structure ###
+Directory structure:
+└── francoishup-puissance4/
+    ├── README.md
+    ├── classDiag.puml
+    ├── objectDiag.puml
+    ├── pom.xml
+    ├── sequenceDiag.puml
+    ├── test1.puml
+    ├── src/
+    │   ├── .DS_Store
+    │   ├── main/
+    │   │   ├── .DS_Store
+    │   │   └── java/
+    │   │       ├── Main.java
+    │   │       ├── .DS_Store
+    │   │       └── com/
+    │   │           ├── .DS_Store
+    │   │           └── inf5153/
+    │   │               ├── .DS_Store
+    │   │               └── game/
+    │   │                   ├── ConnectFour.java
+    │   │                   └── .DS_Store
+    │   └── test/
+    │       └── java/
+    │           └── ConnectFour.java
+    └── .github/
+        └── workflows/
+            ├── java.yml
+            └── puml.yml
+
+
+### Code Content ###
+================================================
+File: README.md
+================================================
+# Projet individuel : Jeu du Puissance4
+## Les objectifs du projet : 
+1. Analyser un code légataire en vue de le faire évoluer;
+2. Transformer ce code en véritable application orientée objet;
+3. Faire évoluer un code objet en respectant dans la mesure du possible :
+  * les principes S et O de SOLID;
+  * les principes objet de faible couplage / forte cohésion.
+4. Décrire une application orientée objet avec le langage UML (diagrammes d'objets, de séquences et de classes).
+5. Les ateliers sont des temps où l'équipe enseignante est présente pour vous donner de la rétro-action sur votre projet. Il est vital de profiter de ce temps de travail prévu dans votre emploi du temps pour améliorer vos projets avant la remise finale.
+
+## Consignes
+1.  Votre projet doit être sur git à 23:55 (heure de Montréal) le jour de la date de remise.
+2.  Le projet contient votre code et et un ficher PDF
+3.  Le fichier PDF contient les réponses aux questions et vos trois modèles UML
+4.  Vous devez répondre en français aux quatre (4) questions posées dans ce sujet.
+5.  Le fichier porte comme nom votre code permanenté. 
+6.  Votre code doit compiler et tester (sans échouer) en lançant la commande mvn clean package à la racine de votre projet.
+7.  Votre code doit se lancer depuis la ligne de commande, toujours depuis la racine, par exemple :
+  * mvn -q exec:java "
+  * Toute remise ne respectant pas ces consignes ne sera pas évaluée et obtiendra la note de zéro (0).
+
+## Spécification
+
+### Puissance 4
+Puissance 4 est un jeu de stratégie très connu qui convient à tout le monde.
+
+Comment jouer : Déposez vos disques dans les colonnes de la grille du jeu en appuyant sur la colonne choisie. Faites une ligne d'au moins quatre jetons soit verticalement, horizontalement ou en diagonale avant votre adversaire.
+
+## Le travail à réaliser
+
+### Étape 1 :  Récupération du code légataire
+* Récupérer le code sur ce lien : [https://github.com/INF5153-A21-40/puissance4.git](https://github.com/INF5153-A21-40/puissance4.git)
+* Pour exécuter le code, exécuter les commandes suivantes : 
+  * mvn package
+  * mvn -q exec:java "
+	
+
+### Etape 2 : Analyser le code légataire
+Le code source légataire fourni est stocké dans le repertoire src/main/java, en respect des conventions Maven. La classe com.inf5153.game contient l'implémentation de départ d'un programme répondant aux spécifications du jeu. La Main est une classe client qui utilise les méthodes publique de la classe ConnectFour  pour simuler le jeu.
+
+
+####  Question 1 : Évolution du code légataire : 
+Le client souhaite développer une librairie pour développer  des jeux tels que le jeu Puissance 4 et jeu de dames.
+Est-que l’implémentation actuelle est évolutive pour supporter la spécification d’un jeu semblable ?	
+Sans implémenter, expliquez comment le code devrait être modifié pour prendre en compte une telle évolution.
+
+####  Question 2 : Analyse des défauts du code légataire : 
+Analysez ce code en fonction de votre connaissance de la programmation objet et des principes de génie logiciels vu dans le cours, et dressez une liste des défauts qu'il contient, en donnant des exemples des situations qui sont problématique dans le code. Si un défaut est répété à plusieurs endroits dans le code, n'en donnez pas la liste exhaustive, ce n'est pas utile, un exemple suffit.
+
+### Etape 3 : Ré-usinage en code objet 
+En restant dans le paquetage uqam.inf5153.game, identifiez un ensemble de concepts (c.à.d des classes, des interfaces, des énumérations) qui permettront de travailler au bon niveau d'abstraction de la logique d'affaire du projet et en même temps obéir à la spécification du jeu. Par exemple, changer la représentation des cases d’une représentation basées sur les indices dans le tableau grille vers des classes cellules.
+* Développez le code java (logique d'affaire + tests unitaires) mettant en œuvre votre système d'arbitrage.
+Proposez une conception permettant de représenter le jeux Puissance 4 et des échelles sous la forme d’une application orientée objet. Vous représenterez cette conception sous la forme d’un diagramme de classe UML.
+* Décrivez en utilisant un diagramme de séquence comment se déroule un tour de jeu depuis l'invocation de la classe Main par l'utilisateur jusqu'à l'annonce du gagnant
+*Un diagramme d'objet montrant une instanciation possible de vos concepts lors du tour
+Dans vos modèles, ne représentez que les éléments pertinents pour la compréhension de votre projet, les détails techniques (p.-ex- accesseurs et modificateurs dans le diagramme de classe, appels de fonctions interne helper dans le diagramme de séquence) sont à laisser dans le code.
+
+
+### Étape 4 : Analyse du code objet
+
+Maintenant que le code est réusiné et que l'évolution fonctionnelle à été mise en œuvre, il convient de prendre du recul sur le code développé pour être capable de l'analyser.
+#### Question 3: Justification des choix de conceptions
+Justifiez le choix des concepts que vous avez identifié dans votre modèle de conception, particulièrement en expliquant comment votre modèle respecte les propriétés architecturales demandées.
+Expliquez comment votre conception actuelle du projet respecte les principes de responsabilité unique (S de SOLID) et d'Ouvert/fermé (O de SOLID).
+Si vous pensez que votre conception souffre de certaines faiblesses, indiquez les, et expliquez pourquoi ce sont des faiblesses.
+#### Question 4 : Évolution du code objet
+Expliquez en quelques lignes comment il sera possible de réutiliser votre conception pour permettre de définir le jeu des dames à partir des abstractions identifiées dans puissance 4.
+
+## Grille d’évaluation
+
+| Élément   | Critère d’évaluation                       | Note (/100) |
+|-----------|--------------------------------------------|-------------|
+| Questions | (#1) Évolution du code légataire           | /5          |
+|           | (#2) Analyse des défauts du code légataire | /10         |
+|           | (#3) Justification des choix de conception | /15         |
+|           | (#4) Évolution de code objet               | /5          |
+| Modèles   | Justesse et pertinence de la conception    | /15         |
+|           | Cohérence inter-modèles                    | /5          |
+|           | Respect des principes de conception        | /15         |
+| Code      | Qualité du code Java                       | /10         |
+|           | Cohérence du code avec les modèles         | /10         |
+|           | Qualité des tests                          | /10         |
+
+
+## 📚  Resources 
+* Jeu des dames [http://www.ffjd.fr/Web/index.php?page=reglesdujeu](http://www.ffjd.fr/Web/index.php?page=reglesdujeu
+* Jeu de puissance 4 [https://fr.wikipedia.org/wiki/Puissance_4](https://fr.wikipedia.org/wiki/Puissance_4)
+
+
+
+================================================
+File: classDiag.puml
+================================================
+@startuml
+
+Title Diagramme de classes
+
+class Game {
+    -Player[] players
+    -Piece [] peices
+    -StandardDice standardDice
+    -Board board
+    -int numberPlayer
+
+    -setUpGame() // set numberplayer
+    -initGame() // create Objets set Board
+    -createObjects()
+    -assignPieceToPLayer()
+    -applyCellEffect()
+    -setWinnerIfplayerWin(Player player)
+    -setEndGameIfGameOverCondition()
+}
+
+class Player {
+    -String name;
+    -Piece piece;
+
+    -assingPiece(Piece piece)
+    -rollSixFaceDice(StandardDice sixFaceDice)
+    -boolean finishedGame()
+    -turn()
+    -playerRollDice(Player player)
+    -movePlayerPiece(Piece playerPiece, int diceRoll)
+}
+
+
+class Cell {
+    -Position POSITION;
+    +Position getPosition()
+}
+
+class Position {
+    -int posLine
+    -int posColumn
+    -int WIDTH = Board.STANDARD_WIDTH
+
+    +{static} Position getPosition(int cellId)
+    +{static} int getCellId(Position position)
+    +Position plus(int number)
+    +boolean isBefore(Position position)
+    +boolean isValid(Position position)
+}
+
+class Piece {
+    - Position position
+    - boolean onFinishCell = false
+
+    + Position getPosition()
+    + void moveTo(Position positionDestination)
+    + void setOnFinishCell()
+}
+
+package "Utils" {
+    class InputHandler {
+        + int getNumberPlayer() throws NumberOfPlayerException
+        - int getInteger() throws NumberFormatException
+        + String getPlayerName()
+        + void getEnter()
+    }
+
+    class OutputHandler {
+        + {static} void skipLine()
+        + {static}  void welcoming()
+        ...()
+    }
+}
+
+class Cell implements CellEffect {
+    -Position position
+    -CellType getCellType()
+    ^getCellType()
+    ^applyEffect()
+}
+
+interface CellEffect {
+    -getCellType()
+    -applyEffect()
+}
+
+class MovingCell extends Cell  {
+    - Position destinationPosition
+    - CellType cellType
+    ^getCellType()
+    ^applyEffect()
+}
+
+class FinishCell extends Cell {
+    - CellType cellType
+    ^getCellType()
+    ^applyEffect()
+}
+
+class Board {
+    -Cell CELLS[]
+    -getCell(Position position)
+    -setUp(Piece [] peices)
+}
+
+class CellFactory {
+    -HashMap<Integer,Integer> MOVING_CELLS
+    -createCells(int boardDimension)
+    -createFinishCell()
+}
+
+enum CellType {
+    LADDER,
+    SNAKE,
+    NORMAL,
+    FINISH
+}
+
+Board --"build" CellFactory
+Cell *- CellType
+
+
+
+Game *-- Board
+Board *-- Cell
+Game *-- Player
+Cell *--Position
+Piece ->"possede" Position
+Player *-- Piece
+Game --> OutputHandler
+Game *-- InputHandler
+Player *-- InputHandler
+
+@enduml
+
+
+================================================
+File: objectDiag.puml
+================================================
+@startuml
+
+Title Diagramme de d'objet
+
+object Game
+    Game : players
+    Game : peices
+    Game : standardDice
+    Game : board
+    Game : numberPlayer
+
+
+object Player {
+    Player : name
+    Player : piece
+
+}
+
+object Board {
+    Board : CELLS
+    Board : SIZE
+    Board : WIDTH
+
+}
+
+object Cell {
+    Cell : POSITION
+}
+
+object Position {
+    Position : posLine
+    Position :  posColumn
+    Position : WIDTH
+
+}
+
+object Piece {
+    Piece : position;
+    Piece : onFinishCell = false;
+}
+
+object Cell {
+    Cell : position
+}
+
+object MovingCell {
+    MovingCell : destinationPosition
+    MovingCell : cellType;
+}
+
+object FinishCell {
+    FinishCell: cellType;
+}
+
+object CellFactory {
+    CellFactory : MOVING_CELLS
+}
+
+Board --"build" CellFactory
+Game "1"*--"1" Board
+Board "1"*--"*" Cell
+Game "1"*--"1..*" Player
+Cell "1"*--"1" Position
+Piece "1"->"1" Position
+Player "1"*--"1" Piece
+Cell <|-- MovingCell
+Cell <|-- FinishCell
+
+@enduml
+
+
+================================================
+File: pom.xml
+================================================
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>jar</packaging>
+
+    <groupId>inf5153</groupId>
+    <artifactId>Puissance4-StarterCode</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>UQAM :: Puissance 4 </name>
+  
+    <properties>
+    	<maven.compiler.source>1.8</maven.compiler.source>
+    	<maven.compiler.target>1.8</maven.compiler.target>
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <configuration>
+                    <mainClass>Main</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
+
+================================================
+File: sequenceDiag.puml
+================================================
+@startuml
+
+Title Diagrame de sequence
+
+[-> Game: new Game()
+activate Game
+
+Game -> Game : setUpNumberOfPlayer()
+Game -> Game : init()
+activate Game
+Game -> Player : createPlayers()
+    activate Player
+Game -> Game : createObjects()
+activate Game
+Game -> Board : createBoard(Board.STANDARD_DIMENSION);
+    activate Board
+    Board -> CellFactory : new()
+    activate CellFactory
+    Board -> CellFactory : build()
+        activate CellFactory
+        CellFactory -> Cell : createCells()
+            activate Cell
+        deactivate CellFactory
+    deactivate CellFactory
+Game -> Piece : createPeices()
+    activate Piece
+Game -> Dice : createDice()
+    activate Dice
+deactivate Game
+deactivate Game
+Game -> Player : assignPieceToPLayer()
+Player -> Piece : assingPiece()
+Game -> Board : setup()
+Board -> Piece : positionPiecesToStartingCell()
+Piece -> Piece : setCell
+Game -> Game : startGame()
+
+
+@enduml
+
+
+================================================
+File: test1.puml
+================================================
+@startuml
+!theme reddress-lightblue
+
+'https://plantuml.com/fr/theme
+
+'single line comment
+/'multiple line comment
+'/
+
+title myDiagram
+
+
+class com.inf5153.game.ConnectFour {
+- int width
+- char[][] grid
+- int lastCol
++ String toString()
++ String horizontal()
++ String vertical()
++ String slashDiagonal()
++ String backslashDiagonal()
++ {static} boolean contains(String,String)
++ boolean isWinningPlay()
++ void chooseAndDrop(char,Scanner)
+}
+
+class com.inf5153.game.MyClass {
+}
+@enduml
+
+
+================================================
+File: src/main/java/Main.java
+================================================
+import java.util.Scanner;
+
+import com.inf5153.game.ConnectFour;
+
+
+public class Main {
+	private static final char[] PLAYERS = {'R', 'Y'};
+	public static void main(String[] args) {
+	    // we assemble all the pieces of the puzzle for 
+	    // building our Connect Four Game
+	    try (Scanner input = new Scanner(System.in)) {
+	      // we define some variables for our game like 
+	      // dimensions and nb max of moves
+	      int height = 6; int width = 8; int moves = height * width;
+
+	      // we create the ConnectFour instance
+	      ConnectFour board = new ConnectFour(width, height);
+
+	      // we explain users how to enter their choices
+	      System.out.println("Use 0-" + (width - 1) + " to choose a column");
+	      // we display initial board
+	      System.out.println(board);
+
+	      // we iterate until max nb moves be reached
+	      // simple trick to change player turn at each iteration
+	      for (int player = 0; moves-- > 0; player = 1 - player) {
+	        // symbol for current player
+	        char symbol = PLAYERS[player];
+
+	        // we ask user to choose a column
+	        board.chooseAndDrop(symbol, input);
+
+	        // we display the board
+	        System.out.println(board);
+
+	        // we need to check if a player won. If not, 
+	        // we continue, otherwise, we display a message
+	        if (board.isWinningPlay()) {
+	          System.out.println("\nPlayer " + symbol + " wins!");
+	          return;
+	        }
+	      }
+	    
+	      System.out.println("Game over. No winner. Try again!");
+	    }
+	  }
+ 
+}
+
+================================================
+File: src/main/java/com/inf5153/game/ConnectFour.java
+================================================
+package com.inf5153.game;
+
+import java.util.Arrays;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+// we are going to create a simple 2-players Connect Four implementation in Java 8
+public class ConnectFour {
+
+    // we define characters for players (R for Red, Y for Yellow)
+
+    // dimensions for our board
+    private final int width, height;
+    // grid for the board
+    private final char[][] grid;
+    // we store last move made by a player
+    private int lastCol = -1, lastTop = -1;
+
+    public ConnectFour(int w, int h) {
+        width = w;
+        height = h;
+        grid = new char[h][];
+
+        // init the grid will blank cell
+        for (int i = 0; i < h; i++) {
+            Arrays.fill(grid[i] = new char[w], '.');
+        }
+    }
+
+    // we use Streams to make a more concise method
+    // for representing the board
+    public String toString() {
+        return IntStream.range(0, width).
+                mapToObj(Integer::toString).
+                collect(Collectors.joining()) +
+                "\n" +
+                Arrays.stream(grid).
+                        map(String::new).
+                        collect(Collectors.joining("\n"));
+    }
+
+    // get string representation of the row containing
+    // the last play of the user
+    public String horizontal() {
+        return new String(grid[lastTop]);
+    }
+
+    // get string representation fo the col containing
+    // the last play of the user
+    public String vertical() {
+        StringBuilder sb = new StringBuilder(height);
+
+        for (int h = 0; h < height; h++) {
+            sb.append(grid[h][lastCol]);
+        }
+
+        return sb.toString();
+    }
+
+    // get string representation of the "/" diagonal
+    // containing the last play of the user
+    public String slashDiagonal() {
+        StringBuilder sb = new StringBuilder(height);
+
+        for (int h = 0; h < height; h++) {
+            int w = lastCol + lastTop - h;
+
+            if (0 <= w && w < width) {
+                sb.append(grid[h][w]);
+            }
+        }
+
+        return sb.toString();
+    }
+
+    // get string representation of the "\"
+    // diagonal containing the last play of the user
+    public String backslashDiagonal() {
+        StringBuilder sb = new StringBuilder(height);
+
+        for (int h = 0; h < height; h++) {
+            int w = lastCol - lastTop + h;
+
+            if (0 <= w && w < width) {
+                sb.append(grid[h][w]);
+            }
+        }
+
+        return sb.toString();
+    }
+
+    // static method checking if a substring is in str
+    public static boolean contains(String str, String substring) {
+        return str.indexOf(substring) >= 0;
+    }
+
+    // now, we create a method checking if last play is a winning play
+    public boolean isWinningPlay() {
+        if (lastCol == -1) {
+            System.err.println("No move has been made yet");
+            return false;
+        }
+
+        char sym = grid[lastTop][lastCol];
+        // winning streak with the last play symbol
+        String streak = String.format("%c%c%c%c", sym, sym, sym, sym);
+
+        // check if streak is in row, col,
+        // diagonal or backslash diagonal
+        return contains(horizontal(), streak) ||
+                contains(vertical(), streak) ||
+                contains(slashDiagonal(), streak) ||
+                contains(backslashDiagonal(), streak);
+    }
+
+    // prompts the user for a column, repeating until a valid choice is made
+    public void chooseAndDrop(char symbol, Scanner input) {
+        do {
+            System.out.println("\nPlayer " + symbol + " turn: ");
+            int col = input.nextInt();
+
+            // check if column is ok
+            if (!(0 <= col && col < width)) {
+                System.out.println("Column must be between 0 and " + (width - 1));
+                continue;
+            }
+
+            // now we can place the symbol to the first
+            // available row in the asked column
+            for (int h = height - 1; h >= 0; h--) {
+                if (grid[h][col] == '.') {
+                    grid[lastTop = h][lastCol = col] = symbol;
+                    return;
+                }
+            }
+
+            // if column is full ==> we need to ask for a new input
+            System.out.println("Column " + col + " is full.");
+        } while (true);
+    }
+
+
+}
+
+================================================
+File: src/test/java/ConnectFour.java
+================================================
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class ConnectFour {
+
+    @Test
+    public void connectFourTest(){
+        // contexte
+        ConnectFour connectFour = new ConnectFour();
+        int a = 4;
+        int b = 4;
+
+        // attendu
+        int attendu = 8;
+
+        // test
+        assertEquals(attendu,a+b);
+    }
+}
+
+
+================================================
+File: .github/workflows/java.yml
+================================================
+name: Java Continuous Integration
+
+on: [push]
+
+jobs:
+  build_java:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 13
+        uses: actions/setup-java@v1
+        with:
+          java-version: 13
+
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+================================================
+File: .github/workflows/puml.yml
+================================================
+name: generate plantuml
+
+on: [push]
+
+jobs:
+  generate_plantuml:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+
+      - name: plantuml
+        id: plantuml
+        uses: grassedge/generate-plantuml-action@v1.5
+        with:
+          message: "Render PlantUML files"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+

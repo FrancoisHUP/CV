@@ -1,0 +1,206 @@
+### Directory Structure ###
+Directory structure:
+└── francoishup-inf5153-h22-lab1/
+    ├── classdia.puml
+    ├── pom.xml
+    ├── src/
+    │   ├── main/
+    │   │   └── java/
+    │   │       ├── Main.java
+    │   │       └── Money.java
+    │   └── test/
+    │       └── java/
+    │           └── MoneyTest.java
+    └── .github/
+        └── workflows/
+            ├── java.yml
+            └── puml.yml
+
+
+### Code Content ###
+================================================
+File: classdia.puml
+================================================
+@startuml
+
+class Money{}
+
+@enduml
+
+================================================
+File: pom.xml
+================================================
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>jar</packaging>
+
+    <groupId>inf5153</groupId>
+    <artifactId>SnakesNLadders</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>UQAM :: SnakesNLadders </name>
+
+    <properties>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <configuration>
+                    <mainClass>Main</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
+
+================================================
+File: src/main/java/Main.java
+================================================
+public class Main {
+
+    public static void main(String[] args) {
+        Money money = new Money(10,"CAN");
+
+        System.out.println(money);
+    }
+}
+
+
+
+
+================================================
+File: src/main/java/Money.java
+================================================
+import java.util.Objects;
+
+public class Money {
+
+    private int amount;
+    private String currency;
+
+
+    public Money(int amount, String currency) {
+        this.amount = amount;
+        this.currency = currency;
+    }
+
+    public Money add(Money m2){
+        return new Money(m2.amount+this.amount,this.currency);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Money money = (Money) o;
+        return amount == money.amount && Objects.equals(currency, money.currency);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(amount, currency);
+    }
+
+    @Override
+    public String toString() {
+        return "Money{" +
+                "amount=" + amount +
+                ", currency='" + currency + '\'' +
+                '}';
+    }
+}
+
+
+================================================
+File: src/test/java/MoneyTest.java
+================================================
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+public class MoneyTest {
+
+    @Test
+    public void TestAddCanadians() {
+        Money m1 = new Money(10,"CAN");
+        Money m2 = new Money(11, "CAN");
+
+        Money expected = new Money(21,"CAN");
+
+        assertEquals(expected,m1.add(m2));
+    }
+
+}
+
+
+================================================
+File: .github/workflows/java.yml
+================================================
+name: Java Continuous Integration
+
+on: [push]
+
+jobs:
+  build_java:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 13
+        uses: actions/setup-java@v1
+        with:
+          java-version: 13
+
+      - name: Cache Maven packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+================================================
+File: .github/workflows/puml.yml
+================================================
+name: generate plantuml
+
+on: [push]
+
+jobs:
+  generate_plantuml:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+
+      - name: plantuml
+        id: plantuml
+        uses: grassedge/generate-plantuml-action@v1.5
+        with:
+          message: "Render PlantUML files"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+

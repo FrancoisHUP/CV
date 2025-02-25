@@ -1,0 +1,746 @@
+### Directory Structure ###
+Directory structure:
+└── francoishup-builder_demo/
+    ├── INF889G_TP1.ipynb
+    ├── src/
+    │   ├── Systeme.java
+    │   ├── personnel/
+    │   │   ├── Builder.java
+    │   │   ├── BuilderInterface.java
+    │   │   ├── Directeur.java
+    │   │   ├── Emploie.java
+    │   │   ├── InfirmierBuilder.java
+    │   │   ├── MedecinBuilder.java
+    │   │   ├── Personnel.java
+    │   │   ├── PersonnelBuilder.java
+    │   │   ├── RecepetionnisteBuilder.java
+    │   │   └── dataAdapter.java
+    │   ├── serveur/
+    │   │   ├── Data.java
+    │   │   ├── Serveur.java
+    │   │   └── UniqId.java
+    │   ├── utils/
+    │   │   └── Paire.java
+    │   └── vue/
+    │       └── UserInterface.java
+    └── test/
+        └── UniqIdTest.java
+
+
+### Code Content ###
+================================================
+File: INF889G_TP1.ipynb
+================================================
+# Jupyter notebook converted to Python script.
+
+"""
+<a href="https://colab.research.google.com/github/FrancoisHUP/Builder_demo/blob/master/INF889G_TP1.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+"""
+
+"""
+# TP1 INF 889G H24
+"""
+
+"""
+## Setup
+
+"""
+
+# Connect to my google drive
+from google.colab import drive
+drive.mount('/content/drive')
+
+"""
+## Exercice 1 : High Dynamic Range (HDR) (5 pts)
+"""
+
+"""
+### a) Soit une série d’images d’une même scène acquises pour différents niveaux d’exposition. Expliquez la différence d’apparence entre ces images, en mentionnant les régions sous-exposées
+et surexposées.
+"""
+
+
+================================================
+File: src/Systeme.java
+================================================
+
+import serveur.Serveur;
+import vue.UserInterface;
+
+public class Systeme {
+
+    public static void main(String[] args) {
+        initServeur();
+        new UserInterface();
+
+    }
+
+    private static void initServeur() {
+        Serveur serveur = Serveur.getInstance();
+        serveur.addTable("personnel");
+    }
+
+}
+
+
+================================================
+File: src/personnel/Builder.java
+================================================
+package personnel;
+
+import serveur.Data;
+import java.util.Date;
+
+public class Builder implements BuilderInterface {
+
+    Directeur directeur = new Directeur();
+    PersonnelBuilder builderMedecin = new MedecinBuilder();
+    PersonnelBuilder builderInfirmier = new InfirmierBuilder();
+    PersonnelBuilder builderRecepetionniste = new RecepetionnisteBuilder();
+
+    public Personnel buildEmploye(Data datafield, Emploie emploie) {
+        setDirecteur(emploie);
+
+        // valeur par default
+        String nom = "";
+        Date dateCreation = new Date(java.lang.System.currentTimeMillis());
+
+        if(datafield.keyIsDefine("nom")){
+            nom = (String)datafield.getValueOfkey("nom");
+        }
+
+        directeur.buildPersonnel(nom,dateCreation);
+        Personnel personnel = directeur.getPersonnel();
+
+        return personnel;
+    }
+
+    @Override
+    public void setDirecteur(Emploie emploie) {
+        if(emploie == Emploie.MEDECIN){
+            directeur.setPersonnelBuilder(builderMedecin);
+        } else if (emploie == Emploie.INFIRMIER){
+            directeur.setPersonnelBuilder(builderInfirmier);
+        } else if (emploie == Emploie.RECEPTIONNISTE){
+            directeur.setPersonnelBuilder(builderRecepetionniste);
+        }
+    }
+}
+
+
+================================================
+File: src/personnel/BuilderInterface.java
+================================================
+package personnel;
+
+import serveur.Data;
+
+public interface BuilderInterface {
+
+    void setDirecteur(Emploie emploie);
+    Personnel buildEmploye(Data datafield, Emploie emploie);
+
+
+}
+
+
+================================================
+File: src/personnel/Directeur.java
+================================================
+package personnel;
+
+import java.util.Date;
+
+public class Directeur {
+
+    private PersonnelBuilder personnelBuilder;
+
+    public void setPersonnelBuilder(PersonnelBuilder personnelBuilder) { this.personnelBuilder = personnelBuilder; }
+    public Personnel getPersonnel() { return personnelBuilder.getPersonnel(); }
+
+    public void buildPersonnel(String nom, Date dateCreation) {
+        personnelBuilder.nouveauPersonnel();
+        personnelBuilder.setNom(nom);
+        personnelBuilder.setNumEmploye();
+        personnelBuilder.setDateCreation(dateCreation);
+        personnelBuilder.setEmploie();
+    }
+
+}
+
+
+================================================
+File: src/personnel/Emploie.java
+================================================
+package personnel;
+
+public enum Emploie {
+    INFIRMIER,
+    MEDECIN,
+    RECEPTIONNISTE
+}
+
+
+================================================
+File: src/personnel/InfirmierBuilder.java
+================================================
+package personnel;
+
+public class InfirmierBuilder extends PersonnelBuilder {
+    @Override
+    public void setEmploie() {
+        personnel.setEmploie(Emploie.INFIRMIER);
+    }
+}
+
+
+================================================
+File: src/personnel/MedecinBuilder.java
+================================================
+package personnel;
+
+public class MedecinBuilder extends PersonnelBuilder {
+    @Override
+    public void setEmploie() {
+        personnel.setEmploie(Emploie.MEDECIN);
+    }
+}
+
+
+================================================
+File: src/personnel/Personnel.java
+================================================
+package personnel;
+
+import serveur.Data;
+
+import java.util.Date;
+
+public class Personnel implements dataAdapter {
+
+    private String nom;
+    private Date dateCreation;
+    private Emploie emploie;
+    private int numEmploye;
+
+    private static int compteurEmploye = 0;
+
+    public void setEmploie(Emploie emploie) {
+        this.emploie = emploie;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public void setNumEmploye() {
+        this.numEmploye = compteurEmploye++;
+    }
+
+    public void setDateCreation(Date dateCreation) {
+        this.dateCreation = dateCreation;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    // Adapter
+    public Data toData() {
+        Data data = new Data();
+        data.setKeyValue("nom", nom);
+        data.setKeyValue("dateCreation", dateCreation);
+        data.setKeyValue("numEmploye", numEmploye);
+        data.setKeyValue("emploie", emploie);
+        return data;
+    }
+
+    @Override
+    public String toString() {
+        return "Personnel{" +
+                "nom='" + nom + '\'' +
+                ", dateCreation=" + dateCreation +
+                ", emploie=" + emploie +
+                '}';
+    }
+}
+
+
+================================================
+File: src/personnel/PersonnelBuilder.java
+================================================
+package personnel;
+
+import java.util.Date;
+
+public abstract class PersonnelBuilder {
+
+    protected Personnel personnel;
+
+    public void setNom(String nom) { personnel.setNom(nom); }
+    public void setNumEmploye() { personnel.setNumEmploye(); }
+    public void setDateCreation(Date dateCreation) { personnel.setDateCreation(dateCreation);}
+
+    public abstract void setEmploie();
+
+    public void nouveauPersonnel(){
+        personnel = new Personnel();
+    }
+
+    public Personnel getPersonnel() {
+        return personnel;
+    }
+
+}
+
+
+================================================
+File: src/personnel/RecepetionnisteBuilder.java
+================================================
+package personnel;
+
+public class RecepetionnisteBuilder extends PersonnelBuilder {
+    @Override
+    public void setEmploie() {
+        personnel.setEmploie(Emploie.RECEPTIONNISTE);
+    }
+
+}
+
+
+================================================
+File: src/personnel/dataAdapter.java
+================================================
+package personnel;
+
+import serveur.Data;
+
+public interface dataAdapter {
+
+    Data toData();
+
+}
+
+
+================================================
+File: src/serveur/Data.java
+================================================
+package serveur;
+
+import java.util.HashMap;
+
+public class Data<K, V> {
+
+    private HashMap<K, V> data = new HashMap<>();
+
+    public void setKeyValue(K key, V value){
+        this.data.put(key, value);
+    }
+
+    public V getValueOfkey(K key) {
+        return data.get(key);
+    }
+
+    @Override
+    public String toString() {
+        return "Serveur.Data{" +
+                "data=" + data +
+                '}';
+    }
+
+    public boolean keyIsDefine(String key) {
+        return data.containsKey(key);
+    }
+}
+
+================================================
+File: src/serveur/Serveur.java
+================================================
+package serveur;
+
+import personnel.Personnel;
+
+import java.util.HashMap;
+
+public class Serveur {
+
+    HashMap<String,HashMap<UniqId,Data>> collections;
+
+    // singleton
+    private static Serveur instance;
+
+    private Serveur() {
+        collections = new HashMap<>();
+    }
+
+    public static Serveur getInstance() {
+        if (instance == null) {
+            instance = new Serveur();
+        }
+        return instance;
+    }
+
+    public Data getData(String nomTable,UniqId uniqId) throws TableNotFound, RowNotFound {
+        if(collections.containsKey(nomTable)) {
+            if(collections.get(nomTable).containsKey(uniqId)) {
+                return collections.get(nomTable).get(uniqId);
+            }
+            throw new RowNotFound();
+        }
+        throw new TableNotFound();
+    }
+
+    public void addTable(String nomTable) {
+        collections.put(nomTable,new HashMap<>());
+    }
+
+    public void setDoc(String nomTable, UniqId uniqId, Personnel personnel) {
+        Data dataPersonnel = personnel.toData();
+        collections.get(nomTable).put(uniqId,dataPersonnel);
+    }
+
+    public class TableNotFound extends Exception {
+        public TableNotFound() { super("Table not found in the database"); }
+    }
+    public class RowNotFound extends Exception {
+        public RowNotFound() { super("Row not found in database"); }
+    }
+
+    @Override
+    public String toString() {
+        return "Serveur{" +
+                "collections=" + collections +
+                '}';
+    }
+}
+
+
+================================================
+File: src/serveur/UniqId.java
+================================================
+package serveur;
+
+import java.util.Objects;
+import java.util.Random;
+import static java.lang.Math.abs;
+
+public class UniqId implements Comparable{
+
+    private String uniqId;
+    private String nom;
+    private long salt;
+    private long time;
+
+    private static Random random = new Random();
+
+    public UniqId(String nom){
+        this.nom = nom;
+        this.uniqId = generateUniqId(nom);
+    }
+
+    private String generateUniqId(String nom) {
+        salt = abs(random.nextInt());
+        time = java.lang.System.currentTimeMillis();
+        String uniqId = nom + (time) +""+ (salt);
+        return uniqId;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    @Override
+    public String toString() {
+        return "UniqId{" +
+                "uniqId='" + uniqId + '\'' +
+                ", nom='" + nom + '\'' +
+                ", salt=" + salt +
+                ", time=" + time +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UniqId uniqId1 = (UniqId) o;
+        return uniqId.equals(uniqId1.uniqId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uniqId);
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        if (this == o) return 0;
+        if (o == null || getClass() != o.getClass()) return 0;
+        UniqId uniqId1 = (UniqId) o;
+        return uniqId.compareTo(uniqId1.uniqId);
+    }
+}
+
+
+================================================
+File: src/utils/Paire.java
+================================================
+package utils;
+
+public class Paire<F,S> {
+    public F first;
+    public S second;
+
+    public Paire(F first,S second){
+        this.first=first;
+        this.second=second;
+    }
+
+    @Override
+    public String toString() {
+        return "Paire{" +
+                "first=" + first +
+                ", second=" + second +
+                '}';
+    }
+}
+
+
+================================================
+File: src/vue/UserInterface.java
+================================================
+package vue;
+
+import serveur.Serveur;
+import serveur.Data;
+import serveur.UniqId;
+import personnel.*;
+import utils.Paire;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+
+public class UserInterface extends JFrame {
+
+    // objects
+    private JPanel jPanel;
+    private JButton jButton;
+    private JLabel jLabel;
+    private JList<String> jList;
+    private JScrollPane scrollPane;
+    private JDialog jDialog;
+    private DefaultListModel<String> model;
+    private ArrayList<Paire> uniqIds = new ArrayList<>();
+
+    // frame data
+    public final int WIDTH = 430;
+    public final int HEIGHT = 280;
+    private final Dimension DIMENSION_MAIN_FRAME = new Dimension(WIDTH,HEIGHT);
+    private final String TITLE_MAIN_FRAME = "User interface";
+
+    // interface de lapplication
+    private personnel.BuilderInterface builderInterface;
+
+    public UserInterface() {
+        this.builderInterface = new Builder();
+
+        buildFrameNotResizable(TITLE_MAIN_FRAME,DIMENSION_MAIN_FRAME);
+        jPanel = new JPanel();
+        jPanel.setLayout(null);
+        this.setContentPane(jPanel);
+
+        buildLabels(jPanel);
+        buildButtons(jPanel);
+        buildList(jPanel);
+        jPanel.repaint();
+    }
+
+    private void buildLabels(JPanel jPanel) {
+        jLabel = new JLabel("Ajout medecin");
+        jLabel.setBounds(10,10,200,30);
+        jPanel.add(jLabel);
+        jLabel = new JLabel("Ajoute infirmiere");
+        jLabel.setBounds(10,50,200,30);
+        jPanel.add(jLabel);
+        jLabel = new JLabel("Ajouter receptionniste");
+        jLabel.setBounds(10,90,200,30);
+        jPanel.add(jLabel);
+    }
+
+    private void buildButtons(JPanel jPanel) {
+        jButton = new JButton("Ajout");
+        jButton.setBounds(WIDTH-110,10,90,25);
+        jButton.addActionListener(evt -> {
+            buildDialogAddPersonnel(Emploie.MEDECIN);
+        });
+        jPanel.add(jButton);
+
+        jButton = new JButton("Ajout");
+        jButton.setBounds(WIDTH-110,50,90,25);
+        jButton.addActionListener(evt -> {
+            buildDialogAddPersonnel(Emploie.INFIRMIER);
+        });
+        jPanel.add(jButton);
+        jButton = new JButton("Ajout");
+        jButton.setBounds(WIDTH-110,90,90,25);
+        jButton.addActionListener(evt -> {
+            buildDialogAddPersonnel(Emploie.RECEPTIONNISTE);
+        });
+        jPanel.add(jButton);
+    }
+
+    private void buildList(JPanel jPanel) {
+        model = new DefaultListModel<>();
+        jList = new JList<>( model );
+        scrollPane = new JScrollPane(jList);
+        scrollPane.setBounds(10, 130, 400,100);
+        jList.addListSelectionListener(evt -> {
+            if(evt.getValueIsAdjusting()) {
+                // utilisation du singleton pour les appels au serveur
+                Data personnelData = null;
+                Paire<Integer,UniqId> paire = uniqIds.get(jList.getSelectedIndex());
+                UniqId uniqId = paire.second;
+                try {
+                    personnelData = Serveur.getInstance().getData("personnel",uniqId);
+                } catch (Serveur.TableNotFound | Serveur.RowNotFound e) {
+                    System.err.println(e.getMessage());
+                    buildFenetreErr();
+                }
+                buildDialogFichePersonnel(uniqId,personnelData);
+            }
+        });
+        jPanel.add(scrollPane);
+    }
+
+    private void buildDialogAddPersonnel(Emploie emploie) {
+        jDialog = new JDialog(this, "Add Personnel");
+        int height = 135;
+        jDialog.setBounds(500, 400,250,height);
+        jDialog.setLayout(null);
+        //label
+        JLabel jLabel = new JLabel("Nom personnel");
+        jLabel.setBounds(10,10,100,25);
+        jDialog.add(jLabel);
+        //field
+        JTextField jTextField = new JTextField();
+        jTextField.setBounds(10,30,200,25);
+        jDialog.add(jTextField );
+        //button
+        JButton jButton = new JButton("ok");
+        jButton.setBounds(80,height-75,60,25);
+
+        //jButton.requestFocus();
+        jButton.addActionListener(evt -> {
+            // getting data
+            Data fieldData = new Data();
+            fieldData.setKeyValue("nom",jTextField.getText());
+
+            // build employe
+            Personnel personnel = builderInterface.buildEmploye(fieldData,emploie);
+
+            // mettre les infos du personnel dans le serveur
+            UniqId uniqId = new UniqId(personnel.getNom());
+
+            Serveur.getInstance().setDoc("personnel",uniqId,personnel);
+
+            uniqIds.add(new Paire<>(jList.getModel().getSize(),uniqId));
+            model.addElement(uniqId.getNom());
+
+            jDialog.dispose();
+        });
+        jDialog.add(jButton);
+        jDialog.setVisible(true);
+
+    }
+
+    private void buildDialogFichePersonnel(UniqId uniqId,Data personnelData) {
+        jDialog = new JDialog(this,"Personnel " + uniqId.getNom());
+        jDialog.setBounds(400, 300,300,300);
+        jDialog.setLayout(null);
+        jDialog.setVisible(true);
+
+        JButton jButton = new JButton("fermer");
+        jButton.setBounds( 100,300-75, 100,25);
+        jButton.addActionListener(evt -> {
+            jDialog.dispose();
+        });
+        jDialog.add(jButton);
+
+        // nom
+        JLabel jLabelNom = new JLabel("Nom");
+        jLabelNom.setBounds(10,10,100,25);
+        jDialog.add(jLabelNom);
+        String nom = (String) personnelData.getValueOfkey("nom");
+        JLabel jLabelNomAffichage = new JLabel(nom);
+        jLabelNomAffichage.setBounds(10,30,100,25);
+        jDialog.add(jLabelNomAffichage);
+
+        // emploie
+        JLabel jLabelEmploi = new JLabel("Emploi");
+        jLabelEmploi.setBounds(10,60,100,25);
+        jDialog.add(jLabelEmploi);
+
+        Emploie emploi = (Emploie) personnelData.getValueOfkey("emploie");
+        JLabel jLabelEmploiAffichage = new JLabel(emploi.toString().toLowerCase());
+        jLabelEmploiAffichage.setBounds(10,80,100,25);
+        jDialog.add(jLabelEmploiAffichage);
+
+    }
+
+    private void buildFenetreErr() {
+        jDialog = new JDialog(this,"Erreur");
+        jDialog.setBounds(400, 300,300,300);
+        jDialog.setLayout(null);
+        jDialog.setVisible(true);
+
+        JButton jButton = new JButton("fermer");
+        jButton.setBounds( 100,300-75, 100,25);
+        jButton.addActionListener(evt -> {
+            jDialog.dispose();
+        });
+        jDialog.add(jButton);
+        JLabel jLabelNomAffichage = new JLabel("Oups l employer n a pas ete trouve !");
+        jLabelNomAffichage.setBounds(10,10,300,25);
+    }
+
+    private void buildFrameNotResizable(String titre, Dimension dimension){
+        this.setResizable(false);
+        this.setTitle(titre);
+        this.setBounds(500, 350, dimension.width, dimension.height);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.setLayout(null);
+        this.setVisible(true);
+    }
+}
+
+
+================================================
+File: test/UniqIdTest.java
+================================================
+import serveur.UniqId;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+public class UniqIdTest {
+
+    @Test
+    public void createMiltipleIdInShortTime_IdsShouldNotBeTheSame() {
+        int numberIdGenerated = 10000;
+        UniqId ids [] = new UniqId[numberIdGenerated];
+        for(int i = 0; i < numberIdGenerated; i++) {
+            ids[i] = new UniqId("nom");
+        }
+
+        for(int i = 0; i < numberIdGenerated; i++) {
+            for(int j=i+1; j < numberIdGenerated; j++) {
+                assertFalse(ids[i].equals(ids[j]));
+            }
+        }
+    }
+
+}
+
+
+

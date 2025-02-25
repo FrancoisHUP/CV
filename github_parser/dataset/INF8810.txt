@@ -1,0 +1,353 @@
+### Directory Structure ###
+Directory structure:
+└── francoishup-inf8810/
+    ├── README.md
+    ├── Dockerfile
+    ├── docker-compose.yml
+    ├── configs/
+    │   ├── core-site.xml
+    │   ├── hadoop-env.sh
+    │   ├── hdfs-site.xml
+    │   ├── mapred-site.xml
+    │   └── yarn-site.xml
+    └── src/
+        ├── WordCount.java
+        └── input.txt
+
+
+### Code Content ###
+================================================
+File: README.md
+================================================
+# Hadoop MapReduce with Docker
+
+### 1. Install and Run Docker
+
+Make sure you have [Docker](https://docs.docker.com/desktop/install/windows-install/) installed and running on your system.
+
+### 2. Build and Run the Container
+
+```bash
+docker-compose up --build
+```
+
+### 3. Connect to the Virtual Machine
+
+#### Using VS Code:
+
+If you're using VS Code (or a similar editor), you can connect to the Docker container:
+
+- Click on the `><` sign at the bottom left.
+- Select **Attach to a Running Container**.
+- Choose `"/hadoop-container"` from the list.
+
+#### Using the Command Line:
+
+Alternatively, connect to the running container using:
+
+```bash
+docker exec -it hadoop-container /bin/bash
+```
+
+> You are now inside a Java Virtual Machine. The `javac` compiler is pre-installed, and Hadoop v3.3.6 is configured. You can check the Hadoop report using: `$ hdfs dfsadmin -report`.
+
+### 4. Compile the MapReduce Algorithm in Java
+
+Ensure you are in the `/usr/local/hadoop` directory:
+
+```bash
+cd /usr/local/hadoop
+javac -classpath $(hadoop classpath) -d . my-java-files/WordCount.java
+jar -cvf wordcount.jar -C . .
+```
+
+This will compile the `WordCount.java` file and create the `wordcount.jar` file.
+
+### 5. Create an Input Directory in HDFS
+
+```bash
+hdfs dfs -mkdir /input
+hdfs dfs -put /usr/local/hadoop/my-data/input.txt /input
+hdfs dfs -ls /input
+```
+
+This uploads the `input.txt` file to the `/input` directory in HDFS.
+
+### 6. Run the WordCount Job
+
+```bash
+hadoop jar wordcount.jar WordCount /input /output
+```
+
+### 7. Check the Output
+
+After the job finishes, you can check the output:
+
+```bash
+hdfs dfs -cat /output/part-r-00000
+```
+
+The output should look something like this:
+
+```
+Another  1
+DBMSs,   1
+However, 1
+...
+will     3
+with     1
+```
+
+---
+
+
+================================================
+File: Dockerfile
+================================================
+# Use an official OpenJDK base image
+FROM openjdk:11-slim
+
+# Set environment variables for Hadoop
+ENV HADOOP_VERSION 3.3.6
+ENV HADOOP_URL https://dlcdn.apache.org/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz
+ENV HADOOP_HOME /usr/local/hadoop
+ENV PATH $HADOOP_HOME/bin:$HADOOP_HOME/sbin:$PATH
+
+# Set JAVA_HOME and add it to PATH
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH $JAVA_HOME/bin:$PATH
+
+# Install required packages including the JDK and SSH
+RUN apt-get update && \
+    apt-get install -y wget tar openjdk-11-jdk ssh net-tools && \
+    apt-get clean
+
+# Download and extract Hadoop
+RUN wget $HADOOP_URL && \
+    tar -xzf hadoop-$HADOOP_VERSION.tar.gz -C /usr/local && \
+    mv /usr/local/hadoop-$HADOOP_VERSION $HADOOP_HOME && \
+    rm hadoop-$HADOOP_VERSION.tar.gz
+
+# Set Hadoop configuration
+COPY configs/core-site.xml $HADOOP_HOME/etc/hadoop/
+COPY configs/hdfs-site.xml $HADOOP_HOME/etc/hadoop/
+COPY configs/mapred-site.xml $HADOOP_HOME/etc/hadoop/
+COPY configs/yarn-site.xml $HADOOP_HOME/etc/hadoop/
+COPY configs/hadoop-env.sh $HADOOP_HOME/etc/hadoop/
+
+# Set up SSH
+RUN ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa && \
+    cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && \
+    chmod 0600 ~/.ssh/authorized_keys
+
+# Configure SSH
+RUN echo "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null" >> /root/.ssh/config
+
+# Create a script to start Hadoop services
+RUN echo '#!/bin/bash\n\
+    /etc/init.d/ssh start\n\
+    echo "127.0.0.1 localhost" >> /etc/hosts\n\
+    $HADOOP_HOME/bin/hdfs namenode -format\n\
+    $HADOOP_HOME/sbin/start-dfs.sh\n\
+    $HADOOP_HOME/sbin/start-yarn.sh\n\
+    tail -f $HADOOP_HOME/logs/*' > /usr/local/start-hadoop.sh && \
+    chmod +x /usr/local/start-hadoop.sh
+
+# Set Hadoop-related environment variables
+ENV HDFS_NAMENODE_USER=root
+ENV HDFS_DATANODE_USER=root
+ENV HDFS_SECONDARYNAMENODE_USER=root
+ENV YARN_RESOURCEMANAGER_USER=root
+ENV YARN_NODEMANAGER_USER=root
+
+# Ensure JAVA_HOME is set in Hadoop configuration
+RUN echo "export JAVA_HOME=${JAVA_HOME}" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+
+# Configure Hadoop to use SSH instead of PDSH
+RUN echo "export HADOOP_SSH_OPTS=\"-o StrictHostKeyChecking=no\"" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh && \
+    echo "export PDSH_RCMD_TYPE=ssh" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+
+# Set the working directory
+WORKDIR $HADOOP_HOME
+
+# Expose necessary ports
+EXPOSE 50070 8088 9000 22
+
+# Start Hadoop services
+CMD ["/usr/local/start-hadoop.sh"]
+
+================================================
+File: docker-compose.yml
+================================================
+version: '3.8'
+
+services:
+  hadoop:
+    build: .
+    image: hadoop-image
+    container_name: hadoop-container
+    ports:
+      - "50070:50070"
+      - "8088:8088"
+      - "9000:9000"
+    volumes:
+      - ./src/WordCount.java:/usr/local/hadoop/my-java-files/WordCount.java
+      - ./src/input.txt:/usr/local/hadoop/my-data/input.txt
+      - ./src/compile-java.sh:/usr/local/hadoop/my-script/compile-java.sh
+    environment:
+      - HDFS_NAMENODE_USER=root
+      - HDFS_DATANODE_USER=root
+      - HDFS_SECONDARYNAMENODE_USER=root
+      - YARN_RESOURCEMANAGER_USER=root
+      - YARN_NODEMANAGER_USER=root
+      - JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+    hostname: localhost
+    networks:
+      - hadoop_network
+
+networks:
+  hadoop_network:
+    driver: bridge
+
+================================================
+File: configs/core-site.xml
+================================================
+<configuration>
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://localhost:9000</value>
+    </property>
+</configuration>
+
+
+================================================
+File: configs/hadoop-env.sh
+================================================
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+export HADOOP_SSH_OPTS="-o StrictHostKeyChecking=no"
+export PDSH_RCMD_TYPE=ssh
+
+# Set Hadoop-related user variables
+export HDFS_NAMENODE_USER=root
+export HDFS_DATANODE_USER=root
+export HDFS_SECONDARYNAMENODE_USER=root
+export YARN_RESOURCEMANAGER_USER=root
+export YARN_NODEMANAGER_USER=root
+
+# Disable IPv6
+export HADOOP_OPTS="$HADOOP_OPTS -Djava.net.preferIPv4Stack=true"
+
+================================================
+File: configs/hdfs-site.xml
+================================================
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>1</value>
+    </property>
+</configuration>
+
+================================================
+File: configs/mapred-site.xml
+================================================
+<configuration>
+  <property>
+    <name>yarn.app.mapreduce.am.env</name>
+    <value>HADOOP_MAPRED_HOME=/usr/local/hadoop</value>
+  </property>
+  <property>
+    <name>mapreduce.map.env</name>
+    <value>HADOOP_MAPRED_HOME=/usr/local/hadoop</value>
+  </property>
+  <property>
+    <name>mapreduce.reduce.env</name>
+    <value>HADOOP_MAPRED_HOME=/usr/local/hadoop</value>
+  </property>
+</configuration>
+
+================================================
+File: configs/yarn-site.xml
+================================================
+<configuration>
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
+        <value>org.apache.hadoop.mapred.ShuffleHandler</value>
+    </property>
+</configuration>
+
+================================================
+File: src/WordCount.java
+================================================
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
+import java.io.IOException;
+
+public class WordCount {
+
+  public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable> {
+    private final static IntWritable one = new IntWritable(1);
+    private Text word = new Text();
+
+    public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+      String[] tokens = value.toString().split("\\s+");
+      for (String token : tokens) {
+        word.set(token);
+        context.write(word, one);
+      }
+    }
+  }
+
+  public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+    private IntWritable result = new IntWritable();
+
+    public void reduce(Text key, Iterable<IntWritable> values, Context context)
+        throws IOException, InterruptedException {
+      int sum = 0;
+      for (IntWritable val : values) {
+        sum += val.get();
+      }
+      result.set(sum);
+      context.write(key, result);
+    }
+  }
+
+  public static void main(String[] args) throws Exception {
+    Configuration conf = new Configuration();
+    Job job = Job.getInstance(conf, "word count");
+    job.setJarByClass(WordCount.class);
+    job.setMapperClass(TokenizerMapper.class);
+    job.setCombinerClass(IntSumReducer.class);
+    job.setReducerClass(IntSumReducer.class);
+    job.setOutputKeyClass(Text.class);
+    job.setOutputValueClass(IntWritable.class);
+    FileInputFormat.addInputPath(job, new Path(args[0]));
+    FileOutputFormat.setOutputPath(job, new Path(args[1]));
+    System.exit(job.waitForCompletion(true) ? 0 : 1);
+  }
+}
+
+
+================================================
+File: src/input.txt
+================================================
+We predict that what goes around with databases will continue to come around in upcoming decades.
+Another wave of developers will claim that SQL and the RM are insufficient for emerging application domains.
+People will then propose new query languages and data models to overcome these problems.
+There is tremendous value in exploring new ideas and concepts for DBMSs, it is where we get new features for SQL.
+The database research community and marketplace are more robust because of it.
+However, we do not expect these new data models to supplant the RM.
+
+
+

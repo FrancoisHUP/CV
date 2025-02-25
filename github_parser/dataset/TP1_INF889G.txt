@@ -1,0 +1,377 @@
+### Directory Structure ###
+Directory structure:
+└── francoishup-tp1_inf889g/
+    ├── README.md
+    ├── Annotate.py
+    ├── Annotate_circle.py
+    ├── INF889G_TP1.ipynb
+    ├── annotations.txt
+    ├── annotations_center.txt
+    ├── requirements.txt
+    ├── assets/
+    └── data/
+        └── d1_ex3.pcl
+
+
+### Code Content ###
+================================================
+File: README.md
+================================================
+# TP1 INF889G in colab
+
+
+================================================
+File: Annotate.py
+================================================
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+# Initialize the list to store coordinates
+coordinates = []
+
+def onclick(event):
+    # Store the coordinates of the clicked point
+    ix, iy = event.xdata, event.ydata
+    print('x = %d, y = %d' % (ix, iy))
+
+    # Append to the list of coordinates
+    coordinates.append((ix, iy))
+
+    # Optionally, you can annotate the point on the image itself
+    plt.gca().annotate(len(coordinates), (ix, iy), color='red', weight='bold')
+
+    plt.draw()
+
+# Load and show the image
+image_path = 'data/d1_ex2.png'
+image = mpimg.imread(image_path)
+fig, ax = plt.subplots()
+ax.imshow(image)
+
+# Connect the click event to the onclick function
+cid = fig.canvas.mpl_connect('button_press_event', onclick)
+
+plt.show()
+
+# Print or save the coordinates to a file
+print(coordinates)
+
+with open('annotations.txt', 'w') as file:
+    for coord in coordinates:
+        file.write('%d,%d\n' % coord)
+
+================================================
+File: Annotate_circle.py
+================================================
+import tkinter as tk
+from tkinter import filedialog
+from PIL import Image, ImageTk
+from math import sqrt
+
+class CircleAnnotationApp:
+    def __init__(self, root, image_path):
+        self.root = root
+        self.image_path = image_path
+        self.load_image(image_path)
+        self.annotations = []
+
+        # Bind mouse events
+        self.canvas.bind("<Button-1>", self.on_click)
+        self.canvas.bind("<B1-Motion>", self.on_drag)
+        self.canvas.bind("<ButtonRelease-1>", self.on_release)
+
+        self.undo_button = tk.Button(root, text="Undo", command=self.undo)
+        self.undo_button.pack()
+
+
+    def load_image(self, image_path):
+        # Load the image
+        self.image = Image.open(image_path)
+        
+        # Calculate the new size preserving the aspect ratio
+        original_width, original_height = self.image.size
+        target_width = 1200
+        target_height = 900
+        ratio = min(target_width / original_width, target_height / original_height)
+        new_width = int(original_width * ratio)
+        new_height = int(original_height * ratio)
+        
+        # Check for the best available resampling method
+        try:
+            # For Pillow versions 8.0.0 and later
+            resample_method = Image.Resampling.LANCZOS
+        except AttributeError:
+            try:
+                # For versions between 7.0.0 (inclusive) and 8.0.0 (exclusive)
+                resample_method = Image.LANCZOS
+            except AttributeError:
+                # For versions before 7.0.0
+                resample_method = Image.ANTIALIAS
+        
+        # Resize the image using the determined resampling method
+        self.image = self.image.resize((new_width, new_height), resample_method)
+        self.photo = ImageTk.PhotoImage(self.image)
+
+        self.canvas = tk.Canvas(self.root, width=new_width, height=new_height)
+        self.canvas.pack()
+        self.canvas.create_image(0, 0, anchor=tk.NW, image=self.photo)
+        self.start_x = None
+        self.start_y = None
+        self.current_circle = None
+        self.current_center = None
+
+
+    def on_click(self, event):
+        self.start_x = event.x
+        self.start_y = event.y
+
+    def on_drag(self, event):
+        # Remove the previous circle
+        if self.current_circle:
+            self.canvas.delete(self.current_circle)
+
+        if self.current_center:
+            self.canvas.delete(self.current_center)
+        
+        # Calculate the radius
+        radius = sqrt((event.x - self.start_x) ** 2 + (event.y - self.start_y) ** 2)
+
+        # Draw the new circle
+        self.current_circle = self.canvas.create_oval(
+            self.start_x - radius, self.start_y - radius, 
+            self.start_x + radius, self.start_y + radius,
+            outline='red'
+        )
+
+        # Draw the center point of the circle
+        center_size = 4  # Size of the center point, adjust as needed
+        self.current_center = self.canvas.create_oval(
+            self.start_x - center_size, self.start_y - center_size,
+            self.start_x + center_size, self.start_y + center_size,
+            fill='blue'
+        )
+
+    def on_release(self, event):
+        # Calculate the final radius and add the annotation
+        radius = sqrt((event.x - self.start_x) ** 2 + (event.y - self.start_y) ** 2) 
+        
+        # Normalize the coordinates and radius
+        norm_start_x = self.start_x / 1200  # Assuming 1200 is the width of the canvas
+        norm_start_y = self.start_y / 900   # Assuming 900 is the height of the canvas
+        norm_radius = radius / 1200         # Normalize based on the max dimension for aspect ratio
+
+        # Append the normalized annotation
+        self.annotations.append((self.current_circle, self.current_center, norm_start_x, norm_start_y, norm_radius))
+
+        # self.annotations.append((self.start_x, self.start_y, radius))
+        # Reset current circle
+        self.current_circle = None
+        self.current_center = None
+        print("Annotations:", self.annotations)
+
+    def undo(self, event=None):
+        if self.annotations:
+            last_annotation = self.annotations.pop()
+            self.canvas.delete(last_annotation[0])  # Delete the circle from the canvas
+            if len(last_annotation) > 1:
+                # If you're storing the center point separately and want to delete it too
+                self.canvas.delete(last_annotation[1])
+            print("Undo: Removed last annotation.")
+
+    def close_and_save(self):
+        # Save the annotations to a file
+        with open("annotations.txt", "w") as file:
+            for annotation in self.annotations:
+                file.write(f"{annotation[2]},{annotation[3]},{annotation[4]}\n")
+        print("Annotations saved to annotations.txt")
+        self.root.destroy()
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    # Prompt the user to select an image file
+    image_path = filedialog.askopenfilename(title="Select an image file")
+    if image_path:
+        app = CircleAnnotationApp(root, image_path)
+        root.protocol("WM_DELETE_WINDOW", app.close_and_save)  # Save on window close
+        root.mainloop()
+    else:
+        print("No image selected.")
+
+
+================================================
+File: annotations.txt
+================================================
+0.13078333333333333,0.013333333333333334,0.07934459172565646
+0.289275,0.07666666666666666,0.05219767582097034
+0.41895000000000004,0.06777777777777778,0.05189083627085701
+0.5475166666666668,0.1511111111111111,0.07069915772325563
+0.5098333333333334,0.012222222222222223,0.0330647617898908
+0.59185,0.017777777777777778,0.031210950046062006
+0.701575,0.05,0.06592487412030287
+0.8212750000000001,0.05444444444444444,0.02558786197703035
+0.907725,0.07888888888888888,0.0
+0.9088333333333334,0.07555555555555556,0.0
+0.9088333333333334,0.07555555555555556,0.05109164220083142
+0.9653583333333334,0.15666666666666668,0.0
+0.9697916666666667,0.14,0.0
+0.9675750000000001,0.15777777777777777,0.029945517657535625
+0.8146250000000002,0.13,0.039792099474086004
+0.887775,0.21444444444444444,0.04988731329484259
+0.7381500000000001,0.25666666666666665,0.07660339463394847
+0.6572416666666667,0.13333333333333333,0.020072770389537944
+0.6938166666666666,0.14888888888888888,0.016625
+0.65835,0.17666666666666667,0.015674200316301803
+0.6306416666666668,0.22555555555555556,0.023275000000000004
+0.4211666666666667,0.1811111111111111,0.02741865241035744
+0.3047916666666667,0.2288888888888889,0.06882384115341944
+0.20393333333333333,0.14444444444444443,0.03478471986535339
+0.11083333333333334,0.15333333333333332,0.0333422331868891
+0.025491666666666666,0.11888888888888889,0.03955989305962403
+0.0399,0.2411111111111111,0.05266624604262414
+0.169575,0.23444444444444446,0.04697032455592455
+0.11305000000000001,0.3011111111111111,0.02260565317692801
+0.19063333333333335,0.34444444444444444,0.04738692095692416
+0.05430833333333333,0.39222222222222225,0.06554177685941151
+0.18176666666666666,0.47,0.04797944148857462
+0.32585000000000003,0.4088888888888889,0.06999193009038812
+0.4544166666666667,0.28444444444444444,0.05054777717939511
+0.5874166666666667,0.31555555555555553,0.05785669857021263
+0.6927083333333334,0.3655555555555556,0.020705375375598592
+0.8223833333333334,0.3322222222222222,0.016772126761717226
+0.8456583333333334,0.2866666666666667,0.019639716704225197
+0.9044000000000001,0.34,0.04847612313179438
+0.9764416666666667,0.33666666666666667,0.017733333333333337
+0.04211666666666667,0.5255555555555556,0.04189734561334936
+0.12856666666666666,0.59,0.04612584537015134
+0.16625,0.5633333333333334,0.0
+0.25048333333333334,0.5722222222222222,0.048120050250504844
+0.4012166666666667,0.5788888888888889,0.0782219549494329
+0.4843416666666667,0.42444444444444446,0.058908724712237855
+0.6361833333333333,0.4533333333333333,0.05651413294232003
+0.7891333333333335,0.43333333333333335,0.07018472154884488
+0.9265666666666666,0.4477777777777778,0.03826559957861775
+0.9576,0.5233333333333333,0.0257075999355141
+0.5475166666666668,0.5422222222222223,0.04527918104505768
+0.7115500000000001,0.5088888888888888,0.021319217335019073
+0.048766666666666666,0.7144444444444444,0.06352403580535482
+0.12856666666666666,0.6733333333333333,0.016917974087408406
+0.21390833333333334,0.7155555555555555,0.06896648139172794
+0.30368333333333336,0.6522222222222223,0.025945418135428507
+0.30368333333333336,0.7022222222222222,0.016917974087408406
+0.35688333333333333,0.6955555555555556,0.025127654641406105
+0.5364333333333333,0.6377777777777778,0.03813697535055565
+0.475475,0.6655555555555556,0.018809040379562162
+0.6561333333333333,0.6077777777777778,0.058908724712237855
+0.7769416666666666,0.57,0.03782974010102516
+0.8800166666666667,0.5455555555555556,0.04500706811774741
+0.8356833333333333,0.61,0.020436656880332568
+0.9199166666666667,0.6411111111111111,0.04160311904039034
+0.07093333333333335,0.8588888888888889,0.06112938123357703
+0.15405833333333332,0.8066666666666666,0.020436656880332568
+0.21834166666666666,0.88,0.06056410400925985
+0.31809166666666666,0.7977777777777778,0.03918550079075451
+0.35688333333333333,0.75,0.01731272011492642
+0.45552500000000007,0.7677777777777778,0.07381866107037044
+0.5863083333333334,0.7122222222222222,0.03534523482734271
+0.5852,0.82,0.04311117491762174
+0.6528083333333334,0.7633333333333333,0.027373814028089773
+0.6805166666666668,0.8411111111111111,0.03548398014910704
+0.7858083333333333,0.7277777777777777,0.08551421949659081
+0.9188083333333333,0.72,0.023563489884895143
+0.9587083333333334,0.8333333333333334,0.07759124959612965
+0.841225,0.8388888888888889,0.018178018242432873
+0.9088333333333334,0.9333333333333333,0.020436656880332568
+0.9587083333333334,0.9966666666666667,0.041008333333333334
+0.7802666666666667,0.9566666666666667,0.08674080362717933
+0.615125,0.9322222222222222,0.04522488944154535
+0.4965333333333334,0.9144444444444444,0.043225000000000006
+0.3646416666666667,0.9122222222222223,0.05502738270372509
+0.07758333333333334,0.9677777777777777,0.029092430525634826
+0.17068333333333333,0.9766666666666667,0.029822199971013392
+
+
+================================================
+File: annotations_center.txt
+================================================
+35,5
+76,18
+105,17
+132,3
+151,4
+182,10
+211,12
+235,18
+6,28
+29,38
+51,35
+79,56
+108,45
+142,33
+169,32
+178,37
+170,44
+162,56
+190,62
+211,33
+228,55
+249,38
+8,59
+41,59
+117,70
+152,78
+178,93
+211,83
+216,73
+233,86
+27,76
+15,99
+47,87
+84,102
+125,106
+161,112
+205,109
+238,113
+9,133
+45,116
+33,150
+64,144
+105,144
+141,136
+137,161
+167,153
+198,146
+183,128
+227,138
+245,132
+12,181
+54,181
+78,165
+91,176
+117,195
+151,179
+167,193
+203,183
+235,162
+236,181
+19,219
+56,223
+80,202
+92,231
+129,233
+150,209
+176,214
+159,236
+200,243
+244,209
+19,247
+42,249
+
+
+================================================
+File: requirements.txt
+================================================
+tk
+matplotlib
+Pillow
+
+
