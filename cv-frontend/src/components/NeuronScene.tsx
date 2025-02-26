@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { FlyControls } from "@react-three/drei";
 import ControlsOverlay from "./ControlsOverlay";
 import Particles from "./Particles";
@@ -40,6 +40,31 @@ type ConnectionType = {
 //   { from: 2, to: 4 },
 // ];
 
+// New component to handle camera movement using useFrame
+const CameraController = ({ controlsRef, mobileMove, mobileRotate }: { controlsRef: React.MutableRefObject<any>, mobileMove: { x: number; y: number }, mobileRotate: { x: number; y: number } }) => {
+  const yawRef = useRef(0);
+  const pitchRef = useRef(0);
+  
+  useFrame((state, delta) => {
+    if (controlsRef.current) {
+      const camera = controlsRef.current.object;
+      // Update camera position
+      camera.translateX(mobileMove.x * delta);
+      camera.translateZ(-mobileMove.y * delta);
+      
+      // Update rotation angles
+      yawRef.current -= mobileRotate.x * delta;
+      pitchRef.current -= mobileRotate.y * delta;
+      // Clamp pitch to avoid flipping
+      pitchRef.current = Math.max(Math.min(pitchRef.current, Math.PI / 2 - 0.1), -Math.PI / 2 + 0.1);
+      
+      // Apply clamped rotation
+      camera.rotation.set(pitchRef.current, yawRef.current, 0);
+    }
+  });
+  return null;
+};
+
 const NeuronScene = () => {
   const [speed, setSpeed] = useState(10); // Default speed
   const [chatOpen, setChatOpen] = useState(false);
@@ -51,6 +76,14 @@ const NeuronScene = () => {
     projects: Project[];
     connections: ConnectionType[];
   } | null>(null);
+
+  // State for mobile joystick controls
+  const [mobileMove, setMobileMove] = useState({ x: 0, y: 0 });
+  const [mobileRotate, setMobileRotate] = useState({ x: 0, y: 0 });
+  // Remove window.innerWidth based isMobile detection and use userAgent check instead
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  // Remove useEffect for window resize here
 
   // Keyboard events for chat toggle
   useEffect(() => {
@@ -144,9 +177,17 @@ const NeuronScene = () => {
           rollSpeed={2}
           dragToLook
         />
+        {/* Render CameraController only for mobile */}
+        {isMobile && (
+          <CameraController controlsRef={controlsRef} mobileMove={mobileMove} mobileRotate={mobileRotate} />
+        )}
       </Canvas>
       {chatOpen && <ChatWindow onClose={() => setChatOpen(false)} />}
-      <ControlsOverlay />
+      <ControlsOverlay
+        onMoveChange={setMobileMove}
+        onRotateChange={setMobileRotate}
+        isMobile={isMobile}
+      />
 
       {/* Explosion toggle button */}
       <div style={{ position: "absolute", top: 20, right: 20, zIndex: 100 }}>

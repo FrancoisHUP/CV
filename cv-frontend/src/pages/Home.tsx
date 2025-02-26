@@ -2,7 +2,7 @@ import NeuronScene from "../components/NeuronScene"; // Ensure correct import pa
 
 const Home = () => {
   return (
-    <div style={{ width: "100vw", height: "calc(100vh - 100px)" }}>
+    <div style={{ width: "100vw", height: "calc(100vh - 60px)" }}>
       <NeuronScene />
     </div>
   );
