@@ -116,7 +116,11 @@ const NeuronScene = () => {
           graphData.projects.map((project) => (
             <Node
               key={project.id}
-              position={project.position}
+              position={[
+                project.position[0] / 1000,
+                project.position[1] / 1000,
+                project.position[2] / 1000,
+              ]}
               title={project.title}
               link={project.link}
               exploded={exploded}

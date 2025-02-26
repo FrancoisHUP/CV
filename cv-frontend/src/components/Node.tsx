@@ -17,7 +17,7 @@ const Node = ({ position, title, link, exploded = false }: NodeProps) => {
   // Compute the original position.
   const originalPos = useMemo(() => new THREE.Vector3(...position), [position]);
   // Compute an "exploded" position by scaling the original vector.
-  const explosionFactor = 10; // adjust as needed
+  const explosionFactor = 20000; // adjust as needed
   const explodedPos = useMemo(
     () => originalPos.clone().multiplyScalar(explosionFactor),
     [originalPos]
