@@ -1,0 +1,55 @@
+{
+    "project": {
+      "name": "francoishup-demos",
+      "description": {
+        "summary": "A collection of fun demos to work efficiently with LLMs.",
+        "problem_solved": "Provides example projects demonstrating various approaches to working with large language models.",
+        "impact": "Helps users quickly explore and learn different techniques for integrating or using LLMs in their projects.",
+        "technologies": [
+          "LLMs",
+          "Git"
+        ],
+        "role": "Contributor",
+        "challenges": [
+          "Ensuring demos are simple enough to be approachable while still showcasing useful LLM capabilities."
+        ],
+        "relevance": "Demonstrates how to create practical, instructive examples for learning and leveraging LLMs."
+      },
+      "architecture": {
+        "overview": "This project contains multiple demos, each located in its own branch, illustrating different functionalities and approaches for working with LLMs. The main branch includes a README that summarizes available demos and their purpose.",
+        "components": [
+          {
+            "name": "README.md",
+            "description": "Central documentation file listing demos and basic instructions."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Use separate branches for each demo.",
+            "reasoning": "Keeps each demo self-contained and avoids clutter on the main branch."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "Minimal code footprint in main branch.",
+            "impact": "Allows quick navigation and a clear overview of available demos."
+          }
+        ],
+        "lessons_learned": [
+          "Organizing demos by branch can simplify user discovery and maintain code clarity."
+        ]
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "description": "Provides an overview of the demos and instructions on where to find them.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        }
+      ]
+    }
+  }
+  

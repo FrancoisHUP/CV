@@ -1,0 +1,1570 @@
+{
+    "project": {
+      "name": "my-app (EPS Ideas)",
+      "description": {
+        "summary": "A Vue.js application integrated with Firebase (Firestore, Authentication, Storage) for creating, managing, and sharing ideas. It also features user subscriptions, favorites, likes/dislikes, and a simple dictionary-based search system.",
+        "problem_solved": "Provides a platform where users can sign up, post ideas with optional file attachments, comment, like/dislike, and follow other users, all in real-time using Firebase services.",
+        "impact": "Streamlined user sign-up and idea sharing process. Real-time updates via Firebase significantly improved user engagement and the overall user experience.",
+        "technologies": [
+          "Vue.js",
+          "Vuetify",
+          "Firebase (Firestore, Auth, Storage)",
+          "JavaScript",
+          "Webpack",
+          "Babel"
+        ],
+        "role": "Developer/Contributor",
+        "challenges": [
+          "Implementing secure Firebase Firestore rules to guard user data",
+          "Building a dictionary-based search to handle partial matches and accent removal",
+          "Maintaining real-time updates and minimal data duplication",
+          "Managing file uploads and downloads via Firebase Storage"
+        ],
+        "relevance": "Demonstrates skills in full-stack JavaScript development with Vue.js and Firebase, real-time app design, cloud-based services, and user authentication/authorization strategies."
+      },
+      "architecture": {
+        "overview": "The application is a single-page Vue.js app using Vue Router for navigation, Vuetify for UI components, and Firebase for data storage, authentication, and file hosting. Firestore rules secure the database, while a dictionary-based searching mechanism is integrated for indexing and retrieving relevant documents.",
+        "components": [
+          {
+            "name": "Frontend (Vue.js)",
+            "description": "Handles the UI, routing, and interaction logic through Vue components, Vue Router, and Vuetify."
+          },
+          {
+            "name": "Firebase Firestore",
+            "description": "Stores all user, post, and comment data. Security rules enforce read/write access and data validation."
+          },
+          {
+            "name": "Firebase Authentication",
+            "description": "Manages user sign-in, sign-up, and password resets."
+          },
+          {
+            "name": "Firebase Storage",
+            "description": "Hosts user-uploaded files (attachments for ideas)."
+          },
+          {
+            "name": "Dictionary-based Search (Scripts)",
+            "description": "Processes and indexes text fields from tasks/ideas to enable partial matching and accent-insensitive lookups."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Use Firebase as a serverless backend solution.",
+            "reasoning": "It simplifies real-time data synchronization, authentication, and hosting. Trade-off: vendor lock-in but faster development and simpler maintenance."
+          },
+          {
+            "decision": "Implement a dictionary-based search in Firestore.",
+            "reasoning": "Allows partial matching and accent handling using preprocessed tokens stored in a separate collection. Trade-off: partial complexity in data indexing but more flexible searching."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "Use Firestore indexes and queries with limit/where clauses.",
+            "impact": "Faster lookups and better scalability for real-time data retrieval."
+          },
+          {
+            "optimization": "Soft deletion via a 'delete' field instead of truly removing documents.",
+            "impact": "Reduces overhead of data removal while retaining references for historical or rollback purposes."
+          }
+        ],
+        "lessons_learned": [
+          "Careful design of Firestore rules is crucial for multi-user environments.",
+          "Using Vue with Vuetify can accelerate UI development while maintaining a clean design.",
+          "Dictionary-based searching in Firestore requires additional data preprocessing and maintenance.",
+          "Real-time apps require thoughtful approaches to data synchronization and offline capabilities."
+        ]
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "description": "Basic project setup and usage instructions.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "babel.config.js",
+          "description": "Configuration file for Babel presets used by Vue CLI.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "firebase.json",
+          "description": "Firebase CLI configuration (emulators, Firestore rules/indexes).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "firestore.indexes.json",
+          "description": "Specifies Firestore indexes configuration used by the project.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "firestore.rules",
+          "description": "Security rules for Firestore restricting read/write operations based on user authentication and resource fields.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "package.json",
+          "description": "Project metadata, scripts, and dependency definitions for npm.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "vue.config.js",
+          "description": "Global Vue CLI configuration to customize build/serve options.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "webpack.config.js",
+          "description": "Custom Webpack configuration for bundling the application.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "path",
+              "purpose": "Used to resolve and construct file system paths."
+            }
+          ]
+        },
+        {
+          "path": "public/index.html",
+          "description": "Main HTML entry point for the Vue SPA.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "src/App.vue",
+          "description": "Root Vue component wrapping the entire application.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "src/main.js",
+          "description": "Entry point that initializes Vue, Vuetify, Router, and mounts the application.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "vue",
+              "purpose": "Core Vue library."
+            },
+            {
+              "module": "./App.vue",
+              "purpose": "Root component."
+            },
+            {
+              "module": "@/plugins/vuetify",
+              "purpose": "Imports Vuetify plugin."
+            },
+            {
+              "module": "./Router/index",
+              "purpose": "Sets up route definitions."
+            }
+          ]
+        },
+        {
+          "path": "src/Router/index.js",
+          "description": "Defines and exports the Vue Router instance with application routes.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "vue",
+              "purpose": "Used to install the VueRouter plugin."
+            },
+            {
+              "module": "vue-router",
+              "purpose": "Routing library for Vue."
+            },
+            {
+              "module": "../Views/RecupererPassword.vue",
+              "purpose": "Component for password recovery route."
+            },
+            {
+              "module": "../Views/login.vue",
+              "purpose": "Login component."
+            },
+            {
+              "module": "../Views/createaccount.vue",
+              "purpose": "Registration component."
+            },
+            {
+              "module": "../Views/profil.vue",
+              "purpose": "Profile component."
+            }
+          ]
+        },
+        {
+          "path": "src/Views/RecupererPassword.vue",
+          "description": "View for sending a password reset email to the user.",
+          "functions": [
+            {
+              "name": "resetPassword",
+              "description": "Validates email and triggers sending a reset email via Firebase Auth.",
+              "parameters": [
+                {
+                  "name": "None (uses local component data)",
+                  "type": "String (email input)",
+                  "description": "Email field is read from data property."
+                }
+              ],
+              "returns": {
+                "type": "void",
+                "description": "Updates UI state to show confirmation message."
+              }
+            },
+            {
+              "name": "displayComponentLogin",
+              "description": "Navigates back to the login view.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Uses Vue Router push."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "../scripts/authentification",
+              "purpose": "Imports resetPassword function."
+            }
+          ]
+        },
+        {
+          "path": "src/Views/createaccount.vue",
+          "description": "User registration page (creates new user via Firebase Auth).",
+          "functions": [
+            {
+              "name": "register",
+              "description": "Performs input validation and creates new user with email/password using Firebase. Then navigates to the user profile.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "On success, navigates to the newly created profile route. On failure, shows error."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "../scripts/authentification",
+              "purpose": "Imports register function."
+            }
+          ]
+        },
+        {
+          "path": "src/Views/login.vue",
+          "description": "Login view that authenticates users with Firebase and redirects them to their profile on success.",
+          "functions": [
+            {
+              "name": "login",
+              "description": "Validates input and signs in with Firebase Auth. On success, navigates to the user’s profile.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Displays error message on failure."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "../scripts/firebase.js",
+              "purpose": "Firebase app and authentication references."
+            },
+            {
+              "module": "firebase/auth",
+              "purpose": "signInWithEmailAndPassword function for authentication."
+            }
+          ]
+        },
+        {
+          "path": "src/Views/profil.vue",
+          "description": "Profile page that includes the toolbar, user’s tasks, subscriptions, and other functionality. Also handles routing to sub-features like editing tasks or viewing notifications.",
+          "functions": [
+            {
+              "name": "ComponentMesIdees",
+              "description": "Displays the user’s own ideas by querying Firestore.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Populates a list of tasks for the user’s profile."
+              }
+            },
+            {
+              "name": "afficherTachesActualite",
+              "description": "Queries and displays all public tasks in chronological order.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Updates the local data array with public tasks."
+              }
+            },
+            {
+              "name": "afficherTachesAbonnement",
+              "description": "Displays tasks posted by users you follow.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Retrieves tasks for each subscribed user."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "../components/toolbar.vue",
+              "purpose": "Navigation toolbar for the top of the profile page."
+            },
+            {
+              "module": "../components/barPhoto.vue",
+              "purpose": "Top bar with user’s avatar and name."
+            },
+            {
+              "module": "../scripts/firebase",
+              "purpose": "Main Firebase reference for data retrieval."
+            },
+            {
+              "module": "../scripts/utils",
+              "purpose": "Helper functions to parse and sort documents."
+            },
+            {
+              "module": "../scripts/dictionnaire",
+              "purpose": "Used for searching tasks with dictionary-based approach."
+            },
+            {
+              "module": "../scripts/abonnement",
+              "purpose": "Retrieves subscription info to display tasks from followed users."
+            }
+          ]
+        },
+        {
+          "path": "src/components/affichageComment.vue",
+          "description": "Displays a single comment with optional delete button if authorized.",
+          "functions": [
+            {
+              "name": "supprimerCommentaire",
+              "description": "Marks the given comment as deleted in Firestore.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Refreshes the comment list via the parent’s event emission."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "../scripts/commentaire",
+              "purpose": "Imports supprimerComment function to remove comments from Firestore."
+            },
+            {
+              "module": "../scripts/firebase",
+              "purpose": "Checks current user’s UID for permission logic."
+            }
+          ]
+        },
+        {
+          "path": "src/components/affichageNotification.vue",
+          "description": "Displays a notification (e.g., someone liked your post). Currently uses placeholders for user info.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "../scripts/firebase",
+              "purpose": "Retrieves current user info for notification display."
+            },
+            {
+              "module": "../scripts/authentification",
+              "purpose": "Fetches user profile details (color, avatar, etc.)."
+            }
+          ]
+        },
+        {
+          "path": "src/components/affichageProfil.vue",
+          "description": "Component that shows the editable fields of the user’s profile (name, email, etc.).",
+          "functions": [
+            {
+              "name": "modifierProfil",
+              "description": "Updates user’s profile in Firestore as well as any tasks/comments to reflect new name/initials.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "On success, user data is updated across relevant collections."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "../scripts/firebase",
+              "purpose": "Access current user’s UID."
+            },
+            {
+              "module": "../scripts/profil",
+              "purpose": "Imports method to update profile in Firestore."
+            },
+            {
+              "module": "../scripts/authentification",
+              "purpose": "Fetches user info from Firestore."
+            }
+          ]
+        },
+        {
+          "path": "src/components/affichageTache.vue",
+          "description": "Displays a single task/idea, including details, attachments, like/dislike, and comment functionality.",
+          "functions": [
+            {
+              "name": "addLike",
+              "description": "Increments the like count for this task and updates the user’s 'likes' record.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "UI is updated to show the user’s like status."
+              }
+            },
+            {
+              "name": "removeLike",
+              "description": "Removes the user’s like from this task and decrements the task’s like count.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "UI is updated to remove the user’s like status."
+              }
+            },
+            {
+              "name": "addDislike",
+              "description": "Increments the dislike count for this task and updates user’s 'dislikes' record.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "UI is updated to show the user’s dislike status."
+              }
+            },
+            {
+              "name": "removeDislike",
+              "description": "Removes the user’s dislike from this task and decrements the task’s dislike count.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "UI is updated to remove the user’s dislike status."
+              }
+            },
+            {
+              "name": "comment",
+              "description": "Toggles the visibility of the comment input area.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Allows or hides the comment box for the user."
+              }
+            },
+            {
+              "name": "send",
+              "description": "Sends a new comment to Firestore associated with this task.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Appends the new comment to the existing list and updates Firestore."
+              }
+            },
+            {
+              "name": "supprimerTache",
+              "description": "Soft-deletes the task by setting its 'delete' field to true.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Removes the task from user’s view without permanently erasing data."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "../scripts/firebase",
+              "purpose": "Retrieves Firestore references for tasks/comments."
+            },
+            {
+              "module": "../scripts/like",
+              "purpose": "Handles adding/removing likes or dislikes on tasks."
+            },
+            {
+              "module": "../scripts/favoris",
+              "purpose": "Manages tasks saved as favorites."
+            },
+            {
+              "module": "../scripts/commentaire",
+              "purpose": "Sending and fetching comments from Firestore."
+            },
+            {
+              "module": "../scripts/fileManager",
+              "purpose": "Downloads attached documents from Firebase Storage."
+            }
+          ]
+        },
+        {
+          "path": "src/components/barPhoto.vue",
+          "description": "Displays a banner with the user’s avatar, name, and a follow/unfollow button if viewing another user’s profile.",
+          "functions": [
+            {
+              "name": "suivre",
+              "description": "Adds the displayed user to the current user’s subscription list.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Calls addAbonnement to update Firestore."
+              }
+            },
+            {
+              "name": "nePlusSuivre",
+              "description": "Removes the displayed user from current user’s subscription list.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Calls removeAbonnement to update Firestore."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "../scripts/abonnement",
+              "purpose": "Handles checkAbonnement, addAbonnement, and removeAbonnement for user following logic."
+            }
+          ]
+        },
+        {
+          "path": "src/components/menu.vue",
+          "description": "A simple side menu with navigation buttons (Profile, Mes Idées, Mes Favoris).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "src/components/modifierTache.vue",
+          "description": "A component for editing an existing user task (title, visibility, discipline, etc.).",
+          "functions": [
+            {
+              "name": "getTache",
+              "description": "Fetches the existing task document from Firestore to populate the form fields.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Sets component data with the existing task's details."
+              }
+            },
+            {
+              "name": "updateTache",
+              "description": "Persists changes to Firestore and emits a confirm event.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Updates the existing task. On success, notifies the parent component."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "../scripts/firebase",
+              "purpose": "Retrieves a task document for editing."
+            },
+            {
+              "module": "../scripts/tache",
+              "purpose": "modifierTache function to save changes."
+            }
+          ]
+        },
+        {
+          "path": "src/components/posterIdee.vue",
+          "description": "A component for creating (posting) a new task/idea. Allows file attachments and sets initial visibility.",
+          "functions": [
+            {
+              "name": "publish",
+              "description": "Calls the 'publish' script function to create a new task in Firestore, optionally uploading a file.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Emits an event to notify the parent component upon success."
+              }
+            },
+            {
+              "name": "annuler",
+              "description": "Emits an event to close/exit the task creation form.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Hides or destroys the component from the parent’s perspective."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "../scripts/tache",
+              "purpose": "Provides publish function to insert new tasks into Firestore."
+            }
+          ]
+        },
+        {
+          "path": "src/components/toolbar.vue",
+          "description": "A persistent toolbar containing the app logo, search bar, and user session/notification links.",
+          "functions": [
+            {
+              "name": "search",
+              "description": "Emits an event to trigger a search result view in the parent component.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Passes the entered query string up to the parent."
+              }
+            },
+            {
+              "name": "logout",
+              "description": "Signs the current user out using Firebase Auth and redirects to the login page.",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Ends the user session and navigates them away from the app."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "firebase/auth",
+              "purpose": "signOut function for user logout."
+            }
+          ]
+        },
+        {
+          "path": "src/plugins/vuetify.js",
+          "description": "Initializes and configures Vuetify for use within the Vue application.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "vue",
+              "purpose": "Registers the Vuetify plugin."
+            },
+            {
+              "module": "vuetify/lib/framework",
+              "purpose": "Core Vuetify library."
+            }
+          ]
+        },
+        {
+          "path": "src/scripts/abonnement.js",
+          "description": "Manages user subscription/follow system in Firestore.",
+          "functions": [
+            {
+              "name": "checkAbonnement",
+              "description": "Checks if the current user is already subscribed to another user.",
+              "parameters": [
+                {
+                  "name": "otherUid",
+                  "type": "string",
+                  "description": "UID of the user to check subscription against."
+                }
+              ],
+              "returns": {
+                "type": "boolean",
+                "description": "True if subscribed, false otherwise."
+              }
+            },
+            {
+              "name": "removeAbonnement",
+              "description": "Removes another user’s UID from the current user’s subscription list.",
+              "parameters": [
+                {
+                  "name": "otherUid",
+                  "type": "string",
+                  "description": "UID of the user to unfollow."
+                }
+              ],
+              "returns": {
+                "type": "void",
+                "description": "Modifies the Firestore document for 'abonnement'."
+              }
+            },
+            {
+              "name": "addAbonnement",
+              "description": "Adds another user’s UID to the current user’s subscription list.",
+              "parameters": [
+                {
+                  "name": "otherUid",
+                  "type": "string",
+                  "description": "UID of the user to follow."
+                }
+              ],
+              "returns": {
+                "type": "void",
+                "description": "Creates/updates the 'abonnement' document in Firestore."
+              }
+            },
+            {
+              "name": "getAbonnement",
+              "description": "Retrieves the list of UIDs the given user is following.",
+              "parameters": [
+                {
+                  "name": "monUid",
+                  "type": "string",
+                  "description": "UID of the requesting user."
+                }
+              ],
+              "returns": {
+                "type": "Array<string>",
+                "description": "List of user IDs the current user follows."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "src/scripts/authentification.js",
+          "description": "Provides authentication-related utilities (registering new users, password reset, reading user info).",
+          "functions": [
+            {
+              "name": "getUserInfoByUid",
+              "description": "Fetches user profile info from the Firestore 'userInfo' collection.",
+              "parameters": [
+                {
+                  "name": "uid",
+                  "type": "string",
+                  "description": "User’s unique ID from Firebase Auth."
+                }
+              ],
+              "returns": {
+                "type": "Promise<DocumentSnapshot>",
+                "description": "Firestore document snapshot of the user’s info."
+              }
+            },
+            {
+              "name": "register",
+              "description": "Creates a new user in Firebase Auth and then stores name, lastName, email, and color/initial in Firestore.",
+              "parameters": [
+                {
+                  "name": "email",
+                  "type": "string",
+                  "description": "User’s email address."
+                },
+                {
+                  "name": "password",
+                  "type": "string",
+                  "description": "User’s chosen password."
+                },
+                {
+                  "name": "name",
+                  "type": "string",
+                  "description": "User’s given name."
+                },
+                {
+                  "name": "lastName",
+                  "type": "string",
+                  "description": "User’s family name."
+                }
+              ],
+              "returns": {
+                "type": "Promise<void>",
+                "description": "Completes upon successful account creation and Firestore document creation."
+              }
+            },
+            {
+              "name": "resetPassword",
+              "description": "Sends a password reset email to the specified address.",
+              "parameters": [
+                {
+                  "name": "email",
+                  "type": "string",
+                  "description": "The email to send the reset instructions to."
+                }
+              ],
+              "returns": {
+                "type": "void",
+                "description": "Logs result or error to console."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "src/scripts/commentaire.js",
+          "description": "Handles creation and deletion of task comments.",
+          "functions": [
+            {
+              "name": "supprimerComment",
+              "description": "Marks a comment record as deleted in Firestore.",
+              "parameters": [
+                {
+                  "name": "idComment",
+                  "type": "string",
+                  "description": "Document ID of the comment."
+                }
+              ],
+              "returns": {
+                "type": "Promise<void>",
+                "description": "Updates the 'deleted' field to true."
+              }
+            },
+            {
+              "name": "sendComment",
+              "description": "Adds a new comment document to the 'commentaires' collection.",
+              "parameters": [
+                {
+                  "name": "avatar",
+                  "type": "string",
+                  "description": "Commenter’s initials or avatar text."
+                },
+                {
+                  "name": "commentaire",
+                  "type": "string",
+                  "description": "The text of the comment."
+                },
+                {
+                  "name": "nomComplet",
+                  "type": "string",
+                  "description": "Full display name of the commenter."
+                },
+                {
+                  "name": "id",
+                  "type": "string",
+                  "description": "The task ID that this comment is related to."
+                },
+                {
+                  "name": "uid",
+                  "type": "string",
+                  "description": "UID of the commenter."
+                },
+                {
+                  "name": "couleur",
+                  "type": "string",
+                  "description": "Avatar color for the commenter."
+                }
+              ],
+              "returns": {
+                "type": "Promise<void>",
+                "description": "Inserts the new comment record into Firestore."
+              }
+            },
+            {
+              "name": "getComments",
+              "description": "Retrieves all non-deleted comments for a given task ID.",
+              "parameters": [
+                {
+                  "name": "id",
+                  "type": "string",
+                  "description": "The task ID whose comments are requested."
+                }
+              ],
+              "returns": {
+                "type": "Promise<QuerySnapshot>",
+                "description": "List of active comments from Firestore."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "src/scripts/dictionnaire.js",
+          "description": "Implements a dictionary-based search approach, storing tokens in Firestore to allow accent-insensitive, partial matching.",
+          "functions": [
+            {
+              "name": "insererDictionnaire",
+              "description": "Parses specified fields from a task, generates tokens, and inserts them into 'rechercheMot' collection.",
+              "parameters": [
+                {
+                  "name": "tache",
+                  "type": "object",
+                  "description": "Object containing the task fields necessary for indexing."
+                }
+              ],
+              "returns": {
+                "type": "void",
+                "description": "Updates the dictionary for improved search results."
+              }
+            },
+            {
+              "name": "rechercherDictionnaire",
+              "description": "Takes a user search query, breaks it into tokens, attempts to match them in the dictionary, then returns a list of tasks from Firestore.",
+              "parameters": [
+                {
+                  "name": "resquest",
+                  "type": "string",
+                  "description": "User query to search."
+                }
+              ],
+              "returns": {
+                "type": "Promise<object[]>",
+                "description": "Array of task objects that match the search tokens."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "./utils",
+              "purpose": "Accents removal, edit distance checks, text parsing logic."
+            }
+          ]
+        },
+        {
+          "path": "src/scripts/favoris.js",
+          "description": "Allows users to mark tasks as favorites and retrieve them later.",
+          "functions": [
+            {
+              "name": "addFavori",
+              "description": "Adds a task ID to the user’s 'favori' document in Firestore.",
+              "parameters": [
+                {
+                  "name": "tacheId",
+                  "type": "string",
+                  "description": "ID of the task to favorite."
+                },
+                {
+                  "name": "Uid",
+                  "type": "string",
+                  "description": "Current user’s UID."
+                }
+              ],
+              "returns": {
+                "type": "Promise<void>",
+                "description": "Creates or updates the user’s favorite list."
+              }
+            },
+            {
+              "name": "removeFavori",
+              "description": "Removes a task ID from the user’s favorite list.",
+              "parameters": [
+                {
+                  "name": "tacheId",
+                  "type": "string",
+                  "description": "ID of the task to remove."
+                },
+                {
+                  "name": "Uid",
+                  "type": "string",
+                  "description": "User’s UID."
+                }
+              ],
+              "returns": {
+                "type": "Promise<void>",
+                "description": "Updates the Firestore record."
+              }
+            },
+            {
+              "name": "getFavoris",
+              "description": "Retrieves all task IDs the user marked as favorites.",
+              "parameters": [
+                {
+                  "name": "monUid",
+                  "type": "string",
+                  "description": "User’s UID."
+                }
+              ],
+              "returns": {
+                "type": "Promise<string[]>",
+                "description": "List of task IDs the user favorited."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "src/scripts/fileManager.js",
+          "description": "Handles uploads/downloads of user files in Firebase Storage (e.g., attachments for tasks).",
+          "functions": [
+            {
+              "name": "uploadFile",
+              "description": "Uploads a given file to a path derived from the user and task ID.",
+              "parameters": [
+                {
+                  "name": "file",
+                  "type": "File",
+                  "description": "The file object to be uploaded."
+                },
+                {
+                  "name": "tacheId",
+                  "type": "string",
+                  "description": "Task ID to associate the file with."
+                }
+              ],
+              "returns": {
+                "type": "Promise<string>",
+                "description": "The final storage path for the uploaded file."
+              }
+            },
+            {
+              "name": "getFile",
+              "description": "Retrieves download URL for an already-uploaded file.",
+              "parameters": [
+                {
+                  "name": "document",
+                  "type": "string",
+                  "description": "Path to the file in Firebase Storage."
+                }
+              ],
+              "returns": {
+                "type": "Promise<string>",
+                "description": "Publicly accessible download URL."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "firebase/storage",
+              "purpose": "Uploading and retrieving files from Firebase Storage."
+            },
+            {
+              "module": "./firebase",
+              "purpose": "Uses the shared Firebase auth instance for folder path structure."
+            }
+          ]
+        },
+        {
+          "path": "src/scripts/firebase.js",
+          "description": "Initializes and exports core Firebase services (Auth, Firestore) plus utility functions for reading task documents.",
+          "functions": [
+            {
+              "name": "getTopIdees",
+              "description": "Returns up to 5 tasks sorted by descending likes from Firestore.",
+              "parameters": [],
+              "returns": {
+                "type": "Promise<QuerySnapshot>",
+                "description": "A query snapshot of the top-liked tasks."
+              }
+            },
+            {
+              "name": "getTache",
+              "description": "Fetches a single task document by its ID.",
+              "parameters": [
+                {
+                  "name": "idTache",
+                  "type": "string",
+                  "description": "Document ID of the task."
+                }
+              ],
+              "returns": {
+                "type": "Promise<DocumentSnapshot>",
+                "description": "Firestore document snapshot with the task data."
+              }
+            },
+            {
+              "name": "getAllUserTache",
+              "description": "Retrieves all non-deleted tasks for a particular user ID.",
+              "parameters": [
+                {
+                  "name": "uid",
+                  "type": "string",
+                  "description": "User ID to filter tasks by."
+                }
+              ],
+              "returns": {
+                "type": "Promise<QuerySnapshot>",
+                "description": "Firestore query snapshot of user tasks."
+              }
+            },
+            {
+              "name": "getAllPublicTache",
+              "description": "Retrieves all public (non-deleted) tasks from Firestore.",
+              "parameters": [],
+              "returns": {
+                "type": "Promise<QuerySnapshot>",
+                "description": "A query snapshot of public tasks."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "firebase/app",
+              "purpose": "Core Firebase initialization."
+            },
+            {
+              "module": "firebase/firestore",
+              "purpose": "Access to Firestore methods."
+            },
+            {
+              "module": "firebase/auth",
+              "purpose": "Firebase authentication instance for currentUser checks."
+            }
+          ]
+        },
+        {
+          "path": "src/scripts/like.js",
+          "description": "Implements the like/dislike system, updating both user-level and task-level records.",
+          "functions": [
+            {
+              "name": "addLike",
+              "description": "Adds a like to a task from a specific user.",
+              "parameters": [
+                {
+                  "name": "idTache",
+                  "type": "string",
+                  "description": "Task to like."
+                },
+                {
+                  "name": "monUid",
+                  "type": "string",
+                  "description": "User liking the task."
+                }
+              ],
+              "returns": {
+                "type": "void",
+                "description": "Updates Firestore (task doc + user doc)."
+              }
+            },
+            {
+              "name": "removeLike",
+              "description": "Removes a like from a task for a user.",
+              "parameters": [
+                {
+                  "name": "idTache",
+                  "type": "string",
+                  "description": "Task to unlike."
+                },
+                {
+                  "name": "monUid",
+                  "type": "string",
+                  "description": "User removing the like."
+                }
+              ],
+              "returns": {
+                "type": "void",
+                "description": "Decrements the like count in the task doc."
+              }
+            },
+            {
+              "name": "addDisLike",
+              "description": "Adds a dislike to a task from a user.",
+              "parameters": [
+                {
+                  "name": "idTache",
+                  "type": "string",
+                  "description": "Task to dislike."
+                },
+                {
+                  "name": "monUid",
+                  "type": "string",
+                  "description": "User disliking the task."
+                }
+              ],
+              "returns": {
+                "type": "void",
+                "description": "Increments the dislike count and updates user doc."
+              }
+            },
+            {
+              "name": "removeDislike",
+              "description": "Removes a dislike from a task for a user.",
+              "parameters": [
+                {
+                  "name": "idTache",
+                  "type": "string",
+                  "description": "Task to remove the dislike from."
+                },
+                {
+                  "name": "monUid",
+                  "type": "string",
+                  "description": "User removing the dislike."
+                }
+              ],
+              "returns": {
+                "type": "void",
+                "description": "Decrements the dislike count in the task doc."
+              }
+            },
+            {
+              "name": "getLikes",
+              "description": "Fetches all task IDs liked by a user.",
+              "parameters": [
+                {
+                  "name": "monUid",
+                  "type": "string",
+                  "description": "UID of the user."
+                }
+              ],
+              "returns": {
+                "type": "Promise<string[]>",
+                "description": "Array of task IDs the user has liked."
+              }
+            },
+            {
+              "name": "getDislikes",
+              "description": "Fetches all task IDs disliked by a user.",
+              "parameters": [
+                {
+                  "name": "monUid",
+                  "type": "string",
+                  "description": "UID of the user."
+                }
+              ],
+              "returns": {
+                "type": "Promise<string[]>",
+                "description": "Array of task IDs the user has disliked."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "src/scripts/notification.js",
+          "description": "Placeholder for a notifications system that would store likes/comments in user-specific docs.",
+          "functions": [
+            {
+              "name": "addLikeNotification",
+              "description": "Demonstration method that might record a notification about a like.",
+              "parameters": [
+                {
+                  "name": "idTache",
+                  "type": "string",
+                  "description": "Task ID receiving the like."
+                },
+                {
+                  "name": "monUid",
+                  "type": "string",
+                  "description": "UID of the user who liked."
+                },
+                {
+                  "name": "otherId",
+                  "type": "string",
+                  "description": "UID of the task owner."
+                }
+              ],
+              "returns": {
+                "type": "void",
+                "description": "Currently logs details, intended to create a notification doc in Firestore."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "firebase/firestore/lite",
+              "purpose": "Would be used to set/update a Firestore doc for notifications."
+            }
+          ]
+        },
+        {
+          "path": "src/scripts/profil.js",
+          "description": "Contains logic for updating user profile and cascading changes to tasks/comments that reference that user’s name and initials.",
+          "functions": [
+            {
+              "name": "modifierProfil",
+              "description": "Updates name/initials in userInfo, plus any tasks or comments authored by that user.",
+              "parameters": [
+                {
+                  "name": "nom",
+                  "type": "string",
+                  "description": "User’s first name or chosen display name."
+                },
+                {
+                  "name": "prenom",
+                  "type": "string",
+                  "description": "User’s last name or additional field."
+                },
+                {
+                  "name": "initial",
+                  "type": "string",
+                  "description": "Initials derived from name fields."
+                },
+                {
+                  "name": "id",
+                  "type": "string",
+                  "description": "The user’s UID."
+                }
+              ],
+              "returns": {
+                "type": "Promise<void>",
+                "description": "Updates Firestore documents for user, tasks, and comments referencing them."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "firebase/firestore/lite",
+              "purpose": "Perform updates on user, tasks, and comment documents."
+            },
+            {
+              "module": "./firebase",
+              "purpose": "Provides Firestore reference."
+            }
+          ]
+        },
+        {
+          "path": "src/scripts/tache.js",
+          "description": "Responsible for creating, editing, or soft-deleting tasks. Also inserts dictionary tokens for search.",
+          "functions": [
+            {
+              "name": "publish",
+              "description": "Creates a new task (doc) in Firestore, uploads any file, and indexes the task in the dictionary.",
+              "parameters": [
+                {
+                  "name": "titreTache",
+                  "type": "string",
+                  "description": "Title of the new task."
+                },
+                {
+                  "name": "description",
+                  "type": "string",
+                  "description": "Body/description of the task."
+                },
+                {
+                  "name": "niveauTache",
+                  "type": "string",
+                  "description": "Level of knowledge or skill required."
+                },
+                {
+                  "name": "disciplineTache",
+                  "type": "string",
+                  "description": "Discipline or category."
+                },
+                {
+                  "name": "visibilite",
+                  "type": "string",
+                  "description": "Either 'Public' or 'Privée'."
+                },
+                {
+                  "name": "document",
+                  "type": "File",
+                  "description": "Optional file attachment for the task."
+                }
+              ],
+              "returns": {
+                "type": "Promise<void>",
+                "description": "On success, new document is created and dictionary records are inserted."
+              }
+            },
+            {
+              "name": "modifierTache",
+              "description": "Updates an existing task in Firestore, optionally with a new file reference.",
+              "parameters": [
+                {
+                  "name": "idTache",
+                  "type": "string",
+                  "description": "Document ID of the task being updated."
+                },
+                {
+                  "name": "titreTache",
+                  "type": "string",
+                  "description": "New title for the task."
+                },
+                {
+                  "name": "description",
+                  "type": "string",
+                  "description": "Revised description."
+                },
+                {
+                  "name": "niveauTache",
+                  "type": "string",
+                  "description": "Updated level of skill or knowledge."
+                },
+                {
+                  "name": "disciplineTache",
+                  "type": "string",
+                  "description": "Updated discipline or category."
+                },
+                {
+                  "name": "visibilite",
+                  "type": "string",
+                  "description": "Updated visibility setting."
+                },
+                {
+                  "name": "document",
+                  "type": "File|string",
+                  "description": "Optional new file or existing path."
+                }
+              ],
+              "returns": {
+                "type": "Promise<void>",
+                "description": "Once updated, the task doc is saved in Firestore."
+              }
+            },
+            {
+              "name": "setPrivate",
+              "description": "Sets a task’s visibilite field to 'Privée'.",
+              "parameters": [
+                {
+                  "name": "idTache",
+                  "type": "string",
+                  "description": "Task ID to update."
+                }
+              ],
+              "returns": {
+                "type": "Promise<void>",
+                "description": "Updates the Firestore document’s visibility."
+              }
+            },
+            {
+              "name": "setPublic",
+              "description": "Sets a task’s visibilite field to 'Public'.",
+              "parameters": [
+                {
+                  "name": "idTache",
+                  "type": "string",
+                  "description": "Task ID to update."
+                }
+              ],
+              "returns": {
+                "type": "Promise<void>",
+                "description": "Updates the Firestore document’s visibility."
+              }
+            },
+            {
+              "name": "supprimerTacheSoft",
+              "description": "Soft-deletes the task by setting a 'delete' field to true without removing the record entirely.",
+              "parameters": [
+                {
+                  "name": "idTache",
+                  "type": "string",
+                  "description": "Task ID to delete."
+                }
+              ],
+              "returns": {
+                "type": "Promise<void>",
+                "description": "Task no longer appears in active queries but can be restored if needed."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "./dictionnaire",
+              "purpose": "Inserts tokens for dictionary-based searching."
+            },
+            {
+              "module": "./fileManager",
+              "purpose": "Handles file uploads for tasks."
+            },
+            {
+              "module": "./authentification",
+              "purpose": "Retrieves user info (name, initials, color) for linking to the task."
+            }
+          ]
+        },
+        {
+          "path": "src/scripts/utils.js",
+          "description": "Utility methods for text normalization, date formatting, and sorting Firestore documents by timestamp.",
+          "functions": [
+            {
+              "name": "generateLightColorHex",
+              "description": "Generates a random pastel-like color in hex format.",
+              "parameters": [],
+              "returns": {
+                "type": "string",
+                "description": "Random hex color (e.g., '#abc123')."
+              }
+            },
+            {
+              "name": "getEditDistance",
+              "description": "Computes the Levenshtein distance between two strings.",
+              "parameters": [
+                {
+                  "name": "a",
+                  "type": "string",
+                  "description": "First string to compare."
+                },
+                {
+                  "name": "b",
+                  "type": "string",
+                  "description": "Second string to compare."
+                }
+              ],
+              "returns": {
+                "type": "number",
+                "description": "Integer distance measure of how many edits (insert, delete, substitute) are needed."
+              }
+            },
+            {
+              "name": "getDateFromTimestamp",
+              "description": "Formats a Firestore timestamp as a human-readable string.",
+              "parameters": [
+                {
+                  "name": "timestamp",
+                  "type": "object",
+                  "description": "Firestore timestamp object."
+                }
+              ],
+              "returns": {
+                "type": "string",
+                "description": "Formatted date/time string."
+              }
+            },
+            {
+              "name": "getDatasFromDocument",
+              "description": "Converts a Firestore QuerySnapshot into an array of data objects with 'id' fields attached.",
+              "parameters": [
+                {
+                  "name": "listDocuments",
+                  "type": "QueryDocumentSnapshot[]",
+                  "description": "Firestore documents from a query."
+                }
+              ],
+              "returns": {
+                "type": "Array<object>",
+                "description": "Array of data objects containing the doc fields plus doc.id."
+              }
+            },
+            {
+              "name": "sortByTime",
+              "description": "Sorts data objects in descending order by their 'timestamp' field.",
+              "parameters": [
+                {
+                  "name": "dataDocuments",
+                  "type": "Array<object>",
+                  "description": "Objects each containing a timestamp field."
+                }
+              ],
+              "returns": {
+                "type": "Array<object>",
+                "description": "New array sorted by descending timestamp."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "test/fbSecurityRules.test.js",
+          "description": "Mocha test suite for validating Firestore security rules using the Firebase Emulator.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "@firebase/testing",
+              "purpose": "Provides test utilities to run security rule assertions locally."
+            },
+            {
+              "module": "firebase emulators",
+              "purpose": "Emulated local environment for Firestore."
+            },
+            {
+              "module": "mocha / chai / assert",
+              "purpose": "Test framework (Mocha) and assertions (Chai/Assert)."
+            }
+          ]
+        }
+      ]
+    }
+  }
+  

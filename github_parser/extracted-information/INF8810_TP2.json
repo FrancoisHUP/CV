@@ -1,0 +1,747 @@
+{
+    "project": {
+      "name": "INF8810_TP2 (Neo4j Recommender System)",
+      "description": {
+        "summary": "A Neo4j-based recommendation system that processes Steam game data to suggest games to users using collaborative filtering, content-based filtering, and hybrid methods.",
+        "problem_solved": "Allows users to receive relevant game recommendations from a large dataset, addressing challenges in filtering and ranking based on playtime, popularity, user similarity, and user reviews in a graph database.",
+        "impact": "Improves the discoverability of new games by leveraging both collaborative and content-based insights. Offers a clear pipeline for data ingestion, transformation, storage in Neo4j, and querying for recommendations.",
+        "technologies": [
+          "Python",
+          "Neo4j",
+          "requests",
+          "python-dotenv",
+          "tqdm",
+          "CSV",
+          "JSON"
+        ],
+        "role": "Contributor/Developer",
+        "challenges": [
+          "Efficiently handling large datasets and importing them into Neo4j.",
+          "Implementing multiple recommendation strategies (collaborative, content, hybrid).",
+          "Ensuring data consistency and uniqueness constraints in a graph database context."
+        ],
+        "relevance": "Demonstrates expertise in data engineering, data modeling in graph databases, and recommendation system design, which are valuable for data-focused roles and broader software engineering career goals."
+      },
+      "architecture": {
+        "overview": "The system consists of a set of Python scripts for data preprocessing and downloading, a module that imports data into Neo4j, a recommendation engine that queries the Neo4j graph, and a command-line interface (CLI) for users to request recommendations and user data information.",
+        "components": [
+          {
+            "name": "Data Download and Preparation",
+            "description": "Scripts that download raw JSON data from external sources (Steam review datasets) and generate CSV files for Neo4j ingestion."
+          },
+          {
+            "name": "Neo4j Importer",
+            "description": "Responsible for creating constraints and loading users, games, relationships, and reviews into Neo4j from CSV files."
+          },
+          {
+            "name": "Recommendation Engine",
+            "description": "Provides collaborative filtering, content-based filtering, and hybrid recommendation queries against Neo4j."
+          },
+          {
+            "name": "CLI (main.py)",
+            "description": "Parses command-line arguments and routes them to the appropriate recommendation logic, user listing, or user info retrieval."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Use Neo4j to store and query user-game relationships.",
+            "reasoning": "A graph database facilitates complex relationships and similarity queries (like collaborative filtering) more naturally than purely relational databases."
+          },
+          {
+            "decision": "Provide multiple recommendation strategies (collaborative, content, hybrid).",
+            "reasoning": "Different users and scenarios may prefer distinct strategies based on user similarity, item similarity, or both."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "Use MERGE statements and indexing for User and Game nodes.",
+            "impact": "Ensures unique constraint enforcement, avoids duplicates, and speeds up data import operations in Neo4j."
+          },
+          {
+            "optimization": "Limit the number of similar users (e.g., top 10) in collaborative queries.",
+            "impact": "Reduces query time and resource usage while maintaining relevant results."
+          }
+        ],
+        "lessons_learned": [
+          "How to design and optimize data ingestion for a graph database with large datasets.",
+          "Balancing collaborative and content-based factors can yield more relevant, hybrid recommendations.",
+          "Ensuring data quality and consistency during ETL can significantly improve recommendation quality."
+        ]
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "description": "Provides overall usage instructions, environment setup steps, and details on how to run the Neo4j recommender system.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "instructions_projet2.md",
+          "description": "Contains the project requirements and evaluation criteria, as well as instructions regarding data usage and final submission guidelines.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "main.py",
+          "description": "CLI entry point for the recommendation system. Parses arguments for listing users, fetching user info, and generating recommendations.",
+          "functions": [
+            {
+              "name": "json_format",
+              "description": "Prints JSON-formatted recommendation results to the console.",
+              "parameters": [
+                {
+                  "name": "results",
+                  "type": "list",
+                  "description": "List of recommendation result dictionaries."
+                }
+              ],
+              "returns": {
+                "type": "None",
+                "description": "Prints the JSON output to the console; does not return a value."
+              }
+            },
+            {
+              "name": "list_random_users",
+              "description": "Lists random users from the database and prints their IDs and items count.",
+              "parameters": [
+                {
+                  "name": "recommender",
+                  "type": "RecommenderSystem",
+                  "description": "An instance of RecommenderSystem used to query the database."
+                },
+                {
+                  "name": "limit",
+                  "type": "int",
+                  "description": "Number of random users to list."
+                }
+              ],
+              "returns": {
+                "type": "None",
+                "description": "Prints user data to the console."
+              }
+            },
+            {
+              "name": "get_user_info",
+              "description": "Fetches detailed information for a specific user, including played games, playtimes, and reviews.",
+              "parameters": [
+                {
+                  "name": "recommender",
+                  "type": "RecommenderSystem",
+                  "description": "An instance of RecommenderSystem used to query the database."
+                },
+                {
+                  "name": "user_id",
+                  "type": "str",
+                  "description": "Unique user identifier."
+                }
+              ],
+              "returns": {
+                "type": "None",
+                "description": "Prints detailed user information to the console."
+              }
+            },
+            {
+              "name": "has_relevant_arguments",
+              "description": "Checks if relevant arguments (beyond defaults) are provided to the CLI.",
+              "parameters": [
+                {
+                  "name": "args",
+                  "type": "Namespace",
+                  "description": "Command-line arguments parsed by argparse."
+                }
+              ],
+              "returns": {
+                "type": "bool",
+                "description": "True if relevant arguments are present, otherwise False."
+              }
+            },
+            {
+              "name": "run",
+              "description": "Main entry function for the CLI. Parses arguments and handles different recommendation or info retrieval actions.",
+              "parameters": [],
+              "returns": {
+                "type": "None",
+                "description": "Executes the CLI flow and prints results to the console."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "argparse",
+              "purpose": "Handles command-line argument parsing."
+            },
+            {
+              "module": "json",
+              "purpose": "Formats recommendation results in JSON."
+            },
+            {
+              "module": "utils.config",
+              "purpose": "Loads environment variables (Neo4j credentials)."
+            },
+            {
+              "module": "utils.neo4j_recommender",
+              "purpose": "Implements the RecommenderSystem class used by the CLI."
+            }
+          ]
+        },
+        {
+          "path": "rapport.md",
+          "description": "Markdown report presenting the data sources, methodology, and step-by-step instructions for the project, including experimental results and queries.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "requirements.txt",
+          "description": "Lists required Python packages (requests, python-dotenv, neo4j, tqdm).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "utils/check_neo4j_status.py",
+          "description": "Checks and prints status of the Neo4j connection to confirm the database is accessible.",
+          "functions": [
+            {
+              "name": "test_connection",
+              "description": "Tests connectivity to the Neo4j database by running a simple return query.",
+              "parameters": [],
+              "returns": {
+                "type": "None",
+                "description": "Prints 'Connection Successful!' upon success."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "neo4j.GraphDatabase",
+              "purpose": "Establishes driver sessions with the Neo4j database."
+            },
+            {
+              "module": "config.load_env",
+              "purpose": "Loads environment variables for Neo4j credentials."
+            }
+          ]
+        },
+        {
+          "path": "utils/config.py",
+          "description": "Loads environment variables from a .env file and returns them as a dictionary for Neo4j credentials.",
+          "functions": [
+            {
+              "name": "load_env",
+              "description": "Clears existing environment variables for NEO4J, then loads them from the .env file.",
+              "parameters": [],
+              "returns": {
+                "type": "dict",
+                "description": "Dictionary containing uri, username, and password for Neo4j."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "os",
+              "purpose": "Manages environment variables and file paths."
+            },
+            {
+              "module": "dotenv.load_dotenv",
+              "purpose": "Loads environment variables from .env."
+            }
+          ]
+        },
+        {
+          "path": "utils/download_csv_data.py",
+          "description": "Downloads CSV files from a Google Drive link and saves them to the local filesystem under 'data_csv/'.",
+          "functions": [
+            {
+              "name": "download_file",
+              "description": "General-purpose function for streaming a file from a URL and writing it to local disk.",
+              "parameters": [
+                {
+                  "name": "url",
+                  "type": "str",
+                  "description": "File URL to download."
+                },
+                {
+                  "name": "output_path",
+                  "type": "str",
+                  "description": "Local file path where the downloaded file is saved."
+                }
+              ],
+              "returns": {
+                "type": "None",
+                "description": "Writes the file to the specified path."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "requests",
+              "purpose": "Performs HTTP requests to download files."
+            },
+            {
+              "module": "os",
+              "purpose": "File path manipulation and directory creation."
+            },
+            {
+              "module": "shutil",
+              "purpose": "Copies file objects from the HTTP response to local files."
+            }
+          ]
+        },
+        {
+          "path": "utils/download_raw_data.py",
+          "description": "Downloads and extracts gzipped JSON files (Australian Steam data) and saves them locally for preprocessing.",
+          "functions": [
+            {
+              "name": "download_file",
+              "description": "Similar to the CSV version, streams gzipped JSON from URL to local disk.",
+              "parameters": [
+                {
+                  "name": "url",
+                  "type": "str",
+                  "description": "File URL to download."
+                },
+                {
+                  "name": "output_path",
+                  "type": "str",
+                  "description": "Destination file path for the downloaded file."
+                }
+              ],
+              "returns": {
+                "type": "None",
+                "description": "Writes the compressed file to the specified path."
+              }
+            },
+            {
+              "name": "extract_gz_file",
+              "description": "Extracts the .gz file to a JSON file.",
+              "parameters": [
+                {
+                  "name": "input_path",
+                  "type": "str",
+                  "description": "Path to the .gz file."
+                },
+                {
+                  "name": "output_path",
+                  "type": "str",
+                  "description": "Path to write the extracted JSON file."
+                }
+              ],
+              "returns": {
+                "type": "None",
+                "description": "Extracts the file contents and writes them uncompressed."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "requests",
+              "purpose": "Performs HTTP requests to download gzipped files."
+            },
+            {
+              "module": "gzip",
+              "purpose": "Handles gzip file extraction."
+            },
+            {
+              "module": "shutil",
+              "purpose": "Copies file objects from the HTTP response / gzip stream to local files."
+            },
+            {
+              "module": "os",
+              "purpose": "File path manipulation and directory creation."
+            }
+          ]
+        },
+        {
+          "path": "utils/import_data_neo4j.py",
+          "description": "Main importer that reads CSV data (games, users, user-game relationships, and reviews) and loads them into Neo4j, creating necessary constraints and relationships.",
+          "functions": [
+            {
+              "name": "count_rows",
+              "description": "Counts the number of data rows in a CSV file (excluding the header).",
+              "parameters": [
+                {
+                  "name": "file_path",
+                  "type": "str",
+                  "description": "Path to the CSV file."
+                }
+              ],
+              "returns": {
+                "type": "int",
+                "description": "Number of rows in the CSV (minus header)."
+              }
+            }
+          ],
+          "classes": [
+            {
+              "name": "Neo4jimporter",
+              "description": "Handles creation of constraints, loading of games, users, user-game relationships, and reviews into Neo4j.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Constructor. Initializes a Neo4j driver connection and sets up metrics tracking.",
+                  "parameters": [
+                    {
+                      "name": "uri",
+                      "type": "str",
+                      "description": "Neo4j database URI."
+                    },
+                    {
+                      "name": "user",
+                      "type": "str",
+                      "description": "Neo4j username."
+                    },
+                    {
+                      "name": "password",
+                      "type": "str",
+                      "description": "Neo4j password."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Initializes the importer object."
+                  }
+                },
+                {
+                  "name": "close",
+                  "description": "Closes the Neo4j driver connection.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "Terminates the session with Neo4j."
+                  }
+                },
+                {
+                  "name": "create_constraints",
+                  "description": "Ensures uniqueness constraints for User and Game nodes.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "Creates constraints in the Neo4j database if not already present."
+                  }
+                },
+                {
+                  "name": "load_games",
+                  "description": "Loads game nodes from CSV and merges them into Neo4j, setting game attributes (time played, bins, etc.).",
+                  "parameters": [
+                    {
+                      "name": "file_path",
+                      "type": "str",
+                      "description": "Path to the CSV file with game data."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Increments the games_added metric for each new entry."
+                  }
+                },
+                {
+                  "name": "load_users",
+                  "description": "Loads user nodes from CSV, setting their item count, total playtime, etc.",
+                  "parameters": [
+                    {
+                      "name": "file_path",
+                      "type": "str",
+                      "description": "Path to the CSV file with user data."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Increments the users_added metric."
+                  }
+                },
+                {
+                  "name": "load_user_game_relationships",
+                  "description": "Loads PLAYS relationships between users and games, storing playtime and active flags.",
+                  "parameters": [
+                    {
+                      "name": "file_path",
+                      "type": "str",
+                      "description": "Path to the CSV file with user-game data."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Increments the relationships_added metric."
+                  }
+                },
+                {
+                  "name": "load_reviews",
+                  "description": "Loads REVIEWS relationships with fields such as funny, posted, last_edited, helpful, recommend, and the text of the review.",
+                  "parameters": [
+                    {
+                      "name": "file_path",
+                      "type": "str",
+                      "description": "Path to the CSV file with review data."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Increments the reviews_added metric."
+                  }
+                },
+                {
+                  "name": "import_all_data",
+                  "description": "High-level method that imports games, users, user-game relationships, and reviews from CSV files in a single workflow.",
+                  "parameters": [
+                    {
+                      "name": "games_path",
+                      "type": "str",
+                      "description": "Path to games data CSV."
+                    },
+                    {
+                      "name": "users_path",
+                      "type": "str",
+                      "description": "Path to user data CSV."
+                    },
+                    {
+                      "name": "users_games_path",
+                      "type": "str",
+                      "description": "Path to user-game relationships CSV."
+                    },
+                    {
+                      "name": "reviews_path",
+                      "type": "str",
+                      "description": "Path to reviews CSV."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Runs the entire data load process, printing progress and summary."
+                  }
+                },
+                {
+                  "name": "print_metrics",
+                  "description": "Displays final tallies of games, users, relationships, and reviews added to Neo4j.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "Prints the metrics to the console."
+                  }
+                },
+                {
+                  "name": "fetch_sample_data",
+                  "description": "Retrieves sample nodes from the Game and User labels and prints sample reviews to verify data load.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "Queries Neo4j and prints sample data."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "driver",
+                  "type": "GraphDatabase.driver",
+                  "description": "Neo4j driver session for executing queries."
+                },
+                {
+                  "name": "metrics",
+                  "type": "dict",
+                  "description": "Holds counters for games, users, relationships, and reviews imported."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "neo4j",
+              "purpose": "Provides the GraphDatabase driver for connecting to Neo4j."
+            },
+            {
+              "module": "csv",
+              "purpose": "Reads CSV files containing game, user, relationship, and review data."
+            },
+            {
+              "module": "tqdm",
+              "purpose": "Displays progress bars during import operations."
+            },
+            {
+              "module": "config",
+              "purpose": "Loads environment variables for database credentials."
+            }
+          ]
+        },
+        {
+          "path": "utils/neo4j_recommender.py",
+          "description": "Implements the RecommenderSystem class with collaborative, content-based, and hybrid recommendation methods, as well as user listing and user info retrieval features.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "RecommenderSystem",
+              "description": "Executes various recommendation queries against the Neo4j database for a given user, including collaborative, content-based, and hybrid approaches.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Initializes the RecommenderSystem with a Neo4j driver.",
+                  "parameters": [
+                    {
+                      "name": "uri",
+                      "type": "str",
+                      "description": "Neo4j database URI."
+                    },
+                    {
+                      "name": "user",
+                      "type": "str",
+                      "description": "Neo4j username."
+                    },
+                    {
+                      "name": "password",
+                      "type": "str",
+                      "description": "Neo4j password."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Establishes a connection to the database."
+                  }
+                },
+                {
+                  "name": "close",
+                  "description": "Closes the connection to the Neo4j database.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "Shuts down the driver session."
+                  }
+                },
+                {
+                  "name": "collaborative_filtering",
+                  "description": "Fetches recommendations based on users with similar game libraries.",
+                  "parameters": [
+                    {
+                      "name": "user_id",
+                      "type": "str",
+                      "description": "ID of the user for which we want recommendations."
+                    },
+                    {
+                      "name": "top_n",
+                      "type": "int",
+                      "description": "Number of top recommendations to return."
+                    }
+                  ],
+                  "returns": {
+                    "type": "list",
+                    "description": "A list of dictionaries containing recommended 'game_id', 'name', and 'popularity'."
+                  }
+                },
+                {
+                  "name": "content_based_filtering",
+                  "description": "Suggests games by comparing aggregated metrics (median playtime, player counts) from the user's played games.",
+                  "parameters": [
+                    {
+                      "name": "user_id",
+                      "type": "str",
+                      "description": "Target user ID."
+                    },
+                    {
+                      "name": "top_n",
+                      "type": "int",
+                      "description": "Number of top recommendations to return."
+                    }
+                  ],
+                  "returns": {
+                    "type": "list",
+                    "description": "A list of recommendations with 'game_id', 'name', 'time_diff', and 'player_diff'."
+                  }
+                },
+                {
+                  "name": "hybrid_recommendation",
+                  "description": "Combines collaborative and content-based approaches to refine suggested games.",
+                  "parameters": [
+                    {
+                      "name": "user_id",
+                      "type": "str",
+                      "description": "Target user ID."
+                    },
+                    {
+                      "name": "top_n",
+                      "type": "int",
+                      "description": "Number of results to return."
+                    }
+                  ],
+                  "returns": {
+                    "type": "list",
+                    "description": "A list of recommended items with popularity scores and differences from user averages."
+                  }
+                },
+                {
+                  "name": "recommend_by_bins",
+                  "description": "Placeholder for a future method that recommends games using precomputed bin thresholds.",
+                  "parameters": [
+                    {
+                      "name": "user_id",
+                      "type": "str",
+                      "description": "Target user ID."
+                    },
+                    {
+                      "name": "top_n",
+                      "type": "int",
+                      "description": "Number of results to return."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Not implemented; raises NotImplementedError."
+                  }
+                },
+                {
+                  "name": "list_users",
+                  "description": "Returns a list of random users with basic stats.",
+                  "parameters": [
+                    {
+                      "name": "limit",
+                      "type": "int",
+                      "description": "Number of random users to return."
+                    }
+                  ],
+                  "returns": {
+                    "type": "list",
+                    "description": "List of dicts with 'user_id' and 'items_count'."
+                  }
+                },
+                {
+                  "name": "get_user_info",
+                  "description": "Retrieves detailed user data, including games played and reviews.",
+                  "parameters": [
+                    {
+                      "name": "user_id",
+                      "type": "str",
+                      "description": "Target user ID."
+                    }
+                  ],
+                  "returns": {
+                    "type": "dict or None",
+                    "description": "A dictionary with user stats and a list of games played, or None if the user does not exist."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "driver",
+                  "type": "GraphDatabase.driver",
+                  "description": "Neo4j driver session for executing recommendation queries."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "neo4j",
+              "purpose": "Used to create a driver to connect to the Neo4j database."
+            }
+          ]
+        }
+      ]
+    }
+  }
+  

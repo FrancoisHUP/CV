@@ -1,0 +1,417 @@
+{
+    "project": {
+      "name": "francoishup-prototype_demo",
+      "description": {
+        "summary": "A simple demonstration of the Prototype design pattern in Java. The system fetches data from a mock server to create a Student object and then leverages cloning to avoid the overhead of re-fetching data from the server.",
+        "problem_solved": "Reduces the cost and time of repeatedly fetching or constructing complex objects by cloning already-initialized objects instead of recreating them from scratch.",
+        "impact": "Significantly decreases startup or retrieval time for new objects, improving efficiency and speeding up operations that require repeated object creation.",
+        "technologies": [
+          "Java"
+        ],
+        "role": "Developer",
+        "challenges": [
+          "Implementing Java's Cloneable interface and correctly overriding the clone() method to avoid side effects.",
+          "Designing a generic data structure using Java generics (Data<k,v>) for flexible key-value storage."
+        ],
+        "relevance": "Demonstrates proficiency in the Prototype design pattern and in building modular, testable Java applications—a skill set valuable for broader software architecture and design."
+      },
+      "architecture": {
+        "overview": "The application implements a simple Prototype design pattern. A mock server (ServeurConnection) provides data stored in a Data object. The Student object (StudentImpl) is created once with the provided data and then cloned for subsequent use, avoiding repeated server calls.",
+        "components": [
+          {
+            "name": "Data",
+            "description": "A generic key-value container used to store arbitrary data, simulating a noSQL document."
+          },
+          {
+            "name": "Prototype",
+            "description": "A class implementing the Cloneable interface, responsible for creating and cloning StudentDAO objects."
+          },
+          {
+            "name": "ServeurConnection",
+            "description": "A mock server connection that returns pre-populated Data objects."
+          },
+          {
+            "name": "StudentDAO",
+            "description": "An interface defining the contract for student-related operations (e.g., setting/getting classes)."
+          },
+          {
+            "name": "StudentImpl",
+            "description": "Implements StudentDAO, representing a concrete Student object that can store and retrieve classes."
+          },
+          {
+            "name": "Systeme",
+            "description": "The main entry point that demonstrates creating and cloning student data."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Use the Prototype pattern to clone expensive-to-create objects instead of creating them from scratch.",
+            "reasoning": "Fetching data from the server can be time-consuming, so using clone() after an initial fetch avoids repeated network or database calls."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "Introduced a mock server (ServeurConnection) and a generic Data class to quickly retrieve and store data.",
+            "impact": "Speeds up testing and prototyping by simulating server interactions without a real database."
+          }
+        ],
+        "lessons_learned": [
+          "Cloneable in Java must be used carefully to avoid shallow copy issues.",
+          "Generics can provide flexible data handling without sacrificing type safety.",
+          "Prototyping complex objects can save a significant amount of time and resources in certain use cases."
+        ]
+      },
+      "files": [
+        {
+          "path": "Prototype/src/Data.java",
+          "description": "Defines a generic container Data<k,v> backed by a HashMap, providing set/get methods for key-value pairs.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Data<k,v>",
+              "description": "A generic key-value store that uses a HashMap to store data.",
+              "methods": [
+                {
+                  "name": "setKeyValue",
+                  "description": "Stores a value under the specified key in the data map.",
+                  "parameters": [
+                    {
+                      "name": "key",
+                      "type": "k",
+                      "description": "The key under which the value is stored."
+                    },
+                    {
+                      "name": "value",
+                      "type": "v",
+                      "description": "The value to store in the map."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "getValueOfkey",
+                  "description": "Retrieves the value associated with the given key.",
+                  "parameters": [
+                    {
+                      "name": "key",
+                      "type": "k",
+                      "description": "The key for which the value is retrieved."
+                    }
+                  ],
+                  "returns": {
+                    "type": "v",
+                    "description": "The value corresponding to the specified key."
+                  }
+                },
+                {
+                  "name": "toString",
+                  "description": "Generates a string representation of the Data object.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "String",
+                    "description": "A textual representation of the data map."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "data",
+                  "type": "HashMap<k,v>",
+                  "description": "Holds the generic key-value pairs."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "java.util.HashMap",
+              "purpose": "Provides the HashMap data structure used by the Data class."
+            }
+          ]
+        },
+        {
+          "path": "Prototype/src/Prototype.java",
+          "description": "Implements a Prototype class for cloning an expensive object (StudentDAO) that requires data retrieval.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Prototype<T>",
+              "description": "Generic class implementing the Prototype design pattern. Clones a StudentDAO object after fetching data once.",
+              "methods": [
+                {
+                  "name": "Prototype",
+                  "description": "Constructor that fetches data from the server, initializes a Student object, and stores it.",
+                  "parameters": [
+                    {
+                      "name": "codePermanent",
+                      "type": "String",
+                      "description": "A unique code identifying the student to fetch."
+                    }
+                  ],
+                  "returns": {
+                    "type": "Prototype",
+                    "description": "Constructed Prototype instance containing the student data."
+                  }
+                },
+                {
+                  "name": "clone",
+                  "description": "Creates and returns a shallow copy of the current Prototype instance.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "Object",
+                    "description": "A cloned instance of this Prototype."
+                  }
+                },
+                {
+                  "name": "getObject",
+                  "description": "Retrieves the underlying object stored in this prototype (e.g., StudentDAO).",
+                  "parameters": [],
+                  "returns": {
+                    "type": "T",
+                    "description": "The stored object."
+                  }
+                },
+                {
+                  "name": "toString",
+                  "description": "Returns a string representation of the Prototype instance, including the underlying object.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "String",
+                    "description": "String representation of the Prototype."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "object",
+                  "type": "T",
+                  "description": "The object being managed by this prototype, typically a StudentDAO implementation."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "java.util.ArrayList",
+              "purpose": "Used to store and manage lists of classes for the student object."
+            },
+            {
+              "module": "java.util.concurrent.TimeUnit",
+              "purpose": "Used to simulate the delay in contacting the server (TimeUnit.SECONDS.sleep)."
+            }
+          ]
+        },
+        {
+          "path": "Prototype/src/ServeurConnection.java",
+          "description": "Mocks a server connection, returning a Data object with pre-loaded data (list of courses).",
+          "functions": [],
+          "classes": [
+            {
+              "name": "ServeurConnection",
+              "description": "Provides mock data to simulate real server/database calls.",
+              "methods": [
+                {
+                  "name": "query",
+                  "description": "Simulates a query against a noSQL database, returning a Data object populated with a list of courses.",
+                  "parameters": [
+                    {
+                      "name": "query",
+                      "type": "String",
+                      "description": "A placeholder query string. Not actually used in this mock."
+                    }
+                  ],
+                  "returns": {
+                    "type": "Data",
+                    "description": "A Data object containing a list of courses under the key 'cours'."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "java.util.ArrayList",
+              "purpose": "Used for storing a list of courses."
+            },
+            {
+              "module": "java.util.Arrays",
+              "purpose": "Used to create a fixed list of courses easily."
+            },
+            {
+              "module": "java.util.HashMap",
+              "purpose": "Data uses HashMap internally for storing key-value pairs."
+            }
+          ]
+        },
+        {
+          "path": "Prototype/src/StudentDAO.java",
+          "description": "Defines an interface for Student data objects, focusing on managing the list of classes.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "StudentDAO",
+              "description": "Interface outlining methods for setting and getting a student's classes.",
+              "methods": [
+                {
+                  "name": "setClasses",
+                  "description": "Sets the classes for the student.",
+                  "parameters": [
+                    {
+                      "name": "classes",
+                      "type": "ArrayList",
+                      "description": "List of class identifiers or course codes."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "getClasses",
+                  "description": "Retrieves the student's list of classes.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "List<String>",
+                    "description": "The list of class identifiers for the student."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "java.util.ArrayList",
+              "purpose": "Allows implementing classes to use ArrayList for storing student classes."
+            },
+            {
+              "module": "java.util.List",
+              "purpose": "Defines a more general list type for returning class data."
+            }
+          ]
+        },
+        {
+          "path": "Prototype/src/StudentImpl.java",
+          "description": "Concrete implementation of StudentDAO, storing a student's codePermanent and classes list. Also implements Cloneable.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "StudentImpl",
+              "description": "Represents a student with a unique codePermanent and a list of classes.",
+              "methods": [
+                {
+                  "name": "StudentImpl",
+                  "description": "Constructor that sets the student's codePermanent.",
+                  "parameters": [
+                    {
+                      "name": "codePermanent",
+                      "type": "String",
+                      "description": "A unique identifier for the student."
+                    }
+                  ],
+                  "returns": {
+                    "type": "StudentImpl",
+                    "description": "Constructed StudentImpl instance."
+                  }
+                },
+                {
+                  "name": "setClasses",
+                  "description": "Sets the classes list for the student.",
+                  "parameters": [
+                    {
+                      "name": "classes",
+                      "type": "ArrayList",
+                      "description": "A list of the student's classes."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "getClasses",
+                  "description": "Gets the current list of classes for the student.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "ArrayList<String>",
+                    "description": "The stored list of classes."
+                  }
+                },
+                {
+                  "name": "toString",
+                  "description": "Returns a string representation of the student, including codePermanent and classes.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "String",
+                    "description": "A textual representation of the student."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "codePermanent",
+                  "type": "String",
+                  "description": "A final, unique identifier for the student."
+                },
+                {
+                  "name": "classes",
+                  "type": "ArrayList<String>",
+                  "description": "Stores the list of class identifiers for the student."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "java.util.ArrayList",
+              "purpose": "Used to store the student's list of classes."
+            }
+          ]
+        },
+        {
+          "path": "Prototype/src/Systeme.java",
+          "description": "Houses the main method. Demonstrates the creation of a student prototype and the cloning process.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Systeme",
+              "description": "Application entry point that creates and clones a Prototype object to showcase efficiency gains.",
+              "methods": [
+                {
+                  "name": "main",
+                  "description": "The main method of the application. Creates a prototype, fetches data, clones the prototype, and updates the cloned object's state.",
+                  "parameters": [
+                    {
+                      "name": "args",
+                      "type": "String[]",
+                      "description": "Command-line arguments."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value; prints results to console."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "java.util.ArrayList",
+              "purpose": "Used to handle lists of classes for demonstration purposes."
+            }
+          ]
+        }
+      ]
+    }
+  }
+  

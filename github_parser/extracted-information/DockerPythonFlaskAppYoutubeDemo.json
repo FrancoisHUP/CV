@@ -1,0 +1,145 @@
+{
+  "project": {
+    "name": "Docker Python Flask App YouTube Demo",
+    "description": {
+      "summary": "A minimal project demonstrating how to containerize a Python Flask application using Docker and enable debugging/hot-reload in VSCode via devcontainers.",
+      "problem_solved": "Simplifies the setup of a Flask development environment inside Docker, allowing hot reloads, debugging, and container-based deployment without manual re-building on each code change.",
+      "impact": "Streamlines local development workflows for Python Flask apps, reducing the time to iterate on changes and improving developer productivity when working with containers.",
+      "technologies": [
+        "Python",
+        "Flask",
+        "Docker",
+        "Gunicorn",
+        "VSCode Dev Containers"
+      ],
+      "role": "Contributor/Developer",
+      "challenges": [
+        "Configuring Docker for a Python Flask environment with hot reload",
+        "Setting up remote debugging within VSCode Dev Containers",
+        "Ensuring the Docker environment matches local development needs"
+      ],
+      "relevance": "Illustrates expertise in containerized Python web applications, DevOps workflows, and the integration of debugging tools in modern development environments."
+    },
+    "architecture": {
+      "overview": "The system comprises a Flask application running in a Docker container, managed via Docker Compose. Gunicorn serves the Flask app in production, while a separate debug configuration allows live code reloading and remote debugging in VSCode. A devcontainer configuration facilitates editing code directly inside the Docker container.",
+      "components": [
+        {
+          "name": "Flask App",
+          "description": "Provides the main HTTP endpoints and business logic (in this simple example, a single root route)."
+        },
+        {
+          "name": "Dockerfile",
+          "description": "Defines the base image (Python 3.8-slim), installs dependencies, and configures the container to run Gunicorn."
+        },
+        {
+          "name": "Docker Compose Services",
+          "description": "Manages multiple configurations (standard and debug), port mappings, and environment variables for the Flask app container."
+        },
+        {
+          "name": "VSCode Dev Container",
+          "description": "Allows developers to open the project within a container for hot-reload and debugging without repeatedly rebuilding the Docker image."
+        }
+      ]
+    },
+    "technical_details": {
+      "design_decisions": [
+        {
+          "decision": "Use Docker and Docker Compose for container orchestration.",
+          "reasoning": "Containerization ensures a consistent environment for production and development, simplifying deployment and avoiding local machine discrepancies."
+        },
+        {
+          "decision": "Use Gunicorn as the production WSGI server for Flask.",
+          "reasoning": "Gunicorn is a reliable, production-grade server that can handle multiple requests concurrently more efficiently than the default Flask server."
+        },
+        {
+          "decision": "Enable devcontainers and remote debugging in VSCode.",
+          "reasoning": "Allows live code editing inside the container and debugging without restarting or rebuilding the Docker image each time."
+        }
+      ],
+      "performance_optimizations": [
+        {
+          "optimization": "Configured Gunicorn to bind to 0.0.0.0:5002.",
+          "impact": "Enables external access to the container and can be scaled easily (by adjusting Gunicorn workers, if desired) in higher-load scenarios."
+        }
+      ],
+      "lessons_learned": [
+        "Properly configuring Docker for hot-reload and remote debugging can greatly improve developer productivity.",
+        "Leveraging VSCode’s devcontainers significantly reduces environment mismatch issues.",
+        "A well-structured Docker Compose setup simplifies both standard and debug workflows."
+      ]
+    },
+    "files": [
+      {
+        "path": "README.md",
+        "description": "Contains project setup instructions, Docker/Flask quickstart guide, and notes on configuring debug/hot-reload in VSCode.",
+        "functions": [],
+        "classes": [],
+        "imports": []
+      },
+      {
+        "path": "Dockerfile",
+        "description": "Builds the base Docker image for the Flask app using Python 3.8-slim, installs dependencies, and sets up Gunicorn to run the server.",
+        "functions": [],
+        "classes": [],
+        "imports": []
+      },
+      {
+        "path": "docker-compose.debug.yml",
+        "description": "Defines a debug service for the Flask app, installing debugpy and allowing remote debugging on port 5678 with Flask running on port 5002.",
+        "functions": [],
+        "classes": [],
+        "imports": []
+      },
+      {
+        "path": "docker-compose.yml",
+        "description": "Defines the standard production-like service for the Flask app, mapping host port 5002 to the container’s Gunicorn process.",
+        "functions": [],
+        "classes": [],
+        "imports": []
+      },
+      {
+        "path": "requirements.txt",
+        "description": "Lists the Python dependencies (Flask and Gunicorn) with their specific versions.",
+        "functions": [],
+        "classes": [],
+        "imports": []
+      },
+      {
+        "path": ".dockerignore",
+        "description": "Specifies files and directories for Docker to ignore, preventing them from being copied into the image.",
+        "functions": [],
+        "classes": [],
+        "imports": []
+      },
+      {
+        "path": "app/app.py",
+        "description": "Defines the core Flask application with a single route ('/') returning a simple greeting string.",
+        "functions": [
+          {
+            "name": "hello_world",
+            "description": "Handles requests to the root URL, returning a simple HTML greeting.",
+            "parameters": [],
+            "returns": {
+              "type": "str",
+              "description": "HTML string greeting the user."
+            }
+          }
+        ],
+        "classes": [],
+        "imports": [
+          {
+            "module": "flask",
+            "purpose": "Provides the Flask class and route decorator for creating a web application."
+          }
+        ]
+      },
+      {
+        "path": ".devcontainer/devcontainer.json",
+        "description": "VSCode Dev Container configuration for opening and developing the project in a container, enabling hot-reload and debugging features.",
+        "functions": [],
+        "classes": [],
+        "imports": []
+      }
+    ]
+  }
+}

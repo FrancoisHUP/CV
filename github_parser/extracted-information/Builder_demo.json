@@ -1,0 +1,1339 @@
+{
+    "project": {
+      "name": "francoishup-builder_demo",
+      "description": {
+        "summary": "A Java-based demonstration of the Builder design pattern, showcasing how different types of ‘Personnel’ (e.g., Medecin, Infirmier, Receptionniste) can be constructed in a flexible and maintainable way. It also includes a simple Swing-based UI for adding and viewing these personnel records in a simulated in-memory server.",
+        "problem_solved": "Provides a systematic way to create various personnel objects with different roles using the Builder pattern, reducing code duplication and complexity. Also demonstrates how to manage data (in-memory) and a basic GUI to interface with that data.",
+        "impact": "Improves maintainability by separating the construction process from the representation, making it easy to add new roles or modify existing ones. The in-memory ‘Serveur’ and Swing UI further illustrate how this approach can be integrated into a simple application.",
+        "technologies": [
+          "Java",
+          "Swing",
+          "JUnit"
+        ],
+        "role": "Contributor/Developer",
+        "challenges": [
+          "Designing the Builder pattern for different employee types",
+          "Managing state consistently between the UI, the builder, and the in-memory server",
+          "Ensuring uniqueness of IDs and efficient lookups"
+        ],
+        "relevance": "Demonstrates object-oriented programming, design patterns, basic GUI development, and in-memory data handling in Java."
+      },
+      "architecture": {
+        "overview": "The system is composed of a ‘serveur’ package for in-memory data storage, a ‘personnel’ package implementing the Builder pattern for creating different personnel objects, a ‘vue’ (view) package for the Swing user interface, a ‘utils’ package for utility classes, and a ‘test’ package for JUnit tests. The main entry point is ‘Systeme.java’, which initializes the server and launches the Swing UI. ",
+        "components": [
+          {
+            "name": "personnel (Builder Pattern)",
+            "description": "Houses the core builder interfaces and classes (Builder, Director, Concrete Builders) used to create ‘Personnel’ objects of different roles."
+          },
+          {
+            "name": "serveur",
+            "description": "Implements an in-memory server (Serveur) storing data (Data objects) keyed by unique IDs (UniqId)."
+          },
+          {
+            "name": "vue (Swing UI)",
+            "description": "Contains ‘UserInterface.java’, a basic Swing-based GUI for adding and viewing personnel records."
+          },
+          {
+            "name": "utils",
+            "description": "Holds utility classes, such as ‘Paire’ for storing pairs of values."
+          },
+          {
+            "name": "test",
+            "description": "Contains JUnit tests (e.g., ‘UniqIdTest’) to verify functionality such as unique ID generation."
+          },
+          {
+            "name": "Systeme (Main)",
+            "description": "Entry point that initializes the in-memory server and launches the user interface."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Use the Builder pattern for constructing different ‘Personnel’ objects (Medecin, Infirmier, etc.).",
+            "reasoning": "Separates object construction from its representation, making it easy to add new roles in the future and ensures consistency in object creation steps."
+          },
+          {
+            "decision": "Utilize a singleton pattern for the ‘Serveur’ class.",
+            "reasoning": "Allows a single source of truth for data storage across the entire application without requiring a heavy database setup."
+          },
+          {
+            "decision": "Implement a Swing-based UI for demonstration purposes.",
+            "reasoning": "Provides a simple visual interface to showcase the creation and retrieval of personnel data."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "In-memory data storage using HashMaps in ‘Serveur’.",
+            "impact": "Faster lookups and simplified data handling for demonstration purposes, avoiding overhead of an external database."
+          },
+          {
+            "optimization": "UniqId class uses random + current time to ensure ID uniqueness.",
+            "impact": "Reduces collisions when creating a large number of ‘Personnel’ objects quickly."
+          }
+        ],
+        "lessons_learned": [
+          "The Builder pattern significantly simplifies object creation logic, especially when multiple variations of a similar object are needed.",
+          "Centralizing data in a singleton server can simplify data sharing across different parts of the application, though it may not be suitable for large-scale systems.",
+          "Using Java Swing for UI is straightforward for simple demos, but can become cumbersome for more advanced interfaces."
+        ]
+      },
+      "files": [
+        {
+          "path": "INF889G_TP1.ipynb",
+          "description": "Jupyter Notebook (Python) showcasing some setup for a class or exercise. Demonstrates mounting Google Drive in a Colab environment and includes placeholders for an HDR exercise.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "google.colab",
+              "purpose": "Mount Google Drive"
+            }
+          ]
+        },
+        {
+          "path": "src/Systeme.java",
+          "description": "Main entry point for the application. Initializes the server and launches the Swing UI.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Systeme",
+              "description": "Holds the main method to start the server and the UI.",
+              "methods": [
+                {
+                  "name": "main",
+                  "description": "Static entry point of the Java application. Calls initServeur() and creates a new UserInterface.",
+                  "parameters": [
+                    {
+                      "name": "args",
+                      "type": "String[]",
+                      "description": "Command-line arguments."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "initServeur",
+                  "description": "Initializes the singleton server instance and adds a table named 'personnel'.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "serveur.Serveur",
+              "purpose": "Access the singleton server."
+            },
+            {
+              "module": "vue.UserInterface",
+              "purpose": "Launch the Swing UI."
+            }
+          ]
+        },
+        {
+          "path": "src/personnel/Builder.java",
+          "description": "Concrete implementation of BuilderInterface that decides which PersonnelBuilder to use based on the Emploie (job role).",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Builder",
+              "description": "Holds references to different concrete builders (MedecinBuilder, InfirmierBuilder, RecepetionnisteBuilder) and a Directeur instance.",
+              "methods": [
+                {
+                  "name": "buildEmploye",
+                  "description": "Builds and returns a Personnel object (setting name, date, etc.) based on supplied data and job role.",
+                  "parameters": [
+                    {
+                      "name": "datafield",
+                      "type": "Data",
+                      "description": "Contains key-value pairs for personnel initialization."
+                    },
+                    {
+                      "name": "emploie",
+                      "type": "Emploie",
+                      "description": "Specifies the job role (MEDECIN, INFIRMIER, RECEPTIONNISTE)."
+                    }
+                  ],
+                  "returns": {
+                    "type": "Personnel",
+                    "description": "A fully constructed Personnel object."
+                  }
+                },
+                {
+                  "name": "setDirecteur",
+                  "description": "Chooses the correct PersonnelBuilder (medecin, infirmier, or receptionniste) based on Emploie.",
+                  "parameters": [
+                    {
+                      "name": "emploie",
+                      "type": "Emploie",
+                      "description": "Specifies the job role."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "directeur",
+                  "type": "Directeur",
+                  "description": "Manages the construction process of Personnel objects."
+                },
+                {
+                  "name": "builderMedecin",
+                  "type": "PersonnelBuilder",
+                  "description": "Concrete builder for creating MEDECIN personnel."
+                },
+                {
+                  "name": "builderInfirmier",
+                  "type": "PersonnelBuilder",
+                  "description": "Concrete builder for creating INFIRMIER personnel."
+                },
+                {
+                  "name": "builderRecepetionniste",
+                  "type": "PersonnelBuilder",
+                  "description": "Concrete builder for creating RECEPTIONNISTE personnel."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "serveur.Data",
+              "purpose": "Use Data object to get name or other fields when building a Personnel."
+            },
+            {
+              "module": "java.util.Date",
+              "purpose": "Assign creation date to newly built personnel."
+            }
+          ]
+        },
+        {
+          "path": "src/personnel/BuilderInterface.java",
+          "description": "Defines the interface for building an employee (Personnel) with a given Emploie using provided data.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "BuilderInterface",
+              "description": "Interface that requires implementing classes to set a Director’s builder and build the employee.",
+              "methods": [
+                {
+                  "name": "setDirecteur",
+                  "description": "Sets the director’s builder based on the specified job role.",
+                  "parameters": [
+                    {
+                      "name": "emploie",
+                      "type": "Emploie",
+                      "description": "Specifies the job role."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "buildEmploye",
+                  "description": "Builds a new Personnel instance using the given data and job role.",
+                  "parameters": [
+                    {
+                      "name": "datafield",
+                      "type": "Data",
+                      "description": "Key-value pairs with personnel attributes."
+                    },
+                    {
+                      "name": "emploie",
+                      "type": "Emploie",
+                      "description": "Job role used to determine the builder steps."
+                    }
+                  ],
+                  "returns": {
+                    "type": "Personnel",
+                    "description": "A new Personnel object."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "serveur.Data",
+              "purpose": "Parameter type for buildEmploye method."
+            }
+          ]
+        },
+        {
+          "path": "src/personnel/Directeur.java",
+          "description": "Directeur orchestrates Personnel creation by delegating to a PersonnelBuilder.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Directeur",
+              "description": "Holds a reference to a PersonnelBuilder and provides a method to build a Personnel with given parameters.",
+              "methods": [
+                {
+                  "name": "setPersonnelBuilder",
+                  "description": "Setter for the builder to be used in building personnel.",
+                  "parameters": [
+                    {
+                      "name": "personnelBuilder",
+                      "type": "PersonnelBuilder",
+                      "description": "Concrete builder instance for a specific job role."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "getPersonnel",
+                  "description": "Fetches the built Personnel object from the builder.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "Personnel",
+                    "description": "The built Personnel instance."
+                  }
+                },
+                {
+                  "name": "buildPersonnel",
+                  "description": "Delegates the construction steps (nouveauPersonnel, setNom, setNumEmploye, setDateCreation, setEmploie) to the builder.",
+                  "parameters": [
+                    {
+                      "name": "nom",
+                      "type": "String",
+                      "description": "The personnel’s name."
+                    },
+                    {
+                      "name": "dateCreation",
+                      "type": "Date",
+                      "description": "The date the personnel record is created."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "personnelBuilder",
+                  "type": "PersonnelBuilder",
+                  "description": "Reference to the current builder used for constructing a Personnel."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "java.util.Date",
+              "purpose": "Allows storing and assigning a creation date to personnel."
+            }
+          ]
+        },
+        {
+          "path": "src/personnel/Emploie.java",
+          "description": "Enumeration representing possible job roles for Personnel (INFIRMIER, MEDECIN, RECEPTIONNISTE).",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Emploie",
+              "description": "Enum listing possible roles for a Personnel.",
+              "methods": [],
+              "attributes": []
+            }
+          ],
+          "imports": []
+        },
+        {
+          "path": "src/personnel/InfirmierBuilder.java",
+          "description": "Concrete builder for creating ‘Infirmier’ (nurse) personnel.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "InfirmierBuilder",
+              "description": "Sets the Emploie to INFIRMIER in the personnel object.",
+              "methods": [
+                {
+                  "name": "setEmploie",
+                  "description": "Overrides the abstract method to set the Emploie to INFIRMIER.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": []
+        },
+        {
+          "path": "src/personnel/MedecinBuilder.java",
+          "description": "Concrete builder for creating ‘Medecin’ (doctor) personnel.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "MedecinBuilder",
+              "description": "Sets the Emploie to MEDECIN in the personnel object.",
+              "methods": [
+                {
+                  "name": "setEmploie",
+                  "description": "Overrides the abstract method to set the Emploie to MEDECIN.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": []
+        },
+        {
+          "path": "src/personnel/Personnel.java",
+          "description": "Data class representing a personnel record. Implements dataAdapter for easy conversion to Data objects stored by the server.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Personnel",
+              "description": "Holds attributes like nom, dateCreation, emploie, numEmploye, and implements toData() to convert to a server-friendly Data object.",
+              "methods": [
+                {
+                  "name": "setEmploie",
+                  "description": "Sets the role (Emploie) of the personnel.",
+                  "parameters": [
+                    {
+                      "name": "emploie",
+                      "type": "Emploie",
+                      "description": "The role to be assigned."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "setNom",
+                  "description": "Sets the personnel’s name.",
+                  "parameters": [
+                    {
+                      "name": "nom",
+                      "type": "String",
+                      "description": "The name of the personnel."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "setNumEmploye",
+                  "description": "Assigns a unique employee number using a static counter.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "setDateCreation",
+                  "description": "Sets the creation date for the personnel record.",
+                  "parameters": [
+                    {
+                      "name": "dateCreation",
+                      "type": "Date",
+                      "description": "Creation date."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "getNom",
+                  "description": "Retrieves the personnel’s name.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "String",
+                    "description": "The name of the personnel."
+                  }
+                },
+                {
+                  "name": "toData",
+                  "description": "Converts the Personnel object into a Data object for storage in the server.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "Data",
+                    "description": "A Data object containing the personnel’s fields."
+                  }
+                },
+                {
+                  "name": "toString",
+                  "description": "Returns a string representation of the personnel.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "String",
+                    "description": "Textual representation of the personnel object."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "nom",
+                  "type": "String",
+                  "description": "Name of the personnel."
+                },
+                {
+                  "name": "dateCreation",
+                  "type": "Date",
+                  "description": "The date the personnel record was created."
+                },
+                {
+                  "name": "emploie",
+                  "type": "Emploie",
+                  "description": "Job role (enum)."
+                },
+                {
+                  "name": "numEmploye",
+                  "type": "int",
+                  "description": "A unique employee number, auto-incremented."
+                },
+                {
+                  "name": "compteurEmploye",
+                  "type": "int",
+                  "description": "Static counter used to assign unique employee numbers."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "serveur.Data",
+              "purpose": "Implementation of toData() returning a Data object."
+            },
+            {
+              "module": "java.util.Date",
+              "purpose": "Storing the creation date."
+            }
+          ]
+        },
+        {
+          "path": "src/personnel/PersonnelBuilder.java",
+          "description": "Abstract class for building Personnel objects. Concrete builders (InfirmierBuilder, MedecinBuilder, RecepetionnisteBuilder) override setEmploie().",
+          "functions": [],
+          "classes": [
+            {
+              "name": "PersonnelBuilder",
+              "description": "Contains common build steps for Personnel (nom, numEmploye, dateCreation). Each subclass sets the Emploie field differently.",
+              "methods": [
+                {
+                  "name": "setNom",
+                  "description": "Assigns the personnel’s name.",
+                  "parameters": [
+                    {
+                      "name": "nom",
+                      "type": "String",
+                      "description": "Name of the personnel."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "setNumEmploye",
+                  "description": "Assigns a unique employee ID to the Personnel.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "setDateCreation",
+                  "description": "Sets the creation date for the Personnel.",
+                  "parameters": [
+                    {
+                      "name": "dateCreation",
+                      "type": "Date",
+                      "description": "Creation date."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "setEmploie",
+                  "description": "Abstract method that concrete builders override to specify a role.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "nouveauPersonnel",
+                  "description": "Creates a new Personnel instance to be configured by the builder.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "getPersonnel",
+                  "description": "Returns the Personnel instance after it’s built.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "Personnel",
+                    "description": "The constructed Personnel instance."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "personnel",
+                  "type": "Personnel",
+                  "description": "Reference to the Personnel object being built."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "java.util.Date",
+              "purpose": "Assign date of creation to the Personnel."
+            }
+          ]
+        },
+        {
+          "path": "src/personnel/RecepetionnisteBuilder.java",
+          "description": "Concrete builder for creating ‘Receptionniste’ personnel.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "RecepetionnisteBuilder",
+              "description": "Sets the Emploie to RECEPTIONNISTE in the personnel object.",
+              "methods": [
+                {
+                  "name": "setEmploie",
+                  "description": "Implements the abstract method to set the Emploie to RECEPTIONNISTE.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": []
+        },
+        {
+          "path": "src/personnel/dataAdapter.java",
+          "description": "Interface for converting an object to a serveur.Data object, allowing easy data storage in the server.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "dataAdapter",
+              "description": "Ensures implementing classes can be converted to a Data object for storage/retrieval.",
+              "methods": [
+                {
+                  "name": "toData",
+                  "description": "Converts the implementing class to a Data object.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "Data",
+                    "description": "A Data object representing the implementing class."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "serveur.Data",
+              "purpose": "Return type for the toData() method."
+            }
+          ]
+        },
+        {
+          "path": "src/serveur/Data.java",
+          "description": "Encapsulates key-value storage in a HashMap for storing and retrieving data objects used by the Serveur class.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Data",
+              "description": "Generic class for storing key-value pairs. Used to hold fields for personnel and other data.",
+              "methods": [
+                {
+                  "name": "setKeyValue",
+                  "description": "Inserts a key-value pair into the internal HashMap.",
+                  "parameters": [
+                    {
+                      "name": "key",
+                      "type": "K",
+                      "description": "The key for the data."
+                    },
+                    {
+                      "name": "value",
+                      "type": "V",
+                      "description": "The value associated with the key."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "getValueOfkey",
+                  "description": "Retrieves the value associated with the specified key.",
+                  "parameters": [
+                    {
+                      "name": "key",
+                      "type": "K",
+                      "description": "The key to look up."
+                    }
+                  ],
+                  "returns": {
+                    "type": "V",
+                    "description": "Value mapped to the given key."
+                  }
+                },
+                {
+                  "name": "toString",
+                  "description": "Generates a string representation of the internal HashMap.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "String",
+                    "description": "Readable representation of the Data object."
+                  }
+                },
+                {
+                  "name": "keyIsDefine",
+                  "description": "Checks whether the provided key exists in the HashMap.",
+                  "parameters": [
+                    {
+                      "name": "key",
+                      "type": "String",
+                      "description": "Key to check existence for."
+                    }
+                  ],
+                  "returns": {
+                    "type": "boolean",
+                    "description": "True if the key is defined, false otherwise."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "data",
+                  "type": "HashMap<K, V>",
+                  "description": "Internal storage of key-value pairs."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "java.util.HashMap",
+              "purpose": "Stores key-value pairs internally."
+            }
+          ]
+        },
+        {
+          "path": "src/serveur/Serveur.java",
+          "description": "Singleton class that maintains a HashMap of tables, each mapping unique IDs to Data objects. Provides methods for creating tables, inserting, and retrieving data.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Serveur",
+              "description": "Acts as an in-memory database storing different ‘collections’ keyed by string table names, each containing (UniqId -> Data) mappings.",
+              "methods": [
+                {
+                  "name": "getInstance",
+                  "description": "Returns the singleton instance of Serveur, creating it if it doesn’t exist.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "Serveur",
+                    "description": "The singleton instance."
+                  }
+                },
+                {
+                  "name": "getData",
+                  "description": "Retrieves Data for a given table name and UniqId, throwing exceptions if not found.",
+                  "parameters": [
+                    {
+                      "name": "nomTable",
+                      "type": "String",
+                      "description": "Name of the table to look up."
+                    },
+                    {
+                      "name": "uniqId",
+                      "type": "UniqId",
+                      "description": "Unique identifier to retrieve data for."
+                    }
+                  ],
+                  "returns": {
+                    "type": "Data",
+                    "description": "The data mapped to the given UniqId in the specified table."
+                  }
+                },
+                {
+                  "name": "addTable",
+                  "description": "Creates a new table in the collections map with the given name.",
+                  "parameters": [
+                    {
+                      "name": "nomTable",
+                      "type": "String",
+                      "description": "Name of the table to add."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "setDoc",
+                  "description": "Adds or updates a document (Data) in the specified table keyed by the given UniqId.",
+                  "parameters": [
+                    {
+                      "name": "nomTable",
+                      "type": "String",
+                      "description": "Name of the table."
+                    },
+                    {
+                      "name": "uniqId",
+                      "type": "UniqId",
+                      "description": "Unique identifier."
+                    },
+                    {
+                      "name": "personnel",
+                      "type": "Personnel",
+                      "description": "Personnel object to be converted into Data and stored."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "toString",
+                  "description": "String representation of the server, listing all collections and their records.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "String",
+                    "description": "Readable summary of the stored data."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "collections",
+                  "type": "HashMap<String, HashMap<UniqId, Data>>",
+                  "description": "Stores multiple tables, each mapping a UniqId to a Data object."
+                },
+                {
+                  "name": "instance",
+                  "type": "Serveur",
+                  "description": "Static reference to the singleton instance."
+                }
+              ]
+            },
+            {
+              "name": "TableNotFound",
+              "description": "Exception thrown when a specified table does not exist in the server.",
+              "methods": [],
+              "attributes": []
+            },
+            {
+              "name": "RowNotFound",
+              "description": "Exception thrown when a specified row (UniqId) does not exist within a table.",
+              "methods": [],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "personnel.Personnel",
+              "purpose": "Store Personnel objects in the server by converting them to Data."
+            },
+            {
+              "module": "java.util.HashMap",
+              "purpose": "Store collections of Data objects keyed by UniqId."
+            }
+          ]
+        },
+        {
+          "path": "src/serveur/UniqId.java",
+          "description": "Generates a unique identifier string (uniqId) for each entity. Uses the current system time and a random salt for uniqueness.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "UniqId",
+              "description": "Creates a unique ID by concatenating the provided name, current time, and a random salt value. Implements Comparable.",
+              "methods": [
+                {
+                  "name": "UniqId",
+                  "description": "Constructor that initializes the object with a provided name and generates the unique ID internally.",
+                  "parameters": [
+                    {
+                      "name": "nom",
+                      "type": "String",
+                      "description": "Name component used to generate the unique ID."
+                    }
+                  ],
+                  "returns": {
+                    "type": "UniqId",
+                    "description": "A new UniqId object with a unique ID string."
+                  }
+                },
+                {
+                  "name": "toString",
+                  "description": "Returns a string representation of the UniqId object, including the uniqId, name, salt, and time.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "String",
+                    "description": "A human-readable representation of this UniqId."
+                  }
+                },
+                {
+                  "name": "equals",
+                  "description": "Checks object equality based on the uniqId string.",
+                  "parameters": [
+                    {
+                      "name": "o",
+                      "type": "Object",
+                      "description": "Other object to compare with."
+                    }
+                  ],
+                  "returns": {
+                    "type": "boolean",
+                    "description": "True if the uniqId strings match; false otherwise."
+                  }
+                },
+                {
+                  "name": "hashCode",
+                  "description": "Generates a hash code based on the uniqId string.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "int",
+                    "description": "Hash code of the uniqId."
+                  }
+                },
+                {
+                  "name": "compareTo",
+                  "description": "Implements Comparable, comparing two UniqId objects by their uniqId strings.",
+                  "parameters": [
+                    {
+                      "name": "o",
+                      "type": "Object",
+                      "description": "The UniqId to compare with."
+                    }
+                  ],
+                  "returns": {
+                    "type": "int",
+                    "description": "0 if equal, or a negative/positive value based on string comparison."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "uniqId",
+                  "type": "String",
+                  "description": "Unique identifier string generated for this object."
+                },
+                {
+                  "name": "nom",
+                  "type": "String",
+                  "description": "Base name used in generating the uniqId."
+                },
+                {
+                  "name": "salt",
+                  "type": "long",
+                  "description": "Random salt value to ensure uniqueness."
+                },
+                {
+                  "name": "time",
+                  "type": "long",
+                  "description": "Timestamp (in ms) used to ensure uniqueness."
+                },
+                {
+                  "name": "random",
+                  "type": "Random",
+                  "description": "Static Random instance used in generating salt."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "java.util.Objects",
+              "purpose": "Implements equals/hashCode comparisons."
+            },
+            {
+              "module": "java.util.Random",
+              "purpose": "Generates a random salt."
+            },
+            {
+              "module": "static java.lang.Math.abs",
+              "purpose": "Ensures the salt value is positive."
+            }
+          ]
+        },
+        {
+          "path": "src/utils/Paire.java",
+          "description": "Generic utility class to hold a pair of values (first, second).",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Paire",
+              "description": "Stores two objects (F first, S second) and provides a toString implementation.",
+              "methods": [
+                {
+                  "name": "Paire",
+                  "description": "Constructor setting both ‘first’ and ‘second’ attributes.",
+                  "parameters": [
+                    {
+                      "name": "first",
+                      "type": "F",
+                      "description": "First item of the pair."
+                    },
+                    {
+                      "name": "second",
+                      "type": "S",
+                      "description": "Second item of the pair."
+                    }
+                  ],
+                  "returns": {
+                    "type": "Paire",
+                    "description": "A new Paire object containing two items."
+                  }
+                },
+                {
+                  "name": "toString",
+                  "description": "String representation of the pair.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "String",
+                    "description": "A string showing both first and second values."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "first",
+                  "type": "F",
+                  "description": "First item in the pair."
+                },
+                {
+                  "name": "second",
+                  "type": "S",
+                  "description": "Second item in the pair."
+                }
+              ]
+            }
+          ],
+          "imports": []
+        },
+        {
+          "path": "src/vue/UserInterface.java",
+          "description": "Implements a basic Swing UI allowing users to create and view Personnel objects. Relies on the Builder pattern to instantiate Personnel of different roles and the Serveur singleton for data storage/retrieval.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "UserInterface",
+              "description": "Extends JFrame to create a graphical interface with buttons for adding different roles and a list to view them. Integrates with the Serveur to store and retrieve data.",
+              "methods": [
+                {
+                  "name": "UserInterface",
+                  "description": "Constructor that sets up the main frame, panels, labels, buttons, and list.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "UserInterface",
+                    "description": "A fully initialized UI frame."
+                  }
+                },
+                {
+                  "name": "buildLabels",
+                  "description": "Adds labels to the main panel describing the add-personnel buttons.",
+                  "parameters": [
+                    {
+                      "name": "jPanel",
+                      "type": "JPanel",
+                      "description": "The main content panel to which labels are added."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "buildButtons",
+                  "description": "Creates and positions buttons for adding personnel of each role. Opens a dialog when clicked.",
+                  "parameters": [
+                    {
+                      "name": "jPanel",
+                      "type": "JPanel",
+                      "description": "The main content panel to which buttons are added."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "buildList",
+                  "description": "Sets up the JList to display created personnel’s names, along with a scrollbar. Clicking on an item shows their details.",
+                  "parameters": [
+                    {
+                      "name": "jPanel",
+                      "type": "JPanel",
+                      "description": "The main content panel to which the list is added."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "buildDialogAddPersonnel",
+                  "description": "Opens a dialog to input a new personnel’s name and create the object via the builder. Adds the result to the server and the JList.",
+                  "parameters": [
+                    {
+                      "name": "emploie",
+                      "type": "Emploie",
+                      "description": "The role to set (Medecin, Infirmier, or Receptionniste)."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "buildDialogFichePersonnel",
+                  "description": "Displays a dialog showing the details (nom, emploi) of the selected personnel.",
+                  "parameters": [
+                    {
+                      "name": "uniqId",
+                      "type": "UniqId",
+                      "description": "Unique identifier of the selected Personnel."
+                    },
+                    {
+                      "name": "personnelData",
+                      "type": "Data",
+                      "description": "Data object containing the Personnel’s fields."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "buildFenetreErr",
+                  "description": "Shows an error dialog if the requested personnel record is not found.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "buildFrameNotResizable",
+                  "description": "Configures the main frame properties: title, dimension, close operation, etc.",
+                  "parameters": [
+                    {
+                      "name": "titre",
+                      "type": "String",
+                      "description": "Window title."
+                    },
+                    {
+                      "name": "dimension",
+                      "type": "Dimension",
+                      "description": "Width and height of the frame."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "jPanel",
+                  "type": "JPanel",
+                  "description": "Main panel for placing UI components."
+                },
+                {
+                  "name": "jButton",
+                  "type": "JButton",
+                  "description": "Generic button reference for building multiple buttons."
+                },
+                {
+                  "name": "jLabel",
+                  "type": "JLabel",
+                  "description": "Generic label reference for building multiple labels."
+                },
+                {
+                  "name": "jList",
+                  "type": "JList<String>",
+                  "description": "List displaying created personnel names."
+                },
+                {
+                  "name": "scrollPane",
+                  "type": "JScrollPane",
+                  "description": "Scroll pane wrapping the list of personnel."
+                },
+                {
+                  "name": "jDialog",
+                  "type": "JDialog",
+                  "description": "Dialog for data input or details display."
+                },
+                {
+                  "name": "model",
+                  "type": "DefaultListModel<String>",
+                  "description": "List model holding the names of created personnel."
+                },
+                {
+                  "name": "uniqIds",
+                  "type": "ArrayList<Paire>",
+                  "description": "Stores pairs of (list index, UniqId) to correlate list items with data in Serveur."
+                },
+                {
+                  "name": "WIDTH",
+                  "type": "int",
+                  "description": "Width of the main frame."
+                },
+                {
+                  "name": "HEIGHT",
+                  "type": "int",
+                  "description": "Height of the main frame."
+                },
+                {
+                  "name": "DIMENSION_MAIN_FRAME",
+                  "type": "Dimension",
+                  "description": "Dimension object used to set the main frame size."
+                },
+                {
+                  "name": "TITLE_MAIN_FRAME",
+                  "type": "String",
+                  "description": "Title displayed on the main frame."
+                },
+                {
+                  "name": "builderInterface",
+                  "type": "BuilderInterface",
+                  "description": "Reference to a BuilderInterface implementation for creating Personnel objects."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "serveur.Serveur",
+              "purpose": "Access the singleton server to store/retrieve personnel data."
+            },
+            {
+              "module": "serveur.Data",
+              "purpose": "Represents the data for each personnel record."
+            },
+            {
+              "module": "serveur.UniqId",
+              "purpose": "Generates unique IDs for personnel."
+            },
+            {
+              "module": "personnel.*",
+              "purpose": "Access various classes in the personnel package (Builder, Emploie, Personnel, etc.)."
+            },
+            {
+              "module": "utils.Paire",
+              "purpose": "Stores the link between list index and UniqId for each personnel."
+            },
+            {
+              "module": "javax.swing.*",
+              "purpose": "Build the Swing UI components (JFrame, JDialog, JButton, etc.)."
+            },
+            {
+              "module": "java.awt.*",
+              "purpose": "Dimension class for setting frame size."
+            },
+            {
+              "module": "java.util.ArrayList",
+              "purpose": "Holds the list of Paire objects mapping indexes to UniqIds."
+            }
+          ]
+        },
+        {
+          "path": "test/UniqIdTest.java",
+          "description": "JUnit test class ensuring that multiple UniqIds generated quickly are all unique.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "UniqIdTest",
+              "description": "Contains tests validating the uniqueness of multiple UniqIds.",
+              "methods": [
+                {
+                  "name": "createMiltipleIdInShortTime_IdsShouldNotBeTheSame",
+                  "description": "Generates 10,000 UniqIds and asserts all are unique, ensuring no collisions.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value. Uses assertions to validate uniqueness."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "serveur.UniqId",
+              "purpose": "Test the UniqId class."
+            },
+            {
+              "module": "org.junit.Test",
+              "purpose": "JUnit annotation for test methods."
+            },
+            {
+              "module": "static org.junit.Assert.*",
+              "purpose": "Assertion methods for testing equality and boolean conditions."
+            }
+          ]
+        }
+      ]
+    }
+  }
+  

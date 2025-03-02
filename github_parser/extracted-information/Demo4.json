@@ -1,0 +1,217 @@
+{
+    "project": {
+      "name": "francoishup-demo4",
+      "description": {
+        "summary": "A minimal Java project demonstrating a simple stack implementation with unit tests.",
+        "problem_solved": "Provides a basic LIFO stack structure and demonstrates unit testing principles.",
+        "impact": "Shows how to implement and test fundamental data structures, improving reliability and code confidence.",
+        "technologies": ["Java", "JUnit"],
+        "role": "Developer",
+        "challenges": [
+          "Ensuring correct exception handling (UnderFlow) for edge cases.",
+          "Maintaining stack state accurately with limited array capacity."
+        ],
+        "relevance": "Demonstrates core Java OOP concepts and testing practices, aligning with broader software development expertise."
+      },
+      "architecture": {
+        "overview": "A straightforward architecture consisting of a single Stack class with a nested UnderFlow exception, and a JUnit test class to validate its functionality.",
+        "components": [
+          {
+            "name": "Stack",
+            "description": "Implements push, pop, and isEmpty logic with a fixed-size array."
+          },
+          {
+            "name": "StackTest",
+            "description": "JUnit test suite that ensures the Stack methods function as expected."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Use a fixed-size array for stack storage.",
+            "reasoning": "Simplifies implementation and demonstrates basic stack operations for a small example."
+          },
+          {
+            "decision": "Include a custom UnderFlow exception.",
+            "reasoning": "Provides clear error handling for attempts to pop from an empty stack."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "Minimal memory allocation (fixed-size array).",
+            "impact": "Avoids overhead of dynamic data structures, though at the cost of a strict capacity limit."
+          }
+        ],
+        "lessons_learned": [
+          "Importance of unit tests in verifying data structure correctness.",
+          "Handling edge cases (e.g., popping from an empty stack) through custom exceptions."
+        ]
+      },
+      "files": [
+        {
+          "path": "src/Stack.java",
+          "description": "Implements a simple stack with a fixed capacity of 2, along with a custom UnderFlow exception.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Stack",
+              "description": "A basic stack implementation that allows push, pop, and emptiness checks.",
+              "methods": [
+                {
+                  "name": "isEmpty",
+                  "description": "Checks whether the stack is empty.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "boolean",
+                    "description": "True if the stack is empty; otherwise, false."
+                  }
+                },
+                {
+                  "name": "push",
+                  "description": "Pushes an integer onto the stack.",
+                  "parameters": [
+                    {
+                      "name": "element",
+                      "type": "int",
+                      "description": "The integer value to push."
+                    }
+                  ],
+                  "returns": {
+                    "type": "int",
+                    "description": "Always returns 0 in this implementation."
+                  }
+                },
+                {
+                  "name": "pop",
+                  "description": "Removes and returns the top element of the stack. Throws UnderFlow if the stack is empty.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "int",
+                    "description": "The top element from the stack."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "counter",
+                  "type": "int",
+                  "description": "Tracks the number of elements currently in the stack."
+                },
+                {
+                  "name": "element",
+                  "type": "int[]",
+                  "description": "Array storing the elements of the stack."
+                }
+              ]
+            },
+            {
+              "name": "UnderFlow",
+              "description": "Custom exception thrown when popping from an empty stack.",
+              "methods": [],
+              "attributes": []
+            }
+          ],
+          "imports": []
+        },
+        {
+          "path": "test/StackTest.java",
+          "description": "JUnit test class for the Stack, verifying empty state, push/pop operations, and exception handling.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "StackTest",
+              "description": "Contains test methods to ensure Stack behaves as expected.",
+              "methods": [
+                {
+                  "name": "setUp",
+                  "description": "Initializes a fresh Stack object before each test.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "newStackIsEmpty",
+                  "description": "Tests that a newly created stack is empty.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "onePush_isNotEmpty",
+                  "description": "Tests that pushing one element changes the stack from empty to not empty.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "popOnEmptyStack_WillThrowException",
+                  "description": "Tests that popping an empty stack throws the UnderFlow exception.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "afterPushX_PopX",
+                  "description": "Tests that pushing a value and then popping returns the same value.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "towPushesOnePop_WillNotBeEmpty",
+                  "description": "Ensures that after two pushes and one pop, the stack is not empty.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                },
+                {
+                  "name": "afterPushXY_PopYX",
+                  "description": "Verifies LIFO order by pushing X and Y, then popping in reverse order.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "stack",
+                  "type": "Stack",
+                  "description": "An instance of Stack used for each test."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "org.junit.Before",
+              "purpose": "Marks the setUp() method to run before each test."
+            },
+            {
+              "module": "org.junit.Test",
+              "purpose": "Marks methods as test cases."
+            },
+            {
+              "module": "static org.junit.Assert.*",
+              "purpose": "Provides assertion methods like assertTrue, assertFalse, and assertEquals."
+            }
+          ]
+        }
+      ]
+    }
+  }
+  

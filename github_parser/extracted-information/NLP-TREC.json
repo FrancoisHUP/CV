@@ -1,0 +1,370 @@
+{
+    "project": {
+      "name": "francoishup-nlp-trec",
+      "description": {
+        "summary": "A project implementing and evaluating various Information Retrieval (IR) methods on the TREC AP 88-90 dataset. It provides scripts for indexing documents, querying with multiple retrieval models, and measuring performance using TREC evaluations.",
+        "problem_solved": "Helps researchers or students benchmark IR techniques (BM25, Language Modeling, TF-IDF, etc.) on a standard TREC dataset, facilitating reproducible experiments and evaluations.",
+        "impact": "Enables systematic comparisons of multiple retrieval models, tokenization methods, and parameter settings, thus improving the understanding of which methods perform best for the TREC AP 88-90 dataset. It also streamlines IR experimentation by automating indexing, querying, and evaluation steps.",
+        "technologies": [
+          "Python",
+          "Lucene (PyLucene)",
+          "scikit-learn",
+          "rank-bm25",
+          "nltk",
+          "trectools"
+        ],
+        "role": "Developer and researcher, setting up the IR pipeline, tokenization, indexing, query evaluation, and result analysis.",
+        "challenges": [
+          "Handling a large TREC dataset efficiently",
+          "Ensuring correct tokenization and preprocessing (stemming, lemmatization, stopwords)",
+          "Coordinating multiple retrieval models (BM25, LM, TF-IDF, Boolean, etc.)",
+          "Interpreting and organizing large volumes of evaluation data"
+        ],
+        "relevance": "Demonstrates expertise in search engine implementation, IR model experimentation, and large-scale text data handling, relevant to roles in search, NLP, or data science."
+      },
+      "architecture": {
+        "overview": "The system downloads and reads the TREC AP 88-90 dataset, indexes documents (via Lucene or other vectorizers), processes queries, runs various retrieval models, and collects metrics using TREC evaluations.",
+        "components": [
+          {
+            "name": "Data Preprocessing",
+            "description": "Scripts/notebooks to parse, tokenize, stem, or lemmatize TREC AP 88-90 documents."
+          },
+          {
+            "name": "Indexing",
+            "description": "Lucene-based indexing or Python-based vectorizers for BM25, TF-IDF, etc."
+          },
+          {
+            "name": "Querying & Retrieval",
+            "description": "Implements multiple IR models (BM25, LM, Classic TF-IDF, Boolean) to retrieve documents for each TREC topic."
+          },
+          {
+            "name": "Evaluation",
+            "description": "Generates TREC-format runs, uses trectools to compute MAP, P@N, and other metrics."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Use Lucene (PyLucene) vs. purely Python vectorizers (scikit-learn, rank-bm25).",
+            "reasoning": "Lucene offers robust and tested indexing and searching capabilities, while Python vectorizers allow quick prototyping and comparisons. Combining them broadens the experiment range."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "Use MMapDirectory for Lucene indexes and multi-threading for tokenization.",
+            "impact": "Speeds up indexing on large TREC datasets and reduces memory overhead."
+          }
+        ],
+        "lessons_learned": [
+          "Careful data parsing is crucial with large corpora like TREC AP 88-90.",
+          "Tokenization and stopwords drastically affect IR results.",
+          "Different IR models have varying trade-offs; thorough evaluation fosters better insights."
+        ]
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "description": "Provides installation instructions, environment setup, and basic usage examples for running the IR tests on TREC data.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "autreCode.py",
+          "description": "Contains various experimental or auxiliary functions (some commented out) for tokenization, MAP calculation, progress bar, vectorization, and the Vectorizer class.",
+          "functions": [
+            {
+              "name": "calculate_map",
+              "description": "Computes Mean Average Precision (MAP) given retrieval results and ground truth judgments.",
+              "parameters": [
+                {
+                  "name": "results",
+                  "type": "List[List[str]] or dict",
+                  "description": "List or dict of retrieved document IDs for each query."
+                },
+                {
+                  "name": "judgements",
+                  "type": "dict",
+                  "description": "Ground truth relevance judgments keyed by query ID."
+                }
+              ],
+              "returns": {
+                "type": "float",
+                "description": "The computed MAP value."
+              }
+            },
+            {
+              "name": "progressBar",
+              "description": "Displays a console-based progress bar while iterating.",
+              "parameters": [
+                {
+                  "name": "iterable",
+                  "type": "Iterable",
+                  "description": "The collection we are processing."
+                }
+              ],
+              "returns": {
+                "type": "None",
+                "description": "Prints updates to stdout, does not return anything."
+              }
+            },
+            {
+              "name": "tokenize",
+              "description": "Tokenizes and optionally stems or lemmatizes documents based on a chosen pretreatment type.",
+              "parameters": [
+                {
+                  "name": "documents_metadata",
+                  "type": "dict",
+                  "description": "Dictionary containing doc text keyed by doc ID."
+                },
+                {
+                  "name": "pretreatment_type",
+                  "type": "str",
+                  "description": "Either 'basic', 'lemmatization', or 'stemming'."
+                }
+              ],
+              "returns": {
+                "type": "List[str]",
+                "description": "List of tokenized or processed document strings."
+              }
+            }
+          ],
+          "classes": [
+            {
+              "name": "Vectorizer",
+              "description": "Provides a simple abstraction for different weighting schemes (normalized frequency, TF-IDF, BM25).",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Initializes the vectorizer with a chosen weighting scheme.",
+                  "parameters": [
+                    {
+                      "name": "weight_scheme",
+                      "type": "str",
+                      "description": "'normalized_frequency', 'tf_idf_normalize', or 'BM25'."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Sets up internal vectorizer or BM25Okapi instance."
+                  }
+                },
+                {
+                  "name": "vectorize",
+                  "description": "Transforms documents into vectors using the chosen scheme.",
+                  "parameters": [
+                    {
+                      "name": "preprocess_documents",
+                      "type": "List[str]",
+                      "description": "List of text documents (already preprocessed)."
+                    },
+                    {
+                      "name": "transform",
+                      "type": "bool",
+                      "description": "If True, calls transform instead of fit_transform."
+                    }
+                  ],
+                  "returns": {
+                    "type": "Any",
+                    "description": "Vector representation (sparse matrix, normalized matrix, or BM25 instance) of the documents."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "weight_scheme",
+                  "type": "str",
+                  "description": "Specifies the weighting scheme used by this Vectorizer."
+                },
+                {
+                  "name": "vectorizer",
+                  "type": "Any",
+                  "description": "Holds the actual scikit-learn vectorizer or BM25Okapi object."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "nltk",
+              "purpose": "Tokenization, stopwords, lemmatization, stemming."
+            },
+            {
+              "module": "rank_bm25",
+              "purpose": "Provides BM25Okapi for BM25-based retrieval."
+            },
+            {
+              "module": "sklearn.feature_extraction.text",
+              "purpose": "TfidfVectorizer, CountVectorizer for TF-IDF or frequency weighting."
+            },
+            {
+              "module": "sklearn.preprocessing",
+              "purpose": "normalize for L1/L2 normalization of frequency vectors."
+            }
+          ]
+        },
+        {
+          "path": "corpus_analysis.ipynb",
+          "description": "Jupyter notebook that parses .gz files in TREC AP directory, tokenizes text, performs bigram or co-occurrence analysis, and explores basic mutual information among terms.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "glob, gzip, re, nltk, sklearn",
+              "purpose": "Used for reading files, tokenizing text, computing co-occurrences, mutual info."
+            }
+          ]
+        },
+        {
+          "path": "main_final.ipynb",
+          "description": "Notebook orchestrating the indexing of TREC AP 88-90 documents, applying retrieval models, generating runs, and evaluating them with trectools.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "lucene, trectools, nltk, sklearn",
+              "purpose": "Lucene-based indexing and searching, TREC evaluation, tokenization, vectorization."
+            }
+          ]
+        },
+        {
+          "path": "rapport.txt",
+          "description": "Contains a link to an external Google Doc with additional project documentation or report.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "requirements.txt",
+          "description": "Lists Python dependencies needed to run the project (nltk, numpy, scikit-learn, rank-bm25, trectools, etc.).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "start.sh",
+          "description": "Shell script to run or loop over multiple argument presets for the IR system (tokenization or weighting scheme variants).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "test.py",
+          "description": "Example usage of OpenAI (or other external LLM) calls, presumably for query expansion or other experimentation. Not heavily integrated with the IR pipeline.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "openai",
+              "purpose": "Demonstrates calling the OpenAI API for some test prompt."
+            }
+          ]
+        },
+        {
+          "path": "tmp.txt",
+          "description": "A text snippet containing news articles or random TREC-like content (antitrust ruling, etc.) used presumably for partial testing or demonstration.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "tmp2.txt",
+          "description": "Another text snippet with news about antitrust suits and video cassette recorders. Possibly used for debugging or demonstration.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "todo.txt",
+          "description": "A brief to-do list or project notes about indexing files in a separate folder, token methods, etc.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "tokenise_standard.txt",
+          "description": "Example of a tokenized document snippet, showing lowercased words and separated punctuation. Possibly used as a reference or test input.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "utils.py",
+          "description": "Utility functions to parse TREC AP .gz files, tokenize queries, build short/long queries, and manage data for IR tasks.",
+          "functions": [
+            {
+              "name": "get_documents",
+              "description": "Reads .gz files from TREC AP directory and extracts doc ID, title, and text.",
+              "parameters": [],
+              "returns": {
+                "type": "dict",
+                "description": "Dictionary of doc_id -> {'title':..., 'text':...}"
+              }
+            },
+            {
+              "name": "get_requests",
+              "description": "Parses TREC topic files to build a dictionary of request metadata (title, desc).",
+              "parameters": [],
+              "returns": {
+                "type": "dict",
+                "description": "Dictionary request_id -> {'title':..., 'desc':...}"
+              }
+            },
+            {
+              "name": "build_request",
+              "description": "Builds short or long versions of requests by combining title and description as needed.",
+              "parameters": [
+                {
+                  "name": "req_lenght",
+                  "type": "str",
+                  "description": "'short' or 'long' – how to build requests."
+                },
+                {
+                  "name": "requests",
+                  "type": "dict",
+                  "description": "Requests metadata from get_requests."
+                }
+              ],
+              "returns": {
+                "type": "dict",
+                "description": "Dictionary request_id -> request_string (short or long)."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "glob, gzip, re, nltk, lucene, sklearn",
+              "purpose": "Reading TREC files, tokenizing, indexing with Lucene, building queries for IR tasks."
+            }
+          ]
+        },
+        {
+          "path": "remise/main_final.ipynb",
+          "description": "Another final notebook within 'remise/' folder, replicating or refining the main IR workflow on TREC data, indexing with Lucene, computing runs, and measuring results.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "lucene, trectools, nltk, sklearn",
+              "purpose": "Same IR tasks: indexing, searching, evaluation with TREC metrics."
+            }
+          ]
+        },
+        {
+          "path": "remise/trec_eval/*",
+          "description": "Output JSON or text files containing evaluation metrics (map, P@N, etc.) for various runs (BM25, LM, Classic, with or without stemming). Used to store final IR results for each experiment."
+        },
+        {
+          "path": "remise/trec_runs/*",
+          "description": "TREC-run format files (the system’s retrieval output) for different tokenization (basic, lemmatized, stemmed) and weighting (BM25, LM, TF-IDF)."
+        },
+        {
+          "path": "results/*",
+          "description": "Additional text files capturing experiment logs or aggregated TREC metrics (BM25, short vs. long requests, etc.). The naming indicates which retrieval model and tokenization were used."
+        }
+      ]
+    }
+  }
+  

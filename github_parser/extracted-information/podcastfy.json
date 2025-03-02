@@ -1,0 +1,715 @@
+{
+    "project": {
+      "name": "Podcastfy.ai",
+      "description": {
+        "summary": "Podcastfy is an open-source Python package that transforms multi-modal content (text, images, websites, YouTube videos, PDFs) into engaging, multi-lingual audio conversations using generative AI. It programmatically converts various forms of content into structured, conversation-style transcripts and then applies text-to-speech to produce a final audio file.",
+        "problem_solved": "The project addresses the overwhelming proliferation of digital content in multiple formats by automating the transformation of text-based or multimedia sources into accessible, conversational audio. It helps users consume lengthy or complex content in a more convenient, engaging, and accessible way.",
+        "impact": "By enabling content creators, educators, and researchers to programmatically convert large volumes of content into audio, it broadens accessibility, especially for individuals with visual impairments or those preferring audio over reading. It also supports customization, scale, and multilingual generation, opening up new ways for users to engage with information.",
+        "technologies": [
+          "Python",
+          "LangChain",
+          "Llamafile",
+          "OpenAI",
+          "ElevenLabs",
+          "Google TTS",
+          "Docker",
+          "FFmpeg",
+          "Sphinx"
+        ],
+        "role": "Developer",
+        "challenges": [
+          "Ensuring coherent, conversation-style transcripts via prompting and chunking for longer texts.",
+          "Handling multiple data sources (websites, PDFs, YouTube) with robust extraction methods.",
+          "Supporting both local LLMs and cloud-based LLMs for privacy, cost, and performance trade-offs.",
+          "Managing TTS limitations, especially for multilingual or large-scale usage."
+        ],
+        "relevance": "Demonstrates expertise in Python-based generative AI pipelines, large language models, text-to-speech integration, and end-to-end content transformation workflows."
+      },
+      "architecture": {
+        "overview": "Podcastfy implements a modular pipeline with five main components: (1) a Client Interface for CLI/API orchestration, (2) Configuration Management to handle environment variables and YAML settings, (3) a Content Extraction Layer for websites/PDFs/YouTube, (4) an LLM-based Transcript Generation Layer for conversation-style transcripts, and (5) a TTS Layer to generate audio from transcripts.",
+        "components": [
+          {
+            "name": "Client Interface",
+            "description": "Coordinates user input via CLI or API calls, invokes the pipeline of extraction, generation, and text-to-speech processes."
+          },
+          {
+            "name": "Configuration Management",
+            "description": "Handles environment variables, .env files, YAML configurations, and conversation settings to unify system-wide parameters."
+          },
+          {
+            "name": "Content Extraction Layer",
+            "description": "Extracts and normalizes data from websites, PDFs, images, or YouTube transcripts, providing standardized text output for the generator."
+          },
+          {
+            "name": "LLM-based Transcript Generation Layer",
+            "description": "Transforms extracted text into conversation-style transcripts using large language models. Supports chunking for long-form content and local or remote LLMs."
+          },
+          {
+            "name": "TTS Layer",
+            "description": "Converts conversation transcripts into audio using TTS providers (OpenAI, ElevenLabs, Microsoft Edge, or Google TTS)."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Adopt a modular architecture with distinct layers for extraction, generation, and TTS.",
+            "reasoning": "Separates concerns for easier maintenance, enabling each component to evolve or be swapped independently."
+          },
+          {
+            "decision": "Use conversation-style prompts for transcripts.",
+            "reasoning": "Improves user experience with more natural, engaging outputs compared to purely expository text."
+          },
+          {
+            "decision": "Offer both local and cloud-based LLM options.",
+            "reasoning": "Enables users to choose privacy- or cost-focused solutions while preserving the same pipeline for content generation."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "Content chunking for long-form transcripts.",
+            "impact": "Allows processing large documents by dividing them into smaller parts, preventing model context overflow and improving coherence."
+          }
+        ],
+        "lessons_learned": [
+          "Implementing advanced prompt design is crucial for coherent, multi-turn transcripts.",
+          "Local LLM integration offers privacy benefits but demands more memory and compute.",
+          "Thorough extraction routines must handle diverse formats and edge cases (e.g., complex website structures)."
+        ]
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "description": "Main project README with overview, features, examples, usage instructions, and links to documentation.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "CHANGELOG.md",
+          "description": "Lists version history, major feature additions, and bug fixes.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "CODE_OF_CONDUCT.md",
+          "description": "Contributor Covenant Code of Conduct outlining standards for an inclusive, welcoming environment.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Dockerfile",
+          "description": "Production Docker image specifying system dependencies and installing Podcastfy from PyPI.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Dockerfile.dev",
+          "description": "Development Docker image with testing and linting dependencies for local or CI usage.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "GUIDELINES.md",
+          "description": "Contributor guidelines detailing code style, branching strategy, and pull request submission process.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "LICENSE",
+          "description": "Apache 2.0 License text.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Makefile",
+          "description": "Make targets for linting, testing, and documentation generation (e.g., `make lint`, `make test`, `make doc-gen`).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "NOTICE",
+          "description": "Apache license notice mentioning copyright and contributors.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "PRIVACY_POLICY.md",
+          "description": "Outlines data handling and privacy policies for users of the Podcastfy library.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "TESTIMONIALS.md",
+          "description": "Collection of user testimonials praising the library’s functionality and ease of use.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "build_docs.py",
+          "description": "Script for building the Sphinx documentation from the `docs` directory.",
+          "functions": [
+            {
+              "name": "main",
+              "description": "Builds Sphinx documentation by changing into the docs directory and running Sphinx’s build command.",
+              "parameters": [],
+              "returns": {
+                "type": "None",
+                "description": "Exits the process on completion."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "os",
+              "purpose": "Directory and file operations."
+            },
+            {
+              "module": "sys",
+              "purpose": "Exit with the Sphinx build status."
+            },
+            {
+              "module": "sphinx.cmd.build",
+              "purpose": "Access to the Sphinx build command."
+            }
+          ]
+        },
+        {
+          "path": "dev-requirements.txt",
+          "description": "List of development-specific Python dependencies for testing, linting, documentation, etc.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "docker-compose.yml",
+          "description": "Orchestrates multiple Docker containers (production, dev, test) and sets environment variables for Podcastfy services.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "make.sh",
+          "description": "Shell script exporting PYTHONPATH and facilitating Makefile commands in some Unix environments.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "pyproject.toml",
+          "description": "Defines project metadata, dependencies, and Poetry configuration for building and distributing the package.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "requirements.txt",
+          "description": "List of primary Python dependencies required to run Podcastfy.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": ".dockerignore",
+          "description": "Specifies files and directories for Docker to ignore during build context.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": ".readthedocs.yaml",
+          "description": "Configuration file for Read the Docs to build and host the documentation online.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "podcastfy/__init__.py",
+          "description": "Initializes the podcastfy package and sets the package version.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "podcastfy/client.py",
+          "description": "Implements the CLI (Typer app) and a Python-level API entry point to generate podcasts from content. Orchestrates content extraction, generation, and text-to-speech.",
+          "functions": [
+            {
+              "name": "process_content",
+              "description": "Processes URLs, transcripts, images, or text to generate either audio or transcript files.",
+              "parameters": [
+                {
+                  "name": "urls",
+                  "type": "Optional[List[str]]",
+                  "description": "List of URLs to process."
+                },
+                {
+                  "name": "transcript_file",
+                  "type": "Optional[str]",
+                  "description": "Path to an existing transcript file."
+                },
+                {
+                  "name": "tts_model",
+                  "type": "Optional[str]",
+                  "description": "Text-to-speech model name."
+                },
+                {
+                  "name": "generate_audio",
+                  "type": "bool",
+                  "description": "Whether to produce audio (True) or transcript-only (False)."
+                },
+                {
+                  "name": "config",
+                  "type": "Optional[Dict[str, Any]]",
+                  "description": "Configuration dictionary or object."
+                },
+                {
+                  "name": "conversation_config",
+                  "type": "Optional[Dict[str, Any]]",
+                  "description": "Overrides for conversation style, roles, etc."
+                },
+                {
+                  "name": "image_paths",
+                  "type": "Optional[List[str]]",
+                  "description": "Paths to image files for extraction, if any."
+                },
+                {
+                  "name": "is_local",
+                  "type": "bool",
+                  "description": "Use local LLM if True."
+                },
+                {
+                  "name": "text",
+                  "type": "Optional[str]",
+                  "description": "Raw text input."
+                },
+                {
+                  "name": "model_name",
+                  "type": "Optional[str]",
+                  "description": "Name of the LLM model to use."
+                },
+                {
+                  "name": "api_key_label",
+                  "type": "Optional[str]",
+                  "description": "Environment variable label for the LLM API key."
+                },
+                {
+                  "name": "topic",
+                  "type": "Optional[str]",
+                  "description": "Optional topic to generate content about."
+                },
+                {
+                  "name": "longform",
+                  "type": "bool",
+                  "description": "Generate longer conversation if True."
+                }
+              ],
+              "returns": {
+                "type": "str or None",
+                "description": "Path to the generated audio or transcript, or raises an exception on failure."
+              }
+            },
+            {
+              "name": "main",
+              "description": "The Typer CLI command that parses user arguments for generating a podcast or transcript.",
+              "parameters": [
+                {
+                  "name": "urls",
+                  "type": "List[str]",
+                  "description": "List of URLs to process."
+                },
+                {
+                  "name": "file",
+                  "type": "FileText",
+                  "description": "A file containing URLs (one per line)."
+                },
+                {
+                  "name": "transcript",
+                  "type": "FileText",
+                  "description": "Path to an existing transcript file."
+                },
+                {
+                  "name": "tts_model",
+                  "type": "str",
+                  "description": "Which TTS model to use."
+                },
+                {
+                  "name": "transcript_only",
+                  "type": "bool",
+                  "description": "Generate only transcript if True."
+                },
+                {
+                  "name": "conversation_config_path",
+                  "type": "str",
+                  "description": "Path to a YAML file overriding conversation config."
+                },
+                {
+                  "name": "image_paths",
+                  "type": "List[str]",
+                  "description": "Paths to image files for extraction."
+                },
+                {
+                  "name": "is_local",
+                  "type": "bool",
+                  "description": "Use a local LLM if True."
+                },
+                {
+                  "name": "text",
+                  "type": "str",
+                  "description": "Raw text input to process."
+                },
+                {
+                  "name": "llm_model_name",
+                  "type": "str",
+                  "description": "Name of the LLM model to use."
+                },
+                {
+                  "name": "api_key_label",
+                  "type": "str",
+                  "description": "Environment variable label for the LLM API key."
+                },
+                {
+                  "name": "topic",
+                  "type": "str",
+                  "description": "Optional topic to generate a podcast about."
+                },
+                {
+                  "name": "longform",
+                  "type": "bool",
+                  "description": "Generate a longer conversation if True."
+                }
+              ],
+              "returns": {
+                "type": "None",
+                "description": "Outputs final paths or error messages to console."
+              }
+            },
+            {
+              "name": "generate_podcast",
+              "description": "Convenience function for Python usage to generate a podcast or transcript from various input sources.",
+              "parameters": [
+                {
+                  "name": "urls",
+                  "type": "Optional[List[str]]",
+                  "description": "List of URLs to process."
+                },
+                {
+                  "name": "url_file",
+                  "type": "Optional[str]",
+                  "description": "Path to a file containing URLs."
+                },
+                {
+                  "name": "transcript_file",
+                  "type": "Optional[str]",
+                  "description": "Path to a transcript file."
+                },
+                {
+                  "name": "tts_model",
+                  "type": "Optional[str]",
+                  "description": "Chosen TTS model name."
+                },
+                {
+                  "name": "transcript_only",
+                  "type": "bool",
+                  "description": "Whether to produce only a transcript."
+                },
+                {
+                  "name": "config",
+                  "type": "Optional[Dict[str, Any]]",
+                  "description": "Additional or overridden configuration dict."
+                },
+                {
+                  "name": "conversation_config",
+                  "type": "Optional[Dict[str, Any]]",
+                  "description": "Conversation style config, e.g. roles, language."
+                },
+                {
+                  "name": "image_paths",
+                  "type": "Optional[List[str]]",
+                  "description": "List of local image paths to incorporate."
+                },
+                {
+                  "name": "is_local",
+                  "type": "bool",
+                  "description": "Whether to use a local LLM."
+                },
+                {
+                  "name": "text",
+                  "type": "Optional[str]",
+                  "description": "Raw text input instead of URL or file-based content."
+                },
+                {
+                  "name": "llm_model_name",
+                  "type": "Optional[str]",
+                  "description": "The name of the LLM model to use."
+                },
+                {
+                  "name": "api_key_label",
+                  "type": "Optional[str]",
+                  "description": "Environment variable label for the LLM API key."
+                },
+                {
+                  "name": "topic",
+                  "type": "Optional[str]",
+                  "description": "Optional topic to generate a focused podcast about."
+                },
+                {
+                  "name": "longform",
+                  "type": "bool",
+                  "description": "Generate extended conversation if True."
+                }
+              ],
+              "returns": {
+                "type": "str or None",
+                "description": "Path to the output file or None on error."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "podcastfy.content_parser.content_extractor",
+              "purpose": "Extract content from PDFs, websites, or YouTube transcripts."
+            },
+            {
+              "module": "podcastfy.content_generator",
+              "purpose": "Generate conversation transcripts from extracted content."
+            },
+            {
+              "module": "podcastfy.text_to_speech",
+              "purpose": "Convert transcripts to audio with TTS."
+            },
+            {
+              "module": "podcastfy.utils.config",
+              "purpose": "Load and parse the main config settings."
+            },
+            {
+              "module": "podcastfy.utils.config_conversation",
+              "purpose": "Load and parse conversation-specific overrides."
+            },
+            {
+              "module": "podcastfy.utils.logger",
+              "purpose": "Set up logging functionality."
+            },
+            {
+              "module": "typer",
+              "purpose": "Implement the CLI interface."
+            }
+          ]
+        },
+        {
+          "path": "podcastfy/config.yaml",
+          "description": "Default YAML configuration for content generation, extraction, and logging levels.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "podcastfy/content_parser/content_extractor.py",
+          "description": "Defines the ContentExtractor class that orchestrates multiple specialized extractors (YouTube, website, PDF).",
+          "functions": [],
+          "classes": [
+            {
+              "name": "ContentExtractor",
+              "description": "Coordinates extraction from different source types (websites, PDFs, YouTube, images).",
+              "methods": [
+                {
+                  "name": "extract_content",
+                  "description": "Dispatches URL to the appropriate specialized extractor based on domain or file format.",
+                  "parameters": [
+                    {
+                      "name": "url",
+                      "type": "str",
+                      "description": "URL or file path indicating the content to extract."
+                    }
+                  ],
+                  "returns": {
+                    "type": "str",
+                    "description": "Extracted textual content."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": []
+        },
+        {
+          "path": "podcastfy/content_parser/pdf_extractor.py",
+          "description": "Extract text from PDF documents using libraries such as PyMuPDF or pypdf.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "podcastfy/content_parser/website_extractor.py",
+          "description": "Scrapes web pages, cleans HTML, and outputs plain text or markdown for further processing.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "podcastfy/content_parser/youtube_transcriber.py",
+          "description": "Fetches YouTube transcripts via API or fallback methods, returns plain text to unify with other content.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "podcastfy/content_generator.py",
+          "description": "Implements the pipeline that interacts with LLM(s) to produce conversation-style transcripts from extracted content. Also includes chunking logic for long-form generation and cleaning steps.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "LLMBackend",
+              "description": "Initializes a chosen large language model (local or cloud-based) with appropriate parameters.",
+              "methods": [],
+              "attributes": [
+                {
+                  "name": "llm",
+                  "type": "Any",
+                  "description": "Instance of the chosen LLM for generating text."
+                }
+              ]
+            },
+            {
+              "name": "LongFormContentGenerator",
+              "description": "Handles chunk-based generation for extended transcripts while maintaining context across multiple conversation segments.",
+              "methods": [
+                {
+                  "name": "generate_long_form",
+                  "description": "Splits input text into chunks and iteratively calls the LLM, ensuring a cohesive extended transcript.",
+                  "parameters": [
+                    {
+                      "name": "input_content",
+                      "type": "str",
+                      "description": "Long text to be chunked and processed."
+                    },
+                    {
+                      "name": "prompt_params",
+                      "type": "Dict[str,Any]",
+                      "description": "Parameters for the LLM prompt (styles, roles, etc.)."
+                    }
+                  ],
+                  "returns": {
+                    "type": "str",
+                    "description": "Complete multi-part conversation transcript."
+                  }
+                }
+              ],
+              "attributes": []
+            },
+            {
+              "name": "ContentCleanerMixin",
+              "description": "Provides cleaning methods for transcripts, removing unwanted markup or scratchpads.",
+              "methods": [],
+              "attributes": []
+            },
+            {
+              "name": "ContentGenerationStrategy",
+              "description": "Abstract base for content generation strategies (standard or long-form). Outlines required methods: validate, generate, clean, compose_prompt_params.",
+              "methods": [],
+              "attributes": []
+            },
+            {
+              "name": "StandardContentStrategy",
+              "description": "Generates shorter or moderate-length transcripts in a single pass without chunking.",
+              "methods": [],
+              "attributes": []
+            },
+            {
+              "name": "LongFormContentStrategy",
+              "description": "Implements the multi-chunk approach for large texts, including a post-processing step to fix conversation tags.",
+              "methods": [],
+              "attributes": []
+            },
+            {
+              "name": "ContentGenerator",
+              "description": "High-level orchestrator that selects a content generation strategy (standard or longform) and runs the pipeline from text input to final transcript. Integrates with LLMBackend.",
+              "methods": [
+                {
+                  "name": "generate_qa_content",
+                  "description": "Main entry point that decides how to parse user config, pick the correct strategy, run generation, and return the final transcript.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "str",
+                    "description": "The final conversation transcript."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "langchain_community.chat_models",
+              "purpose": "LiteLLM or other custom chat-based LLM classes."
+            },
+            {
+              "module": "langchain_google_genai",
+              "purpose": "Google Generative AI model (Gemini) integration."
+            },
+            {
+              "module": "langchain_community.llms.llamafile",
+              "purpose": "Local LLM (LlamaFile) support for user-provided models."
+            },
+            {
+              "module": "langchain_core.prompts",
+              "purpose": "Prompt template management within the LangChain ecosystem."
+            },
+            {
+              "module": "hub",
+              "purpose": "Pull prompt templates from a versioned repository or hub."
+            }
+          ]
+        },
+        {
+          "path": "podcastfy/text_to_speech.py",
+          "description": "Implements text-to-speech generation using providers like OpenAI, ElevenLabs, Microsoft Edge, or Google TTS. Converts conversation transcripts into final MP3 audio files.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "TextToSpeech",
+              "description": "Factory-based approach to produce TTS audio from transcripts with multiple provider backends.",
+              "methods": [
+                {
+                  "name": "convert_to_speech",
+                  "description": "Main method that receives transcript text, selects a TTS provider, and writes an audio file.",
+                  "parameters": [
+                    {
+                      "name": "input_text",
+                      "type": "str",
+                      "description": "The conversation transcript to be synthesized."
+                    },
+                    {
+                      "name": "output_filepath",
+                      "type": "str",
+                      "description": "Path to the resulting .mp3 file."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Writes the audio data to the specified file."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": []
+        }
+      ]
+    }
+  }
+  

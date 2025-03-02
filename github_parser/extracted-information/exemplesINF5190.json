@@ -1,0 +1,2275 @@
+{
+    "project": {
+      "name": "francoishup-exemplesinf5190",
+      "description": {
+        "summary": "A collection of illustrative examples for the INF5190 course, covering topics such as Python fundamentals, Flask web development, SQLite usage, JSON/XML handling, authentication, and more.",
+        "problem_solved": "Demonstrates practical solutions and reference implementations for common web development tasks (HTTP requests, form handling, Ajax, REST APIs, database integration, file uploads, authentication).",
+        "impact": "Helps students and developers learn by providing ready-to-run code samples that illustrate best practices and typical use cases in web development with Python and Flask.",
+        "technologies": [
+          "Python",
+          "Flask",
+          "SQLite",
+          "HTML",
+          "CSS",
+          "JavaScript"
+        ],
+        "role": "Contributor / Maintainer of examples",
+        "challenges": [
+          "Ensuring each example remains self-contained, understandable, and up-to-date; covering a wide variety of web development topics under one repository."
+        ],
+        "relevance": "Demonstrates proficiency in back-end web development with Python/Flask, as well as front-end Ajax/JSON/XML handling, aligning with broader expertise in full-stack web development and teaching."
+      },
+      "architecture": {
+        "overview": "The repository is organized into directories for different topics (Ateliers, Flask, JSON, Python, SQLite, auth, email), each containing example code or exercises. Many folders contain small, standalone Flask applications or Python scripts demonstrating specific features.",
+        "components": [
+          {
+            "name": "Ateliers",
+            "description": "Markdown instructions and exercises on Ajax, API creation, database usage, Flask basics, etc."
+          },
+          {
+            "name": "Flask",
+            "description": "Multiple subfolders, each a miniature Flask application highlighting various functionalities (cookies, files, form handling, login, REST APIs)."
+          },
+          {
+            "name": "JSON and XML",
+            "description": "Exercises and files demonstrating JSON/XML data formats, validation, and transformation."
+          },
+          {
+            "name": "Python",
+            "description": "Foundational scripts illustrating Python syntax, file I/O, exceptions, classes, inheritance, etc."
+          },
+          {
+            "name": "SQLite",
+            "description": "Scripts for basic SQL operations (select, insert, update) and demonstrating SQL injection vs. parameterized queries."
+          },
+          {
+            "name": "auth",
+            "description": "Examples showing how to store hashed passwords (salted + hashed) and check them, demonstrating secure authentication patterns."
+          },
+          {
+            "name": "email",
+            "description": "An example script (gmail.py) showing how to send emails via Gmail’s SMTP."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Use of small, self-contained Flask apps for each topic.",
+            "reasoning": "Keeps examples focused and easier to learn, avoids a monolithic codebase with too many features at once."
+          },
+          {
+            "decision": "Use of SQLite for database examples.",
+            "reasoning": "SQLite is lightweight, requires no separate server, and is easy to bundle for teaching purposes."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "Minimal dependencies and straightforward queries in the Flask examples.",
+            "impact": "Keeps demonstration code simple and efficient for class usage."
+          }
+        ],
+        "lessons_learned": [
+          "Breaking down large topics into bite-sized code samples fosters easier comprehension.",
+          "Demonstrations of secure coding (e.g., parameterized queries, salted hashes) are vital for real-world readiness."
+        ]
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "description": "Project readme (French) briefly stating examples for INF5190.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/Ajax/enonce.md",
+          "description": "Exercises outlining Ajax usage, including instructions to create a database-backed route and query more data via XMLHttpRequest.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/Api/enonce.md",
+          "description": "Instructions for building a RESTful API for a book catalog in JSON, including CRUD routes in Flask.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/BD/enonce.md",
+          "description": "Exercise instructions on SQLite usage in Python—creating and querying a music database, reading file data, etc.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/BD/input.txt",
+          "description": "Sample data for the BD exercise (albums, artists, year).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/Flask-1/enonce.md",
+          "description": "Introductory exercise on Flask—creating a simple form, routes, and basic server-side validation.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/Flask-2/enonce.md",
+          "description": "Exercise on building a more complete web application with Flask, including a SQLite DB, form validation, and listing data.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/HTTP/enonce.md",
+          "description": "Exercise on understanding and inspecting HTTP requests and responses with Chrome DevTools.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/JSON/Exercice2.json",
+          "description": "Example JSON timesheet data for an exercise.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/JSON/Exercice3.json",
+          "description": "Example JSON medical dossier data for an exercise.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/JSON/Exercice4.json",
+          "description": "Example JSON listing of course data (sigle, groupe, trimestre, etc.).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/JSON/enonce.md",
+          "description": "Instructions on JSON format, validation, transformations, and modeling for a medical record and courses list.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/JSON/json_avec_erreurs.json",
+          "description": "A JSON file intentionally containing syntax errors for a correction exercise.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/JSON/json_sans_erreurs.json",
+          "description": "A corrected version of the same JSON data from json_avec_erreurs.json.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/MailAuth/enonce.md",
+          "description": "Exercises for sending emails and handling user authentication flows in a Flask app.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/MotDePasse/enonce.md",
+          "description": "Lab instructions for handling password storage (salt+hash) within an application.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/Python/enonce.md",
+          "description": "Python fundamentals and assignment for reading data from files, computing invoices, writing to text files, etc.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/XML/Exercice2.xml",
+          "description": "Example XML medical dossier for an exercise on structured data.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/XML/enonce.md",
+          "description": "XML-based exercises on validation, modeling medical data, and error corrections.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Ateliers/XML/xml_avec_erreurs.xml",
+          "description": "An XML file with intentional syntax errors for validation exercises.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/ajax/database.py",
+          "description": "Flask database helper class for location data (countries, provinces, cities).",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Database",
+              "description": "Manages SQLite connection and queries for location data.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Initializes the Database object, no parameters except self.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "Constructor does not return anything."
+                  }
+                },
+                {
+                  "name": "get_connection",
+                  "description": "Returns an active SQLite connection, creating one if needed.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "sqlite3.Connection",
+                    "description": "The active SQLite connection."
+                  }
+                },
+                {
+                  "name": "disconnect",
+                  "description": "Closes the connection if it exists.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "No direct return."
+                  }
+                },
+                {
+                  "name": "get_pays",
+                  "description": "Fetches all countries from the DB.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "list",
+                    "description": "List of (id, name) for each country."
+                  }
+                },
+                {
+                  "name": "get_provinces",
+                  "description": "Fetches provinces for a given country ID.",
+                  "parameters": [
+                    {
+                      "name": "pays_id",
+                      "type": "int",
+                      "description": "Country ID to filter provinces."
+                    }
+                  ],
+                  "returns": {
+                    "type": "list",
+                    "description": "List of (id, name) for each province."
+                  }
+                },
+                {
+                  "name": "get_villes",
+                  "description": "Fetches cities for a given province ID.",
+                  "parameters": [
+                    {
+                      "name": "province_id",
+                      "type": "int",
+                      "description": "Province ID to filter cities."
+                    }
+                  ],
+                  "returns": {
+                    "type": "list",
+                    "description": "List of (id, name) for each city."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "connection",
+                  "type": "sqlite3.Connection or None",
+                  "description": "Holds the database connection."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "sqlite3",
+              "purpose": "Database connectivity."
+            }
+          ]
+        },
+        {
+          "path": "Flask/ajax/index.py",
+          "description": "Flask routes returning HTML fragments (provinces, cities) and rendering a form, demonstrating Ajax usage.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "flask",
+              "purpose": "Flask framework (Flask, render_template, g)."
+            },
+            {
+              "module": ".database",
+              "purpose": "Local Database class for queries."
+            }
+          ]
+        },
+        {
+          "path": "Flask/ajax/makefile",
+          "description": "Makefile for running the Flask app via `flask run`.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/ajax/db/location.sql",
+          "description": "SQL schema and inserts for country/province/city data used in the Ajax example.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/ajax/static/js/script.js",
+          "description": "JavaScript for dynamically updating province/city options based on country selection via Ajax calls.",
+          "functions": [
+            {
+              "name": "onPaysChange",
+              "description": "Triggered on country select change; fetches provinces list with XMLHttpRequest.",
+              "parameters": [],
+              "returns": {
+                "type": "None",
+                "description": "Updates the DOM with new province options."
+              }
+            },
+            {
+              "name": "onProvinceChange",
+              "description": "Triggered on province select change; fetches city list with XMLHttpRequest.",
+              "parameters": [],
+              "returns": {
+                "type": "None",
+                "description": "Updates the DOM with new city options."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/ajax/templates/form.html",
+          "description": "HTML form to choose name, country, province, city, using dynamic <select> fields updated by Ajax.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/ajax/templates/provinces.html",
+          "description": "HTML snippet that populates province <option> elements (Ajax response).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/ajax/templates/villes.html",
+          "description": "HTML snippet that populates city <option> elements (Ajax response).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/api/database.py",
+          "description": "Similar to ajax/database.py, but includes an additional method add_pays for inserting new countries.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Database",
+              "description": "Handles SQLite connection for country/province/city data with an insert method for countries.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Initializes the Database object, no parameters except self.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "Constructor."
+                  }
+                },
+                {
+                  "name": "get_connection",
+                  "description": "Returns or creates an active SQLite connection.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "sqlite3.Connection",
+                    "description": "Database connection."
+                  }
+                },
+                {
+                  "name": "disconnect",
+                  "description": "Closes the connection if it exists.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "No direct return value."
+                  }
+                },
+                {
+                  "name": "get_pays",
+                  "description": "Selects all countries from DB.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "list",
+                    "description": "List of (id, name)."
+                  }
+                },
+                {
+                  "name": "add_pays",
+                  "description": "Inserts a new country record.",
+                  "parameters": [
+                    {
+                      "name": "nom",
+                      "type": "str",
+                      "description": "Name of the country."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Commits changes to DB."
+                  }
+                },
+                {
+                  "name": "get_provinces",
+                  "description": "Selects provinces given a country ID.",
+                  "parameters": [
+                    {
+                      "name": "pays_id",
+                      "type": "int",
+                      "description": "Country ID."
+                    }
+                  ],
+                  "returns": {
+                    "type": "list",
+                    "description": "List of (id, name)."
+                  }
+                },
+                {
+                  "name": "get_villes",
+                  "description": "Selects cities for a given province ID.",
+                  "parameters": [
+                    {
+                      "name": "province_id",
+                      "type": "int",
+                      "description": "Province ID."
+                    }
+                  ],
+                  "returns": {
+                    "type": "list",
+                    "description": "List of (id, name)."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "connection",
+                  "type": "sqlite3.Connection or None",
+                  "description": "Holds the database connection."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "sqlite3",
+              "purpose": "Database connectivity."
+            }
+          ]
+        },
+        {
+          "path": "Flask/api/index.py",
+          "description": "Flask routes for both HTML and a JSON API. Demonstrates GET/POST endpoints, JSON responses for countries, provinces, cities, and insertion of new countries.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "flask",
+              "purpose": "Main Flask objects and request handling."
+            },
+            {
+              "module": ".database",
+              "purpose": "Database class with methods for reading/inserting location data."
+            }
+          ]
+        },
+        {
+          "path": "Flask/api/makefile",
+          "description": "Makefile for running the Flask API example with `flask run`.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/api/db/location.sql",
+          "description": "Same schema/inserts as the ajax example, used here for the REST API demonstration.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/api/static/js/script.js",
+          "description": "Similar Ajax-based JavaScript code as in the ajax example, plus a function sendPays() for POSTing new country data via JSON.",
+          "functions": [
+            {
+              "name": "onPaysChange",
+              "description": "Updates province dropdown via an XHR GET to /provinces/<pays>.",
+              "parameters": [],
+              "returns": {
+                "type": "None",
+                "description": "Modifies the DOM."
+              }
+            },
+            {
+              "name": "onProvinceChange",
+              "description": "Updates city dropdown via an XHR GET to /villes/<province>.",
+              "parameters": [],
+              "returns": {
+                "type": "None",
+                "description": "Modifies the DOM."
+              }
+            },
+            {
+              "name": "sendPays",
+              "description": "Posts a new country name as JSON to /api/pays/.",
+              "parameters": [],
+              "returns": {
+                "type": "None",
+                "description": "Alerts success or logs server error."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/api/templates/form.html",
+          "description": "HTML form template for name, fname, location plus an extra field to add new countries.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/api/templates/provinces.html",
+          "description": "HTML snippet for the dynamic province dropdown (API-based).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/api/templates/villes.html",
+          "description": "HTML snippet for the dynamic city dropdown (API-based).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/cookies/database.py",
+          "description": "Database code for a cookies-based Flask example, focusing on retrieving artist data from a music.db file.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Database",
+              "description": "Connects to a local SQLite DB of artists, retrieving single or multiple rows.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Initializes the class; sets connection to None.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "Constructor."
+                  }
+                },
+                {
+                  "name": "get_connection",
+                  "description": "Gets or creates the SQLite connection.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "sqlite3.Connection",
+                    "description": "The active DB connection."
+                  }
+                },
+                {
+                  "name": "disconnect",
+                  "description": "Closes the connection.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "No direct return."
+                  }
+                },
+                {
+                  "name": "get_artists",
+                  "description": "Returns a list of all artists.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "list",
+                    "description": "List of artists with fields id, nom, est_solo, nombre_individus."
+                  }
+                },
+                {
+                  "name": "get_artist",
+                  "description": "Returns a single artist by ID.",
+                  "parameters": [
+                    {
+                      "name": "identifier",
+                      "type": "int",
+                      "description": "Artist ID."
+                    }
+                  ],
+                  "returns": {
+                    "type": "dict or None",
+                    "description": "Artist data if found, otherwise None."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "sqlite3",
+              "purpose": "Database connectivity"
+            }
+          ]
+        },
+        {
+          "path": "Flask/cookies/index.py",
+          "description": "Flask app that sets a cookie with the last viewed artist ID, and shows a 'recently visited artist' on the homepage.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "flask",
+              "purpose": "Flask objects (Flask, render_template, request, make_response)."
+            },
+            {
+              "module": ".database",
+              "purpose": "Local Database class to query artists."
+            }
+          ]
+        },
+        {
+          "path": "Flask/cookies/makefile",
+          "description": "Makefile to run the cookies example with `flask run`.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/cookies/db/musique.sql",
+          "description": "SQLite schema for 'musique.db' with an 'artiste' table that the cookies example queries.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/cookies/templates/404.html",
+          "description": "Custom 404 page for unknown artists.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/cookies/templates/accueil.html",
+          "description": "Homepage listing all artists and showing the last visited artist from the cookie.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/cookies/templates/artiste.html",
+          "description": "Artist details page, sets the 'last visited' cookie upon viewing.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/db/database.py",
+          "description": "Flask example code for basic artist/album DB queries and insertion of a new artist.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Database",
+              "description": "Handles a SQLite DB (musique.db) with queries for artists and albums.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Initialize the DB object; no param except self.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "Constructor."
+                  }
+                },
+                {
+                  "name": "get_connection",
+                  "description": "Gets the SQLite connection or creates it.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "sqlite3.Connection",
+                    "description": "Active connection."
+                  }
+                },
+                {
+                  "name": "disconnect",
+                  "description": "Closes the connection.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "No return."
+                  }
+                },
+                {
+                  "name": "get_artists",
+                  "description": "Returns a list of artist names.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "list",
+                    "description": "List of string (artist names)."
+                  }
+                },
+                {
+                  "name": "get_albums",
+                  "description": "Returns a list of album titles.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "list",
+                    "description": "List of album titles."
+                  }
+                },
+                {
+                  "name": "insert_artist",
+                  "description": "Inserts a new artist record with default values for est_solo/nombre_individus.",
+                  "parameters": [
+                    {
+                      "name": "name",
+                      "type": "str",
+                      "description": "Artist name."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Commits the new artist to DB."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "sqlite3",
+              "purpose": "Database connectivity."
+            }
+          ]
+        },
+        {
+          "path": "Flask/db/index.py",
+          "description": "Flask routes demonstrating forms, listing artists/albums, and adding new artists.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "flask",
+              "purpose": "Flask objects (Flask, render_template, request, redirect)."
+            },
+            {
+              "module": ".database",
+              "purpose": "Database class for queries."
+            }
+          ]
+        },
+        {
+          "path": "Flask/db/makefile",
+          "description": "Makefile for launching the DB-based Flask app.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/db/db/musique.sql",
+          "description": "Creates tables (artiste, maison_disque, album) and inserts test data for the DB example.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/db/templates/2listes-vides.html",
+          "description": "Template demonstrating logic when artists/albums lists are empty.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/db/templates/2listes.html",
+          "description": "Template showing two lists (artists, albums).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/db/templates/accueil.html",
+          "description": "Simple landing page with a link to view artists or forms.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/db/templates/artistes.html",
+          "description": "Lists all artist names from the DB.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/db/templates/form.html",
+          "description": "Form to create a new artist record, includes validation and error messages.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/files/database.py",
+          "description": "Flask example storing profile data with optional picture upload in SQLite (BLOB).",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Database",
+              "description": "Handles creation and retrieval of profiles and pictures (BLOB data).",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Initializes the DB handle.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "Constructor."
+                  }
+                },
+                {
+                  "name": "get_connection",
+                  "description": "Gets or creates a connection to profiles.db.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "sqlite3.Connection",
+                    "description": "Database connection."
+                  }
+                },
+                {
+                  "name": "disconnect",
+                  "description": "Closes the DB connection.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "No direct return."
+                  }
+                },
+                {
+                  "name": "create_profile",
+                  "description": "Inserts a new profile record referencing a picture ID.",
+                  "parameters": [
+                    {
+                      "name": "firstname",
+                      "type": "str",
+                      "description": "User's first name."
+                    },
+                    {
+                      "name": "lastname",
+                      "type": "str",
+                      "description": "User's last name."
+                    },
+                    {
+                      "name": "pic_id",
+                      "type": "str",
+                      "description": "Unique image identifier or None."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Commits changes."
+                  }
+                },
+                {
+                  "name": "create_picture",
+                  "description": "Inserts the picture data (as BLOB) into the pictures table.",
+                  "parameters": [
+                    {
+                      "name": "pic_id",
+                      "type": "str",
+                      "description": "Unique ID for the picture."
+                    },
+                    {
+                      "name": "file_data",
+                      "type": "File-like object",
+                      "description": "Binary data representing the picture."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Commits BLOB record to DB."
+                  }
+                },
+                {
+                  "name": "load_picture",
+                  "description": "Fetches the BLOB data by picture ID.",
+                  "parameters": [
+                    {
+                      "name": "pic_id",
+                      "type": "str",
+                      "description": "Picture ID to query."
+                    }
+                  ],
+                  "returns": {
+                    "type": "bytes or None",
+                    "description": "Binary image data or None if not found."
+                  }
+                },
+                {
+                  "name": "get_profiles",
+                  "description": "Fetches all profiles with their associated picture IDs.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "list",
+                    "description": "List of dictionaries, each with prenom, nom, photo keys."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "sqlite3",
+              "purpose": "Database connectivity for profiles/pictures."
+            }
+          ]
+        },
+        {
+          "path": "Flask/files/index.py",
+          "description": "Flask app that handles uploading a user photo, storing it as a BLOB, and serving it at /image/<pic_id>.png.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "flask",
+              "purpose": "Core Flask classes and methods (Flask, render_template, request, redirect, Response)."
+            },
+            {
+              "module": ".database",
+              "purpose": "Database class for saving/loading profiles and pictures."
+            },
+            {
+              "module": "uuid",
+              "purpose": "Generating unique hex IDs for uploaded pictures."
+            }
+          ]
+        },
+        {
+          "path": "Flask/files/makefile",
+          "description": "Makefile for running the Flask file upload example.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/files/db/profiles.sql",
+          "description": "Schema for storing profile info and images (BLOB) in an SQLite DB.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/files/templates/confirmation.html",
+          "description": "Template listing all profiles after a new one is created, including a thumbnail for the uploaded image.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/files/templates/formulaire.html",
+          "description": "Form for creating a profile with optional photo upload.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/files/templates/layout.html",
+          "description": "Base HTML layout used by the confirmation and form pages in this example.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/form/index.py",
+          "description": "A basic Flask app processing a form that captures personal data. Demonstrates form fields, radio buttons, checkboxes, etc.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "flask",
+              "purpose": "Flask, request handling, redirect, etc."
+            }
+          ]
+        },
+        {
+          "path": "Flask/form/makefile",
+          "description": "Makefile for running the basic form example with `flask run`.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/form/templates/formulaire.html",
+          "description": "HTML form collecting a variety of personal data (name, birthday, email, username, salary range, etc.).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/form/templates/merci.html",
+          "description": "A simple 'thank you' page displayed after form submission.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/hello_world/index.py",
+          "description": "Minimal Flask 'hello world' example returning static HTML.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "flask",
+              "purpose": "Basic Flask server"
+            }
+          ]
+        },
+        {
+          "path": "Flask/hello_world/makefile",
+          "description": "Makefile for the simple Hello World example.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/jberger/index.py",
+          "description": "Flask app serving an 'accueil' page and an 'inf3005' page, with a Bootstrap-based layout.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "flask",
+              "purpose": "Flask and render_template."
+            }
+          ]
+        },
+        {
+          "path": "Flask/jberger/makefile",
+          "description": "Makefile for the jberger example with `flask run`.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/jberger/static/vendor/bootstrap/css/bootstrap-theme.css",
+          "description": "Minified/compiled Bootstrap theme CSS for styling the jberger example pages.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/jberger/static/vendor/bootstrap/js/npm.js",
+          "description": "Helper JS used by Bootstrap's bundling, references additional scripts.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/jberger/templates/accueil.html",
+          "description": "Bootstrap-based homepage with articles, social links, and navigation to courses or other sections.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/jberger/templates/inf3005.html",
+          "description": "Course page for INF3005 with a schedule table, references to labs, etc.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/jberger-extends/index.py",
+          "description": "Similar to jberger but uses Jinja template inheritance with a separate layout.html.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "flask",
+              "purpose": "Flask, render_template."
+            }
+          ]
+        },
+        {
+          "path": "Flask/jberger-extends/makefile",
+          "description": "Makefile for jberger-extends example.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/jberger-extends/static/vendor/bootstrap/css/bootstrap-theme.css",
+          "description": "Bootstrap theme CSS for jberger-extends example (similar to jberger).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/jberger-extends/static/vendor/bootstrap/js/npm.js",
+          "description": "Bootstrap’s npm-based JS references for jberger-extends example.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/jberger-extends/templates/accueil.html",
+          "description": "Extended from layout.html, shows blog posts and Twitter feed, similar to jberger example.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/jberger-extends/templates/inf3005.html",
+          "description": "Extended from layout.html, provides the INF3005 schedule layout.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/jberger-extends/templates/layout.html",
+          "description": "Base layout with a navbar and a bootstrap container, used by child templates via Jinja extends.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/login/database.py",
+          "description": "Handles user creation, login sessions, storing salted/hashed passwords in a 'users.db' database.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Database",
+              "description": "Manages user table (for credentials) and sessions table (for active sessions).",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Sets connection to None.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "Constructor."
+                  }
+                },
+                {
+                  "name": "get_connection",
+                  "description": "Returns or creates the DB connection to 'users.db'.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "sqlite3.Connection",
+                    "description": "Active connection."
+                  }
+                },
+                {
+                  "name": "disconnect",
+                  "description": "Closes the connection, if any.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "No direct return."
+                  }
+                },
+                {
+                  "name": "create_user",
+                  "description": "Inserts a user record with salted+hashed password.",
+                  "parameters": [
+                    {
+                      "name": "username",
+                      "type": "str",
+                      "description": "User's chosen name."
+                    },
+                    {
+                      "name": "email",
+                      "type": "str",
+                      "description": "User's email address."
+                    },
+                    {
+                      "name": "salt",
+                      "type": "str",
+                      "description": "Random salt hex for hashing."
+                    },
+                    {
+                      "name": "hashed_password",
+                      "type": "str",
+                      "description": "Result of hashing password+salt."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Commits new user to DB."
+                  }
+                },
+                {
+                  "name": "get_user_login_info",
+                  "description": "Retrieves (salt, hash) for a given username.",
+                  "parameters": [
+                    {
+                      "name": "username",
+                      "type": "str",
+                      "description": "User's name to look up."
+                    }
+                  ],
+                  "returns": {
+                    "type": "tuple or None",
+                    "description": "(salt, hash) if user exists, else None."
+                  }
+                },
+                {
+                  "name": "save_session",
+                  "description": "Inserts a new session record.",
+                  "parameters": [
+                    {
+                      "name": "id_session",
+                      "type": "str",
+                      "description": "Unique session token."
+                    },
+                    {
+                      "name": "username",
+                      "type": "str",
+                      "description": "Associated username."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Commits new session to DB."
+                  }
+                },
+                {
+                  "name": "delete_session",
+                  "description": "Removes the specified session record from DB.",
+                  "parameters": [
+                    {
+                      "name": "id_session",
+                      "type": "str",
+                      "description": "Session token to remove."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Commits session deletion."
+                  }
+                },
+                {
+                  "name": "get_session",
+                  "description": "Retrieves username associated with a session token.",
+                  "parameters": [
+                    {
+                      "name": "id_session",
+                      "type": "str",
+                      "description": "Session ID."
+                    }
+                  ],
+                  "returns": {
+                    "type": "str or None",
+                    "description": "Username if the session is valid, else None."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "sqlite3",
+              "purpose": "DB connectivity"
+            }
+          ]
+        },
+        {
+          "path": "Flask/login/index.py",
+          "description": "Flask login system with session cookies, salted-hash authentication, and user creation route.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "flask",
+              "purpose": "Flask server, session management, etc."
+            },
+            {
+              "module": ".database",
+              "purpose": "Database class for user & session records."
+            },
+            {
+              "module": "hashlib",
+              "purpose": "SHA-512 hashing for passwords."
+            },
+            {
+              "module": "uuid",
+              "purpose": "Generating session tokens & salt hex if needed."
+            },
+            {
+              "module": "functools",
+              "purpose": "Used for the @wraps decorator in authentication_required."
+            }
+          ]
+        },
+        {
+          "path": "Flask/login/makefile",
+          "description": "Makefile to run the login Flask app.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/login/db/users.sql",
+          "description": "Schema for a 'users' table (username, salt, hash) and 'sessions' table (session ID, username).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/login/templates/accueil.html",
+          "description": "Home page showing whether a user is logged in or not, plus a login form if not.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/login/templates/confirmation.html",
+          "description": "Simple confirmation page after account creation.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/login/templates/formulaire.html",
+          "description": "Form to create a user account (username, password, email).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/login/templates/layout.html",
+          "description": "Base layout for the login example.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/rest/database.py",
+          "description": "Database logic for a RESTful API managing a 'person' table, using a Person class wrapper.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Database",
+              "description": "Reads, writes, and deletes Person objects in person.db.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Initializes DB connection to None.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "Constructor."
+                  }
+                },
+                {
+                  "name": "get_connection",
+                  "description": "Returns or creates the SQLite connection.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "sqlite3.Connection",
+                    "description": "The active DB connection."
+                  }
+                },
+                {
+                  "name": "disconnect",
+                  "description": "Closes the connection if non-null.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "No direct return."
+                  }
+                },
+                {
+                  "name": "read_all_persons",
+                  "description": "Fetches all rows from the person table as Person objects.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "list",
+                    "description": "List of Person objects."
+                  }
+                },
+                {
+                  "name": "read_one_person",
+                  "description": "Fetches a single Person by rowid, returns None if not found.",
+                  "parameters": [
+                    {
+                      "name": "id",
+                      "type": "int",
+                      "description": "RowID in the DB."
+                    }
+                  ],
+                  "returns": {
+                    "type": "Person or None",
+                    "description": "Person instance or None."
+                  }
+                },
+                {
+                  "name": "save_person",
+                  "description": "Insert or update a Person record in the table, sets Person.id if newly created.",
+                  "parameters": [
+                    {
+                      "name": "person",
+                      "type": "Person",
+                      "description": "Person object to save."
+                    }
+                  ],
+                  "returns": {
+                    "type": "Person",
+                    "description": "Same Person object with updated ID if inserted."
+                  }
+                },
+                {
+                  "name": "delete_person",
+                  "description": "Removes the Person row from the DB.",
+                  "parameters": [
+                    {
+                      "name": "person",
+                      "type": "Person",
+                      "description": "The object to delete (by id)."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Commits deletion."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "sqlite3",
+              "purpose": "DB connectivity"
+            },
+            {
+              "module": ".person",
+              "purpose": "The Person class model."
+            }
+          ]
+        },
+        {
+          "path": "Flask/rest/doc.raml",
+          "description": "RAML API specification documenting the /api/person endpoints (GET, POST, PUT, DELETE).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/rest/index.py",
+          "description": "Flask RESTful endpoints for person records, uses JSON Schema for validation, handles CRUD with a Person model.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "flask",
+              "purpose": "Core Flask classes and request/response handling."
+            },
+            {
+              "module": "flask_json_schema",
+              "purpose": "JSON schema validation for incoming data."
+            },
+            {
+              "module": ".database",
+              "purpose": "DB read/write operations for Person objects."
+            },
+            {
+              "module": ".schemas",
+              "purpose": "JSON schemas for new or updated Person data."
+            }
+          ]
+        },
+        {
+          "path": "Flask/rest/makefile",
+          "description": "Generates doc.html from doc.raml using raml2html, then runs the Flask app.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/rest/person.py",
+          "description": "Defines the Person class with id, lastname, firstname, age, plus a method asDictionary().",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Person",
+              "description": "Model object representing a row in the person table.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Initialize a Person with id, lastname, firstname, age.",
+                  "parameters": [
+                    {
+                      "name": "id",
+                      "type": "int or None",
+                      "description": "Row ID or None if new."
+                    },
+                    {
+                      "name": "lastname",
+                      "type": "str",
+                      "description": "Person's last name."
+                    },
+                    {
+                      "name": "firstname",
+                      "type": "str",
+                      "description": "Person's first name."
+                    },
+                    {
+                      "name": "age",
+                      "type": "int",
+                      "description": "Person's age."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Constructor."
+                  }
+                },
+                {
+                  "name": "asDictionary",
+                  "description": "Returns a dict version of the Person’s data for JSON serialization.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "dict",
+                    "description": "Includes keys: id, lastname, firstname, age."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": []
+        },
+        {
+          "path": "Flask/rest/schemas.py",
+          "description": "Defines the JSON schemas for a new Person (no id) vs. updating an existing Person (requires id).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/rest/db/person.sql",
+          "description": "SQLite create table statement for person (lastname, firstname, age).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/rest/templates/doc.html",
+          "description": "HTML documentation (generated from doc.raml) describing the /api/person REST endpoints.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Flask/user-agent/index.py",
+          "description": "Flask route that prints the user-agent header to stdout, a demonstration of request headers.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "flask",
+              "purpose": "Flask and request object."
+            }
+          ]
+        },
+        {
+          "path": "Flask/user-agent/makefile",
+          "description": "Makefile to run the user-agent example.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "JSON/library.json",
+          "description": "JSON array describing library items (type: book/article, title, authors, year).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "JSON/timesheet.json",
+          "description": "JSON representation of an employee timesheet with daily project minutes, example for data manipulation.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Python/classes.py",
+          "description": "Simple class Person demonstrating constructor, methods, and dynamic attribute assignment in Python.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Person",
+              "description": "Represents a person with first/last name and optional age.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Constructor with firstname, lastname.",
+                  "parameters": [
+                    {
+                      "name": "firstname",
+                      "type": "str",
+                      "description": "Person's first name."
+                    },
+                    {
+                      "name": "lastname",
+                      "type": "str",
+                      "description": "Person's last name."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "No return."
+                  }
+                },
+                {
+                  "name": "get_complete_name",
+                  "description": "Returns 'firstname lastname'.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "str",
+                    "description": "Full name."
+                  }
+                },
+                {
+                  "name": "set_age",
+                  "description": "Sets the person's age as a new attribute.",
+                  "parameters": [
+                    {
+                      "name": "age",
+                      "type": "int",
+                      "description": "Age to assign."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "No direct return."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": []
+        },
+        {
+          "path": "Python/dictionnaire.py",
+          "description": "Shows Python dict usage: accessing, looping, deleting keys, adding new keys.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Python/exception.py",
+          "description": "Demonstrates basic try/except usage when a file is missing.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Python/files.py",
+          "description": "Example of reading/writing files, checking file existence with os.path.exists.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "os.path",
+              "purpose": "To check if a file exists."
+            }
+          ]
+        },
+        {
+          "path": "Python/fonctions.py",
+          "description": "Demonstrates function definitions, returning values, referencing a function in a variable.",
+          "functions": [
+            {
+              "name": "print_error_message",
+              "description": "Prints an error message with today's date.",
+              "parameters": [
+                {
+                  "name": "message",
+                  "type": "str",
+                  "description": "Error detail to display."
+                }
+              ],
+              "returns": {
+                "type": "None",
+                "description": "No return (prints to console)."
+              }
+            },
+            {
+              "name": "get_today",
+              "description": "Returns the current date via datetime.",
+              "parameters": [],
+              "returns": {
+                "type": "date",
+                "description": "Today's date object."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "datetime",
+              "purpose": "To get today's date."
+            }
+          ]
+        },
+        {
+          "path": "Python/hello.py",
+          "description": "Basic hello world print statement.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Python/heritage.py",
+          "description": "Demonstrates class inheritance in Python with Person, Student, Teacher examples.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Person",
+              "description": "Base class with firstname, lastname, age.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Sets up the person's name and age.",
+                  "parameters": [
+                    {
+                      "name": "firstname",
+                      "type": "str",
+                      "description": "First name."
+                    },
+                    {
+                      "name": "lastname",
+                      "type": "str",
+                      "description": "Last name."
+                    },
+                    {
+                      "name": "age",
+                      "type": "int",
+                      "description": "Age."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "No direct return."
+                  }
+                },
+                {
+                  "name": "get_complete_name",
+                  "description": "Returns 'firstname lastname'.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "str",
+                    "description": "Full name."
+                  }
+                }
+              ],
+              "attributes": []
+            },
+            {
+              "name": "Student",
+              "description": "Inherits from Person, adds a student code.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Extends Person with a code attribute.",
+                  "parameters": [
+                    {
+                      "name": "firstname",
+                      "type": "str",
+                      "description": "First name."
+                    },
+                    {
+                      "name": "lastname",
+                      "type": "str",
+                      "description": "Last name."
+                    },
+                    {
+                      "name": "age",
+                      "type": "int",
+                      "description": "Age."
+                    },
+                    {
+                      "name": "code",
+                      "type": "str",
+                      "description": "Student code (e.g. STES12129701)."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Constructor."
+                  }
+                },
+                {
+                  "name": "get_complete_name",
+                  "description": "Overrides the base method to include [code].",
+                  "parameters": [],
+                  "returns": {
+                    "type": "str",
+                    "description": "'firstname lastname [code]'."
+                  }
+                }
+              ],
+              "attributes": []
+            },
+            {
+              "name": "Teacher",
+              "description": "Inherits from Person, overrides get_complete_name.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Extends Person with an employee_number.",
+                  "parameters": [
+                    {
+                      "name": "firstname",
+                      "type": "str",
+                      "description": "First name."
+                    },
+                    {
+                      "name": "lastname",
+                      "type": "str",
+                      "description": "Last name."
+                    },
+                    {
+                      "name": "age",
+                      "type": "int",
+                      "description": "Teacher's age."
+                    },
+                    {
+                      "name": "employee_number",
+                      "type": "str",
+                      "description": "Some internal employee ID."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Constructor."
+                  }
+                },
+                {
+                  "name": "get_complete_name",
+                  "description": "Overrides to return a comedic string instead of normal name.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "str",
+                    "description": "\"A Teacher Has No Name\""
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": []
+        },
+        {
+          "path": "Python/hilo.py",
+          "description": "A simple number-guessing game with a random target from 1..100 and limited tries.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "random",
+              "purpose": "Generate a random number for the game."
+            }
+          ]
+        },
+        {
+          "path": "Python/listes.py",
+          "description": "Examples of Python list usage: iteration, indexing, range() usage.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Python/mathsEx.py",
+          "description": "Shows basic arithmetic, boolean comparisons, variable usage, average calculations.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Python/service-web.py",
+          "description": "Demonstrates calling a local Flask API with the requests library, performing GET/POST.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "requests",
+              "purpose": "HTTP calls to local API."
+            }
+          ]
+        },
+        {
+          "path": "Python/strings.py",
+          "description": "String usage in Python: quotes, multiline, formatting, length, and printing examples.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Python/input/input1",
+          "description": "Sample text about interview preparation, used in file reading examples.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Python/input/input2",
+          "description": "File with simple list of names, used in reading single lines example.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Python/modules/main.py",
+          "description": "Demonstrates importing local modules (person, student, teacher) and using them.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "person",
+              "purpose": "Defines the base Person class."
+            },
+            {
+              "module": "student",
+              "purpose": "Defines the Student subclass."
+            },
+            {
+              "module": "teacher",
+              "purpose": "Defines the Teacher subclass."
+            }
+          ]
+        },
+        {
+          "path": "Python/modules/person.py",
+          "description": "Defines a Person class identical to heritage's version, for module import demonstration.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Person",
+              "description": "Stores a first/last name and age.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Constructor sets up the person's data.",
+                  "parameters": [
+                    {
+                      "name": "firstname",
+                      "type": "str",
+                      "description": "First name."
+                    },
+                    {
+                      "name": "lastname",
+                      "type": "str",
+                      "description": "Last name."
+                    },
+                    {
+                      "name": "age",
+                      "type": "int",
+                      "description": "Age."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Constructor."
+                  }
+                },
+                {
+                  "name": "get_complete_name",
+                  "description": "Returns 'firstname lastname'.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "str",
+                    "description": "Full name."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": []
+        },
+        {
+          "path": "Python/modules/student.py",
+          "description": "Defines a Student subclass of Person, including a student code property.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Student",
+              "description": "Inherits from Person, overriding get_complete_name to include code.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Constructs the Person fields plus a code.",
+                  "parameters": [
+                    {
+                      "name": "firstname",
+                      "type": "str",
+                      "description": "First name."
+                    },
+                    {
+                      "name": "lastname",
+                      "type": "str",
+                      "description": "Last name."
+                    },
+                    {
+                      "name": "age",
+                      "type": "int",
+                      "description": "Age."
+                    },
+                    {
+                      "name": "code",
+                      "type": "str",
+                      "description": "Student code."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Constructor."
+                  }
+                },
+                {
+                  "name": "get_complete_name",
+                  "description": "Appends [code] to the parent's full name.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "str",
+                    "description": "fullname plus [code]."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "person",
+              "purpose": "Imports the Person base class."
+            }
+          ]
+        },
+        {
+          "path": "Python/modules/teacher.py",
+          "description": "Defines a Teacher subclass of Person, with an employee_number and custom get_complete_name.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "Teacher",
+              "description": "Inherits from Person, overrides name method.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Sets up Person plus employee_number.",
+                  "parameters": [
+                    {
+                      "name": "firstname",
+                      "type": "str",
+                      "description": "First name."
+                    },
+                    {
+                      "name": "lastname",
+                      "type": "str",
+                      "description": "Last name."
+                    },
+                    {
+                      "name": "age",
+                      "type": "int",
+                      "description": "Teacher age."
+                    },
+                    {
+                      "name": "employee_number",
+                      "type": "str",
+                      "description": "Teacher ID."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Constructor."
+                  }
+                },
+                {
+                  "name": "get_complete_name",
+                  "description": "Always returns 'A Teacher Has No Name'.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "str",
+                    "description": "Fixed comedic string."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "person",
+              "purpose": "Imports the Person base class."
+            }
+          ]
+        },
+        {
+          "path": "SQLite/insert-update.py",
+          "description": "Demonstrates inserting and updating an artist in musique.db, retrieving last insert row ID, etc.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "sqlite3",
+              "purpose": "SQL operations on musique.db."
+            }
+          ]
+        },
+        {
+          "path": "SQLite/musique.sql",
+          "description": "Schema definitions for artiste, maison_disque, album, plus test data for each.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "SQLite/no_injection.py",
+          "description": "Shows safe parameterized insert, preventing SQL injection with placeholders (?).",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "sqlite3",
+              "purpose": "Database operations."
+            }
+          ]
+        },
+        {
+          "path": "SQLite/select.py",
+          "description": "Example of a simple SELECT query over the album table and printing the results.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "sqlite3",
+              "purpose": "Database connectivity."
+            }
+          ]
+        },
+        {
+          "path": "SQLite/sql_injection.py",
+          "description": "Illustrates how naive string concatenation can lead to dropping tables via injection.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "sqlite3",
+              "purpose": "Used for executescript demonstration."
+            }
+          ]
+        },
+        {
+          "path": "auth/check.py",
+          "description": "Prompts user for a username and password, checks against a stored salted hash in users.db.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "hashlib",
+              "purpose": "For SHA-512 hashing."
+            },
+            {
+              "module": "sqlite3",
+              "purpose": "DB connectivity."
+            },
+            {
+              "module": "uuid",
+              "purpose": "Not used in this example, but imported in similar scripts."
+            }
+          ]
+        },
+        {
+          "path": "auth/insert.py",
+          "description": "Prompts user for credentials, salts and hashes the password, then inserts to users.db.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "hashlib",
+              "purpose": "SHA-512 hashing."
+            },
+            {
+              "module": "sqlite3",
+              "purpose": "DB connectivity."
+            },
+            {
+              "module": "uuid",
+              "purpose": "Generate a salt hex."
+            }
+          ]
+        },
+        {
+          "path": "auth/users.sql",
+          "description": "Schema for a 'users' table storing (username, salt, hash).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "email/gmail.py",
+          "description": "Shows how to send an email using Python's smtplib and the Gmail SMTP server, including plain text body and subject.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "smtplib",
+              "purpose": "SMTP client for sending emails."
+            },
+            {
+              "module": "email.mime.text",
+              "purpose": "To create a text MIME part."
+            },
+            {
+              "module": "email.mime.multipart",
+              "purpose": "To construct a multipart email message."
+            }
+          ]
+        }
+      ]
+    }
+  }
+  

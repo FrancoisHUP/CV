@@ -1,0 +1,127 @@
+{
+    "project": {
+      "name": "gitArchiver",
+      "description": {
+        "summary": "A simple Python script (with accompanying README files) designed to archive and remove outdated Git branches except for designated ones (e.g., master).",
+        "problem_solved": "Helps keep Git repositories clean by automating the process of tagging and deleting branches that are no longer needed, minimizing clutter in development workflows.",
+        "impact": "Reduces manual overhead and human error when cleaning up Git branches, thereby streamlining repository maintenance.",
+        "technologies": [
+          "Python",
+          "Git"
+        ],
+        "role": "Developer",
+        "challenges": [
+          "Handling potential failures in subprocess calls and ensuring branches are properly archived before deletion.",
+          "Dealing with command-line argument parsing and managing special characters in branch names."
+        ],
+        "relevance": "Demonstrates scripting and automation skills using Python for DevOps tasks, aligning with broader goals of efficient software lifecycle management."
+      },
+      "architecture": {
+        "overview": "A straightforward single-script system that reads command-line arguments, tags branches for archiving, and then deletes them if they do not belong to a protected list.",
+        "components": [
+          {
+            "name": "Command-Line Interface",
+            "description": "Main entry point for users to specify the Git repository path and optional arguments (silence, force, delete)."
+          },
+          {
+            "name": "Branch Archiver",
+            "description": "Contains the logic for tagging branches and conditionally deleting them from the repository."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Use subprocess to execute Git commands directly from the Python script.",
+            "reasoning": "Subprocess allows for granular control and real-time feedback from Git commands without requiring additional libraries."
+          },
+          {
+            "decision": "Maintain a list of branches to keep (e.g., master, appro).",
+            "reasoning": "Prevents accidental deletion of critical branches while automating the cleanup process."
+          }
+        ],
+        "performance_optimizations": [],
+        "lessons_learned": [
+          "Ensuring that command-line parsing handles all edge cases and optional flags.",
+          "Tagging branches before deletion provides a quick way to restore them if needed."
+        ]
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "description": "High-level usage instructions and introduction to the gitArchiver script.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "READEME.md",
+          "description": "Appears to be a duplicate or misspelled README file providing similar usage instructions for the gitArchiver script.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "gitArchiver.py",
+          "description": "The main Python script responsible for archiving and deleting Git branches based on specified criteria.",
+          "functions": [
+            {
+              "name": "archiver",
+              "description": "Archives branches by tagging them with 'archive/' and then deletes them if they are not in the protected list.",
+              "parameters": [
+                {
+                  "name": "gitDirPath",
+                  "type": "str",
+                  "description": "Normalized path to the local Git repository."
+                },
+                {
+                  "name": "silence",
+                  "type": "bool",
+                  "description": "When True, suppresses console output."
+                },
+                {
+                  "name": "force",
+                  "type": "bool",
+                  "description": "When True, forcibly deletes branches even if not merged."
+                },
+                {
+                  "name": "delete",
+                  "type": "bool",
+                  "description": "When True, deletes branches even if an archive with the same name already exists."
+                }
+              ],
+              "returns": {
+                "type": "None",
+                "description": "No return value; performs Git tagging and deletion as a side effect."
+              }
+            },
+            {
+              "name": "main",
+              "description": "Entry point for the script; parses command-line arguments and calls archiver with the appropriate flags.",
+              "parameters": [],
+              "returns": {
+                "type": "None",
+                "description": "No direct return value; orchestrates the script's flow."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "subprocess",
+              "purpose": "Used to execute Git commands via shell."
+            },
+            {
+              "module": "sys",
+              "purpose": "Provides access to command-line arguments."
+            },
+            {
+              "module": "os",
+              "purpose": "Used for normalizing file paths."
+            }
+          ]
+        }
+      ]
+    }
+  }
+  
