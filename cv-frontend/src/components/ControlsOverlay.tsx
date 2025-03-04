@@ -2,8 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 
 interface ControlsOverlayProps {
-	onMoveChange?: (data: { x: number; y: number }) => void;
-	onRotateChange?: (data: { x: number; y: number }) => void;
+  onMoveChange?: (data: { x: number; y: number }) => void;
+  onRotateChange?: (data: { x: number; y: number }) => void;
   isMobile?: boolean;
 }
 
@@ -13,15 +13,20 @@ interface TouchData {
   y: number;
 }
 
-const clamp = (val: number, min = -20, max = 20) => Math.max(Math.min(val, max), min);
+const clamp = (val: number, min = -20, max = 20) =>
+  Math.max(Math.min(val, max), min);
 
-const ControlsOverlay = ({ onMoveChange, onRotateChange, isMobile = false }: ControlsOverlayProps) => {
+const ControlsOverlay = ({
+  onMoveChange,
+  onRotateChange,
+  isMobile = false,
+}: ControlsOverlayProps) => {
   // Only use overlay visibility for non-mobile
   const [isVisible, setIsVisible] = useState(true);
   const [bubbleVisible, setBubbleVisible] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [pressedKey, setPressedKey] = useState<string | null>(null);
-  
+
   // New states for joystick knob offsets
   const [leftKnob, setLeftKnob] = useState({ x: 0, y: 0 });
   const [rightKnob, setRightKnob] = useState({ x: 0, y: 0 });
@@ -90,12 +95,18 @@ const ControlsOverlay = ({ onMoveChange, onRotateChange, isMobile = false }: Con
   // Left joystick handlers (for user movement) with multi-touch support
   const handleLeftTouchStart = (e: React.TouchEvent) => {
     const touch = e.changedTouches[0];
-    leftStart.current = { id: touch.identifier, x: touch.clientX, y: touch.clientY };
+    leftStart.current = {
+      id: touch.identifier,
+      x: touch.clientX,
+      y: touch.clientY,
+    };
     setLeftKnob({ x: 0, y: 0 });
   };
   const handleLeftTouchMove = (e: React.TouchEvent) => {
     if (!leftStart.current) return;
-    const touch = Array.from(e.touches).find(t => t.identifier === leftStart.current!.id);
+    const touch = Array.from(e.touches).find(
+      (t) => t.identifier === leftStart.current!.id
+    );
     if (!touch) return;
     const deltaX = touch.clientX - leftStart.current.x;
     const deltaY = touch.clientY - leftStart.current.y;
@@ -105,7 +116,9 @@ const ControlsOverlay = ({ onMoveChange, onRotateChange, isMobile = false }: Con
   };
   const handleLeftTouchEnd = (e: React.TouchEvent) => {
     if (!leftStart.current) return;
-    const touch = Array.from(e.changedTouches).find(t => t.identifier === leftStart.current!.id);
+    const touch = Array.from(e.changedTouches).find(
+      (t) => t.identifier === leftStart.current!.id
+    );
     if (touch) {
       leftStart.current = null;
       setLeftKnob({ x: 0, y: 0 });
@@ -116,12 +129,18 @@ const ControlsOverlay = ({ onMoveChange, onRotateChange, isMobile = false }: Con
   // Right joystick handlers (for camera view) with multi-touch support
   const handleRightTouchStart = (e: React.TouchEvent) => {
     const touch = e.changedTouches[0];
-    rightStart.current = { id: touch.identifier, x: touch.clientX, y: touch.clientY };
+    rightStart.current = {
+      id: touch.identifier,
+      x: touch.clientX,
+      y: touch.clientY,
+    };
     setRightKnob({ x: 0, y: 0 });
   };
   const handleRightTouchMove = (e: React.TouchEvent) => {
     if (!rightStart.current) return;
-    const touch = Array.from(e.touches).find(t => t.identifier === rightStart.current!.id);
+    const touch = Array.from(e.touches).find(
+      (t) => t.identifier === rightStart.current!.id
+    );
     if (!touch) return;
     const deltaX = touch.clientX - rightStart.current.x;
     const deltaY = touch.clientY - rightStart.current.y;
@@ -130,7 +149,9 @@ const ControlsOverlay = ({ onMoveChange, onRotateChange, isMobile = false }: Con
   };
   const handleRightTouchEnd = (e: React.TouchEvent) => {
     if (!rightStart.current) return;
-    const touch = Array.from(e.changedTouches).find(t => t.identifier === rightStart.current!.id);
+    const touch = Array.from(e.changedTouches).find(
+      (t) => t.identifier === rightStart.current!.id
+    );
     if (touch) {
       rightStart.current = null;
       setRightKnob({ x: 0, y: 0 });
@@ -184,7 +205,9 @@ const ControlsOverlay = ({ onMoveChange, onRotateChange, isMobile = false }: Con
               {["A", "S", "D"].map((key) => (
                 <motion.div
                   key={key}
-                  animate={{ scale: pressedKey === key.toLowerCase() ? 1.2 : 1 }}
+                  animate={{
+                    scale: pressedKey === key.toLowerCase() ? 1.2 : 1,
+                  }}
                   className="w-12 h-12 bg-gray-100 text-black flex items-center justify-center rounded-md"
                 >
                   {key}
@@ -232,17 +255,19 @@ const ControlsOverlay = ({ onMoveChange, onRotateChange, isMobile = false }: Con
             onTouchEnd={handleLeftTouchEnd}
           >
             {/* Joystick knob visual */}
-            <div style={{
-              width: 70,
-              height: 70,
-              background: "rgba(255,255,255,0.2)",
-              borderRadius: "50%",
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: `translate(-50%, -50%) translate(${leftKnob.x}px, ${leftKnob.y}px)`,
-              pointerEvents: "none"
-            }} />
+            <div
+              style={{
+                width: 70,
+                height: 70,
+                background: "rgba(255,255,255,0.2)",
+                borderRadius: "50%",
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: `translate(-50%, -50%) translate(${leftKnob.x}px, ${leftKnob.y}px)`,
+                pointerEvents: "none",
+              }}
+            />
             {/* ...existing code... */}
           </div>
           <div
@@ -263,17 +288,19 @@ const ControlsOverlay = ({ onMoveChange, onRotateChange, isMobile = false }: Con
             onTouchEnd={handleRightTouchEnd}
           >
             {/* Joystick knob visual */}
-            <div style={{
-              width: 70,
-              height: 70,
-              background: "rgba(255,255,255,0.2)",
-              borderRadius: "50%",
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: `translate(-50%, -50%) translate(${rightKnob.x}px, ${rightKnob.y}px)`,
-              pointerEvents: "none"
-            }} />
+            <div
+              style={{
+                width: 70,
+                height: 70,
+                background: "rgba(255,255,255,0.2)",
+                borderRadius: "50%",
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: `translate(-50%, -50%) translate(${rightKnob.x}px, ${rightKnob.y}px)`,
+                pointerEvents: "none",
+              }}
+            />
             {/* ...existing code... */}
           </div>
         </>

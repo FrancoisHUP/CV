@@ -25,11 +25,11 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: #ffffff;
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: #bebebe;
 }
 
 
@@ -62,7 +62,7 @@ h1 {
 button {
   border-radius: 8px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
+  padding: 0.6em 1.0em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
@@ -71,12 +71,54 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: #929292;
 }
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.17);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(13.7px);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #252525 transparent;
+}
+
+/* WebKit Browsers */
+*::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  /* Use a gradient that will animate by shifting its background position */
+  background-size: 200% 200%;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+  animation: animate-scrollbar 4s ease infinite;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.7);
+}
+
+
 
 /* @media (prefers-color-scheme: light) {
   :root {
