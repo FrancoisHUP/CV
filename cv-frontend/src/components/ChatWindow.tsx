@@ -1,11 +1,20 @@
+// src/components/ChatWindow.tsx
 import { useState, useRef, useEffect } from "react";
 
-const ChatWindow = ({ onClose }: { onClose: () => void }) => {
+const apiUrl = import.meta.env.VITE_API_URL as string;
+
+interface ChatWindowProps {
+  onClose: () => void;
+  onResponseChange: (response: string) => void;
+}
+
+const ChatWindow = ({ onClose, onResponseChange }: ChatWindowProps) => {
   const [input, setInput] = useState("");
-  const [response, setResponse] = useState<string | null>(null);
+  const [streamedResponse, setStreamedResponse] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-expand textarea but keep max height with scrolling
+  // Auto-expand the textarea on input change.
   useEffect(() => {
     if (textareaRef.current) {
       setTimeout(() => {
@@ -15,17 +24,17 @@ const ChatWindow = ({ onClose }: { onClose: () => void }) => {
       textareaRef.current.style.height = `${Math.min(
         textareaRef.current.scrollHeight,
         400
-      )}px`; // Expand up to max height
+      )}px`;
     }
   }, [input]);
-  // Listen for key events when the AI response is visible.
+
+  // Listen for key events for closing chat.
   useEffect(() => {
-    if (response) {
+    if (streamedResponse) {
       const handleResponseKeyDown = (event: KeyboardEvent) => {
         if (event.key === "Enter" && !event.shiftKey) {
           event.preventDefault();
-          // Dismiss the AI response and re-enable the text area
-          setResponse(null);
+          setStreamedResponse("");
           setTimeout(() => {
             textareaRef.current?.focus();
           }, 0);
@@ -40,65 +49,110 @@ const ChatWindow = ({ onClose }: { onClose: () => void }) => {
         window.removeEventListener("keydown", handleResponseKeyDown);
       };
     }
-  }, [response, onClose]);
+  }, [streamedResponse, onClose]);
 
-  // Handle user input submission
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) {
-      onClose(); // If input is empty, close the chat
+      onClose();
       return;
     }
-
-    setResponse("I'm thinking..."); // Fake AI response
+    // Clear previous AI response.
+    onResponseChange("");
+    setIsStreaming(true);
+    const currentInput = input;
     setInput("");
 
-    setTimeout(() => {
-      setResponse("This is a fake AI response."); // Simulate AI response after delay
-    }, 1000);
+    try {
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: currentInput }),
+      });
+
+      if (!res.body) {
+        console.error("No response body");
+        setIsStreaming(false);
+        return;
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let done = false;
+
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          // Process each "data:" line in the stream.
+          const lines = chunk.split("\n");
+          for (const line of lines) {
+            if (line.trim().startsWith("data:")) {
+              const jsonStr = line.replace("data:", "").trim();
+              if (!jsonStr) continue;
+              try {
+                const parsed = JSON.parse(jsonStr);
+                const candidateText =
+                  parsed?.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (candidateText !== undefined) {
+                  // Update the parent with the latest candidate text.
+                  // setStreamedResponse(candidateText);
+                  onResponseChange(candidateText);
+                }
+              } catch (err) {
+                console.error("Error parsing JSON:", err);
+              }
+            }
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error("Error during fetch:", err);
+    }
+    setIsStreaming(false);
   };
 
   return (
     <div
-      className="absolute bottom-5 left-1/2 transform -translate-x-1/2 w-2/3 p-3 flex items-center"
+      className="absolute bottom-9 left-1/2 transform -translate-x-1/2 w-2/3 p-3 flex items-center"
       onKeyDown={(e) => e.stopPropagation()}
     >
-      {/* If AI response is present, show it. Otherwise, show input box */}
-      {response ? (
+      {streamedResponse ? (
         <div
           className="text-white px-4 py-2 rounded-3xl max-w-full"
           onClick={onClose}
         >
-          {response}
+          {streamedResponse}
         </div>
       ) : (
-        <textarea
-          ref={textareaRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            e.stopPropagation();
-            if (e.key === "Escape") {
-              onClose();
-            }
-            if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              if (!input.trim()) {
-                console.log("Should close");
-                onClose(); // Closes chat if input is empty
-              } else {
-                console.log("Should Send", input);
-                handleSend(); // Sends message if input has content
+        <div className="flex w-full">
+          <button onClick={onClose} className="!bg-transparent w-10 h-10 !p-2">
+            ✖
+          </button>
+
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.key === "Escape") {
+                onClose();
               }
-            }
-          }}
-          className="flex-grow text-white px-4 py-2 rounded-3xl focus:outline-none resize-none overflow-y-auto"
-          placeholder="Ask me anything..."
-          rows={1}
-          style={{
-            maxHeight: "400px", // Max height for scrolling
-            minHeight: "40px", // Minimum height
-          }}
-        />
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            className="flex-grow text-white px-4 py-2 rounded-3xl focus:outline-none resize-none overflow-y-auto"
+            placeholder="Ask me anything..."
+            rows={1}
+            style={{
+              maxHeight: "400px",
+              minHeight: "40px",
+            }}
+          />
+        </div>
       )}
     </div>
   );

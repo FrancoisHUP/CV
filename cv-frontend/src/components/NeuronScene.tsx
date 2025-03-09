@@ -1,3 +1,4 @@
+// cv-frontend/src/components/NeuronScene.tsx
 import { useRef, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { FlyControls } from "@react-three/drei";
@@ -5,6 +6,7 @@ import ControlsOverlay from "./ControlsOverlay";
 import Particles from "./Particles";
 import Fairy from "./Fairy";
 import ChatWindow from "./ChatWindow";
+// import ChatPanel3D from "./ChatPanel3D"; // Import the new 3D chat panel
 import Node from "./Node";
 import Connection from "./Connections";
 import InfoPanel from "./InfoPanel";
@@ -32,6 +34,7 @@ type FlattenedGraph = {
   connections: ConnectionType[];
 };
 
+// ... flattenTree function and CameraController remain unchanged ...
 function flattenTree(root: any): FlattenedGraph {
   const nodes: NodeType[] = [];
   const connections: ConnectionType[] = [];
@@ -91,6 +94,7 @@ const CameraController = ({
 const NeuronScene = () => {
   const [speed, setSpeed] = useState(10);
   const [chatOpen, setChatOpen] = useState(false);
+  const [aiResponse, setAiResponse] = useState("");
   const [exploded, setExploded] = useState(false);
   const [labelsActive, setLabelsActive] = useState(false);
   const controlsRef = useRef<any>(null);
@@ -104,6 +108,7 @@ const NeuronScene = () => {
       navigator.userAgent
     );
 
+  // ... existing useEffects for mouse/pointer events, key listeners, graph data, etc. ...
   useEffect(() => {
     const handleGlobalMouseUp = (event: MouseEvent) => {
       // Only handle genuine user events (isTrusted is true)
@@ -204,16 +209,20 @@ const NeuronScene = () => {
       .catch((error) => console.error("Error loading graph data:", error));
   }, []);
 
-  // Choose which node info to show: if one is selected, show that; otherwise show hovered node.
-  const activeNode = selectedNode;
-
   return (
     <div className="relative w-full h-full">
-      <Canvas camera={{ position: [0, 0, 10], fov: 100 }}>
+      <Canvas
+        camera={{ position: [0, 0, 10], fov: 100 }}
+        dpr={[window.devicePixelRatio, 2]}
+      >
         <ambientLight intensity={0.5} />
         <pointLight position={[5, 5, 5]} intensity={1} />
         <Particles count={1000} />
-        <Fairy onChatOpen={() => setChatOpen(true)} isChatOpen={chatOpen} />
+        <Fairy
+          onChatOpen={() => setChatOpen(true)}
+          isChatOpen={chatOpen}
+          aiMessage={aiResponse}
+        />
         {graphData &&
           graphData.nodes.map((node) => {
             const isRoot =
@@ -236,7 +245,6 @@ const NeuronScene = () => {
                 onRootClick={
                   isRoot ? () => setExploded((prev) => !prev) : undefined
                 }
-                // For non-root nodes, clicking locks the info panel.
                 onSelect={
                   !isRoot ? (nodeData) => setSelectedNode(nodeData) : undefined
                 }
@@ -279,7 +287,7 @@ const NeuronScene = () => {
           })}
         <FlyControls
           ref={controlsRef}
-          movementSpeed={speed}
+          movementSpeed={chatOpen ? 0 : speed}
           rollSpeed={2}
           dragToLook
         />
@@ -290,16 +298,26 @@ const NeuronScene = () => {
             mobileRotate={mobileRotate}
           />
         )}
+        {/* Render the 3D chat panel if the chat is open and there is an AI response */}
+        {/* {chatOpen && aiResponse && <ChatPanel3D message={aiResponse} />} */}
       </Canvas>
-      {chatOpen && <ChatWindow onClose={() => setChatOpen(false)} />}
+      {chatOpen && (
+        <ChatWindow
+          onClose={() => {
+            setChatOpen(false);
+            setAiResponse("");
+          }}
+          onResponseChange={setAiResponse}
+        />
+      )}
       <ControlsOverlay
         onMoveChange={setMobileMove}
         onRotateChange={setMobileRotate}
         isMobile={isMobile}
       />
-      {activeNode && graphData && (
+      {selectedNode && graphData && (
         <InfoPanel
-          activeNode={activeNode}
+          activeNode={selectedNode}
           graphNodes={graphData.nodes}
           onClose={() => {
             setSelectedNode(null);

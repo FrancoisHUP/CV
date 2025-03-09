@@ -36,7 +36,7 @@ const Node = ({
   const [isHovered, setIsHovered] = useState(false);
 
   const originalPos = useMemo(() => new THREE.Vector3(...position), [position]);
-  const explosionFactor = 10000;
+  const explosionFactor = 20000;
   const explodedPos = useMemo(
     () => originalPos.clone().multiplyScalar(explosionFactor),
     [originalPos]

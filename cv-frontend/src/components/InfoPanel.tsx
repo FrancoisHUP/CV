@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { NodeType } from "./NeuronScene";
-import GitHubLogo from "../assets/github-logo.svg";
+import OpenOnGithub from "./OpenOnGithub";
 
 type InfoPanelProps = {
   activeNode: NodeType;
@@ -74,7 +74,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
         </div>
         {/* Close Button */}
         <button
-          className="relative bg-black opacity-70 shadow-lg rounded-full"
+          className="w-12 h-12 bg-gray-100 flex items-center justify-center opacity-70 shadow-lg rounded-md"
           onClick={(e) => {
             e.stopPropagation();
             onClose();
@@ -84,32 +84,12 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
           ✖
         </button>
       </div>
-      <h4 className="flex items-center justify-between text-4xl font-extrabold mb-2 leading-none">
+      <h4 className="flex items-center justify-between text-4xl font-extrabold mb-6 leading-none">
         {activeNode.name}
       </h4>
 
       {/* GitHub Button */}
-      {activeNode.link && (
-        <a
-          href={activeNode.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-stretch mt-2 bg-gray-900 hover:bg-gray-700 text-white text-lg font-semibold rounded-lg shadow-md transition duration-300 ease-in-out border border-gray-600 hover:border-white"
-          title="Open on GitHub"
-        >
-          {/* Left Part: GitHub Logo (Full Height) */}
-          <div className="flex items-center justify-center bg-white px-3 rounded-l-lg">
-            <img
-              src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-              alt="GitHub Logo"
-              className="w-8 h-8"
-            />
-          </div>
-
-          {/* Right Part: Text (Takes Only Required Width) */}
-          <span className="px-4 py-2">Open on GitHub</span>
-        </a>
-      )}
+      {activeNode.link && <OpenOnGithub githubLink={activeNode.link} />}
 
       {activeNode.details && (
         <>

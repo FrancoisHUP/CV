@@ -3,6 +3,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=Sigmar&display=swap");
 
 @import "tailwindcss";
+@import 'katex/dist/katex.min.css';
+
+.katex .katex-mathml {
+  position: absolute;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 0;
+  border: 0;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+}
 
 @theme {
   --font-inconsolata: "Inconsolata", sans-serif; 
@@ -118,6 +129,29 @@ button:focus-visible {
   box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.7);
 }
 
+.active-sort {
+  background-color: white !important;
+  color: #242424;
+}
+
+.border-animate {
+  border-color: rgba(255, 255, 255, 0.3);
+  transition: border-color 0.3s ease-in-out;
+}
+
+.border-animate:hover {
+  border-color: white;
+}
+
+
+@keyframes floatLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-110vw);
+  }
+}
 
 
 /* @media (prefers-color-scheme: light) {
