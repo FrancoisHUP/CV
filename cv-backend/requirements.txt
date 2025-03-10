@@ -1,0 +1,8 @@
+Flask
+nltk
+openai
+numpy
+gunicorn
+flasgger 
+dotenv
+flask_cors

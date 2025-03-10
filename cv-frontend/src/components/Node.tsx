@@ -2,19 +2,20 @@ import { useRef, useState, useEffect, useMemo } from "react";
 import { Billboard, Html } from "@react-three/drei";
 import gsap from "gsap";
 import * as THREE from "three";
+import { NodeType } from "./NeuronScene";
 
 type NodeProps = {
-  data: any; // Ideally, type this as NodeType.
+  data: NodeType;
   position: [number, number, number];
   title: string;
   color: string;
   size: number;
-  link: string;
+  link?: string;
   exploded?: boolean;
   labelsActive?: boolean;
   onRootClick?: () => void;
-  onSelect?: (node: any) => void;
-  onHover?: (node: any) => void;
+  onSelect?: (node: NodeType) => void;
+  onHover?: (node: NodeType) => void;
   onHoverOut?: () => void;
 };
 
@@ -24,7 +25,6 @@ const Node = ({
   title,
   color,
   size,
-  link,
   exploded = false,
   labelsActive = false,
   onRootClick,
@@ -36,7 +36,7 @@ const Node = ({
   const [isHovered, setIsHovered] = useState(false);
 
   const originalPos = useMemo(() => new THREE.Vector3(...position), [position]);
-  const explosionFactor = 10000;
+  const explosionFactor = 20000;
   const explodedPos = useMemo(
     () => originalPos.clone().multiplyScalar(explosionFactor),
     [originalPos]
@@ -101,7 +101,7 @@ const Node = ({
             center
             position={[0, 0.8, 0]}
             pointerEvents="none"
-            distanceFactor={20} // adjust as needed for consistent scale
+            distanceFactor={20}
           >
             <div className="bg-gray-800 text-white p-2 text-sm rounded shadow-lg opacity-90 transition-opacity duration-200 ease-in-out">
               {title}

@@ -112,7 +112,7 @@ const ControlsOverlay = ({
     const deltaY = touch.clientY - leftStart.current.y;
     setLeftKnob({ x: clamp(deltaX), y: clamp(deltaY) });
     // Invert deltaY to fix forward/backward movement
-    onMoveChange && onMoveChange({ x: deltaX / 50, y: -deltaY / 50 });
+    onMoveChange?.({ x: deltaX / 50, y: -deltaY / 50 });
   };
   const handleLeftTouchEnd = (e: React.TouchEvent) => {
     if (!leftStart.current) return;
@@ -122,7 +122,7 @@ const ControlsOverlay = ({
     if (touch) {
       leftStart.current = null;
       setLeftKnob({ x: 0, y: 0 });
-      onMoveChange && onMoveChange({ x: 0, y: 0 });
+      onMoveChange?.({ x: 0, y: 0 });
     }
   };
 
@@ -145,7 +145,7 @@ const ControlsOverlay = ({
     const deltaX = touch.clientX - rightStart.current.x;
     const deltaY = touch.clientY - rightStart.current.y;
     setRightKnob({ x: clamp(deltaX), y: clamp(deltaY) });
-    onRotateChange && onRotateChange({ x: deltaX / 100, y: deltaY / 100 });
+    onRotateChange?.({ x: deltaX / 100, y: deltaY / 100 });
   };
   const handleRightTouchEnd = (e: React.TouchEvent) => {
     if (!rightStart.current) return;
@@ -155,7 +155,7 @@ const ControlsOverlay = ({
     if (touch) {
       rightStart.current = null;
       setRightKnob({ x: 0, y: 0 });
-      onRotateChange && onRotateChange({ x: 0, y: 0 });
+      onRotateChange?.({ x: 0, y: 0 });
     }
   };
 

@@ -1,3 +1,10 @@
 requests
 beautifulsoup4
 tqdm 
+sentence-transformers
+nltk
+rank-bm25
+google-auth
+tensorflow 
+tensorflow-hub
+openai

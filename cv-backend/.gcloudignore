@@ -1,0 +1,15 @@
+# Exclude local virtual environment
+
+.venv/
+env/
+**pycache**/
+_.pyc
+_.pyo
+_.pyd
+_.log
+.git/
+.gitignore
+tests/
+\*.md
+
+dockerfile

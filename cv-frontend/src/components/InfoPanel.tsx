@@ -1,12 +1,33 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { NodeType } from "./NeuronScene";
-import GitHubLogo from "../assets/github-logo.svg";
+import OpenOnGithub from "./OpenOnGithub";
 
 type InfoPanelProps = {
   activeNode: NodeType;
   graphNodes: NodeType[];
   onClose: () => void;
+};
+
+export type NodeDetails = {
+  description?: {
+    summary?: string;
+    problem_solved?: string;
+    impact?: string;
+    relevance?: string;
+    technologies?: string[];
+    role?: string;
+    challenges?: string[];
+  };
+  architecture?: {
+    overview?: string;
+    components?: { name: string; description: string }[];
+  };
+  technical_details?: {
+    design_decisions?: { decision: string; reasoning: string }[];
+    performance_optimizations?: { optimization: string; impact: string }[];
+    lessons_learned?: string[];
+  };
 };
 
 const InfoPanel: React.FC<InfoPanelProps> = ({
@@ -21,7 +42,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
     while (current) {
       path.push(current);
       if (current.parentId) {
-        current = nodes.find((n) => n.id === current.parentId);
+        current = nodes.find((n) => n.id === current?.parentId);
       } else {
         break;
       }
@@ -29,7 +50,6 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
     return path.reverse();
   };
 
-  // Listen for Escape key to close the panel.
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -40,9 +60,16 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  const description = activeNode.details?.description;
-  const architecture = activeNode.details?.architecture;
-  const technical = activeNode.details?.technical_details;
+  // 🔹 Fix: Parse details safely
+  const parsedDetails =
+    typeof activeNode.details === "string"
+      ? JSON.parse(activeNode.details)
+      : activeNode.details || {};
+
+  // Extract fields from parsedDetails
+  const description = parsedDetails?.description;
+  const architecture = parsedDetails?.architecture;
+  const technical = parsedDetails?.technical_details;
 
   return (
     <motion.div
@@ -74,7 +101,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
         </div>
         {/* Close Button */}
         <button
-          className="relative bg-black opacity-70 shadow-lg rounded-full"
+          className="w-12 h-12 bg-gray-100 flex items-center justify-center opacity-70 shadow-lg rounded-md"
           onClick={(e) => {
             e.stopPropagation();
             onClose();
@@ -84,32 +111,12 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
           ✖
         </button>
       </div>
-      <h4 className="flex items-center justify-between text-4xl font-extrabold mb-2 leading-none">
+      <h4 className="flex items-center justify-between text-4xl font-extrabold mb-6 leading-none">
         {activeNode.name}
       </h4>
 
       {/* GitHub Button */}
-      {activeNode.link && (
-        <a
-          href={activeNode.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-stretch mt-2 bg-gray-900 hover:bg-gray-700 text-white text-lg font-semibold rounded-lg shadow-md transition duration-300 ease-in-out border border-gray-600 hover:border-white"
-          title="Open on GitHub"
-        >
-          {/* Left Part: GitHub Logo (Full Height) */}
-          <div className="flex items-center justify-center bg-white px-3 rounded-l-lg">
-            <img
-              src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-              alt="GitHub Logo"
-              className="w-8 h-8"
-            />
-          </div>
-
-          {/* Right Part: Text (Takes Only Required Width) */}
-          <span className="px-4 py-2">Open on GitHub</span>
-        </a>
-      )}
+      {activeNode.link && <OpenOnGithub githubLink={activeNode.link} />}
 
       {activeNode.details && (
         <>

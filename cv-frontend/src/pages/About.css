@@ -1,0 +1,195 @@
+/* cv-frontend\src\pages\About.css */
+/* Animations */
+@keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translate(-30px, -50%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(-50%);
+    }
+  }
+  
+  @keyframes pulseLine {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+  }
+  
+  @keyframes pulseDot {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  
+  /* Vertical Navigation Timeline Container */
+  .vertical-nav {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    z-index: 1000;
+    animation: slideIn 1s ease-out;
+  }
+  
+  /* Dark Timeline Line */
+  .vertical-nav::before {
+    content: "";
+    position: absolute;
+    top: 20px;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 3px;
+    background: linear-gradient(180deg, #5a5a5a, #1a1a1a);
+    border-radius: 3px;
+    animation: pulseLine 3s infinite;
+  }
+  
+  /* Dot Styles for Dark Theme */
+  .nav-dot {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    background: radial-gradient(circle, #2e2e2e, #555);
+    border: 3px solid #888;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: pulseDot 2s infinite;
+  }
+  
+  .nav-dot:hover {
+    transform: scale(1.8);
+    box-shadow: 0 0 15px 5px rgba(200, 200, 200, 0.5);
+  }
+  
+  /* Tooltip with Dark Styling */
+  .nav-dot::after {
+    content: attr(data-label);
+    position: absolute;
+    left: 130%;
+    top: 50%;
+    transform: translateY(-50%) translateX(-10px) scale(0.8);
+    background: #333;
+    color: #eee;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .nav-dot:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0) scale(1);
+  }
+  
+  /* Base Section Styling for Dark Theme */
+  .section {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+    color: #eee;
+  }
+  
+  /* Landing Section - Dark Background */
+  .landing {
+    padding-top: 60px;
+    background: #1e1e1e;
+  }
+  
+  /* Dark Backgrounds for Other Sections */
+  .childhood {
+    background: #2c2c2c;
+  }
+  
+  .teenager {
+    background: #333;
+  }
+  
+  .young-adult {
+    background: #2a2a2a;
+  }
+  
+  .adult {
+    background: #222;
+  }
+  
+  /* Avatar Image Styling */
+  .avatar {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: 4px solid #888;
+  }
+  
+  /* Scroll Control Button Styling for Dark Theme */
+  .scroll-control {
+    margin-top: 20px;
+  }
+  
+  .scroll-control button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #444;
+    color: #eee;
+    border: 1px solid #666;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .scroll-control button:hover {
+    background-color: #555;
+  }
+  /* Scroll Control Button - Always fixed with smooth transition */
+.scroll-control {
+    position: fixed;
+    transition: all 1s ease;
+    z-index: 1100;
+  }
+  
+  /* Initial state: placed at bottom center */
+  .scroll-control.initial {
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  /* Fixed state: moves to top left */
+  .scroll-control.fixed {
+    top: 10px;
+    left: 10px;
+    transform: none;
+  }
+  
+  /* Button styling */
+  .scroll-control button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #444;
+    color: #eee;
+    border: 1px solid #666;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .scroll-control button:hover {
+    background-color: #555;
+  }

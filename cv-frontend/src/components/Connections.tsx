@@ -12,7 +12,7 @@ type ConnectionProps = {
 
 const Connection = ({ start, end, exploded = false }: ConnectionProps) => {
   const ref = useRef<THREE.Mesh>(null);
-  const explosionFactor = 10000; // Factor to scale positions when exploded is true
+  const explosionFactor = 20000; // Factor to scale positions when exploded is true
 
   // Compute effective positions based on exploded state.
   const effectivePositions = useMemo(() => {
