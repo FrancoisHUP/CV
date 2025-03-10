@@ -1,83 +1,168 @@
 import { useRef, useState, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
-import { FlyControls } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { FlyControls as DreiFlyControls } from "@react-three/drei";
+import { FlyControls as ThreeFlyControls } from "three-stdlib";
 import ControlsOverlay from "./ControlsOverlay";
 import Particles from "./Particles";
 import Fairy from "./Fairy";
 import ChatWindow from "./ChatWindow";
 import Node from "./Node";
 import Connection from "./Connections";
+import InfoPanel from "./InfoPanel";
+import { useThree } from "@react-three/fiber";
 
-type Project = {
-  id: number;
-  title: string;
+export type NodeType = {
+  id: string;
+  name: string;
+  label?: string;
   position: [number, number, number];
-  link: string;
+  color: string;
+  size: number;
+  link?: string;
+  type: string;
+  parentId?: string;
+  details?: string;
+  last_modified?: string;
+  children?: NodeType[];
 };
 
 type ConnectionType = {
-  from: number;
-  to: number;
+  from: string;
+  to: string;
 };
 
-// type Connection = {
-//   from: number;
-//   to: number;
-// };
+type FlattenedGraph = {
+  nodes: NodeType[];
+  connections: ConnectionType[];
+};
 
-// const projects: Project[] = [
-//   { id: 1, title: "Project A", position: [2, 1, 0], link: "/project-a" },
-//   { id: 2, title: "Project B", position: [-2, -1, 1], link: "/project-b" },
-//   { id: 3, title: "Project C", position: [1, -2, -1], link: "/project-c" },
-//   { id: 4, title: "Project D", position: [-1, 2, -1], link: "/project-d" },
-// ];
+function flattenTree(root: NodeType): FlattenedGraph {
+  const nodes: NodeType[] = [];
+  const connections: ConnectionType[] = [];
+  function traverse(node: NodeType, parentId?: string) {
+    const currentNode: NodeType = {
+      id: node.id,
+      name: node.name,
+      position: node.position,
+      color: node.color,
+      size: node.size,
+      link: node.link,
+      type: node.type,
+      parentId: parentId,
+      details: node.details,
+      last_modified: node.last_modified,
+    };
+    nodes.push(currentNode);
+    if (parentId) {
+      connections.push({ from: parentId, to: node.id });
+    }
+    if (node.children && node.children.length > 0) {
+      node.children.forEach((child: NodeType) => traverse(child, node.id));
+    }
+  }
+  traverse(root);
+  return { nodes, connections };
+}
 
-// const connections: Connection[] = [
-//   { from: 1, to: 2 },
-//   { from: 2, to: 3 },
-//   { from: 3, to: 1 },
-//   { from: 1, to: 4 },
-//   { from: 2, to: 4 },
-// ];
+const CameraController = ({
+  controlsRef,
+  mobileMove,
+  mobileRotate,
+}: {
+  controlsRef: React.MutableRefObject<ThreeFlyControls | null>;
+  mobileMove: { x: number; y: number };
+  mobileRotate: { x: number; y: number };
+}) => {
+  const yawRef = useRef(0);
+  const pitchRef = useRef(0);
+  useFrame((_, delta) => {
+    if (controlsRef.current) {
+      const { camera } = useThree();
+      camera.translateX(mobileMove.x * delta);
+      camera.translateZ(-mobileMove.y * delta);
+      yawRef.current -= mobileRotate.x * delta;
+      pitchRef.current -= mobileRotate.y * delta;
+      pitchRef.current = Math.max(
+        Math.min(pitchRef.current, Math.PI / 2 - 0.1),
+        -Math.PI / 2 + 0.1
+      );
+      camera.rotation.set(pitchRef.current, yawRef.current, 0);
+    }
+  });
+  return null;
+};
 
 const NeuronScene = () => {
-  const [speed, setSpeed] = useState(10); // Default speed
+  const [speed, setSpeed] = useState(10);
   const [chatOpen, setChatOpen] = useState(false);
+  const [aiResponse, setAiResponse] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
   const [exploded, setExploded] = useState(false);
-  const controlsRef = useRef<React.ElementRef<typeof FlyControls> | null>(null);
+  const [labelsActive, setLabelsActive] = useState(false);
+  const controlsRef = useRef<ThreeFlyControls | null>(null);
+  const [graphData, setGraphData] = useState<FlattenedGraph | null>(null);
+  const [mobileMove, setMobileMove] = useState({ x: 0, y: 0 });
+  const [mobileRotate, setMobileRotate] = useState({ x: 0, y: 0 });
+  const [selectedNode, setSelectedNode] = useState<NodeType | null>(null);
+  const [_, setHoveredNode] = useState<NodeType | null>(null);
+  const isMobile =
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
 
-  // State for graph data loaded from graph_3d.json
-  const [graphData, setGraphData] = useState<{
-    projects: Project[];
-    connections: ConnectionType[];
-  } | null>(null);
-
-  // Keyboard events for chat toggle
   useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === "Enter" && !chatOpen) {
-        setChatOpen(true);
-      }
-      if (event.key === "Escape") {
-        setChatOpen(false);
+    const handleGlobalMouseUp = (event: MouseEvent) => {
+      if (!event.isTrusted) return;
+      const canvas = document.querySelector("canvas");
+      if (canvas) {
+        canvas.dispatchEvent(new MouseEvent("mouseup", { bubbles: false }));
       }
     };
+    window.addEventListener("mouseup", handleGlobalMouseUp);
+    return () => window.removeEventListener("mouseup", handleGlobalMouseUp);
+  }, []);
 
+  useEffect(() => {
+    const canvas = document.querySelector("canvas");
+    if (!canvas) return;
+    const handlePointerLeave = () => {
+      canvas.dispatchEvent(new PointerEvent("pointerup", { bubbles: false }));
+    };
+    const handleWindowBlur = () => {
+      canvas.dispatchEvent(new PointerEvent("pointerup", { bubbles: false }));
+    };
+    canvas.addEventListener("pointerleave", handlePointerLeave);
+    window.addEventListener("blur", handleWindowBlur);
+    return () => {
+      canvas.removeEventListener("pointerleave", handlePointerLeave);
+      window.removeEventListener("blur", handleWindowBlur);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        if (selectedNode) {
+          setSelectedNode(null);
+        } else {
+          setChatOpen(false);
+          setAiResponse("");
+        }
+      }
+      if (event.key === "Enter" && !chatOpen) setChatOpen(true);
+    };
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [chatOpen]);
+  }, [chatOpen, selectedNode]);
 
-  // Keyboard events to adjust movement speed
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (chatOpen) return;
       if (event.shiftKey) setSpeed(30);
     };
-
     const handleKeyUp = () => {
       if (!chatOpen) setSpeed(10);
     };
-
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
     return () => {
@@ -86,77 +171,153 @@ const NeuronScene = () => {
     };
   }, [chatOpen]);
 
-  // Update FlyControls movement speed based on chat status
   useEffect(() => {
     if (controlsRef.current) {
       controlsRef.current.movementSpeed = chatOpen ? 0 : speed;
     }
   }, [chatOpen, speed]);
 
-  // Load graph data from graph_3d.json on component mount
+  useEffect(() => {
+    if (exploded) {
+      const timer = setTimeout(() => setLabelsActive(true), 1500);
+      return () => clearTimeout(timer);
+    } else {
+      setLabelsActive(false);
+    }
+  }, [exploded]);
+
   useEffect(() => {
     fetch("/graph_3d.json")
       .then((response) => response.json())
-      .then((data) => setGraphData(data))
+      .then((data) => {
+        if (data.root) {
+          const flattened = flattenTree(data.root);
+          setGraphData(flattened);
+        } else {
+          console.error("No 'root' key found in the JSON data.");
+        }
+      })
       .catch((error) => console.error("Error loading graph data:", error));
   }, []);
 
   return (
-    <div style={{ width: "100%", height: "100%" }}>
-      <Canvas camera={{ position: [0, 0, 10], fov: 100 }}>
-        {/* Lighting */}
+    <div className="relative w-full h-full">
+      <Canvas
+        camera={{ position: [0, 0, 10], fov: 100 }}
+        dpr={[window.devicePixelRatio, 2]}
+      >
         <ambientLight intensity={0.5} />
         <pointLight position={[5, 5, 5]} intensity={1} />
-
         <Particles count={1000} />
-        <Fairy onChatOpen={() => setChatOpen(true)} isChatOpen={chatOpen} />
-
-        {/* Render nodes from graph data if available */}
+        <Fairy
+          onChatOpen={() => setChatOpen(true)}
+          isChatOpen={chatOpen}
+          aiMessage={aiResponse}
+          isStreaming={isStreaming}
+        />
         {graphData &&
-          graphData.projects.map((project) => (
-            <Node
-              key={project.id}
-              position={project.position}
-              title={project.title}
-              link={project.link}
-              exploded={exploded}
-            />
-          ))}
-
-        {/* Render connections from graph data if available */}
-        {/* {graphData &&
-          graphData.connections.map((conn, index) => {
-            const fromNode = graphData.projects.find((p) => p.id === conn.from);
-            const toNode = graphData.projects.find((p) => p.id === conn.to);
-            return fromNode && toNode ? (
-              <Connection
-                key={index}
-                start={fromNode.position}
-                end={toNode.position}
-                exploded={exploded} // Pass the explosion state
+          graphData.nodes.map((node) => {
+            const isRoot =
+              node.id === "francoisHUP" || node.name === "FrancoisHUP";
+            return (
+              <Node
+                key={node.id}
+                data={{ ...node, label: node.name }}
+                position={[
+                  node.position[0] / 1000,
+                  node.position[1] / 1000,
+                  node.position[2] / 1000,
+                ]}
+                title={node.name}
+                color={node.color}
+                size={node.size}
+                link={node.link || ""}
+                exploded={exploded}
+                labelsActive={labelsActive}
+                onRootClick={
+                  isRoot ? () => setExploded((prev) => !prev) : undefined
+                }
+                onSelect={
+                  !isRoot
+                    ? (nodeData: NodeType) => setSelectedNode(nodeData)
+                    : undefined
+                }
+                onHover={
+                  !selectedNode
+                    ? (nodeData) => setHoveredNode(nodeData)
+                    : undefined
+                }
+                onHoverOut={
+                  !selectedNode ? () => setHoveredNode(null) : undefined
+                }
               />
-            ) : null;
-          })} */}
-        {/* Camera Controls */}
-        <FlyControls
+            );
+          })}
+        {graphData &&
+          graphData.connections.map((conn, index) => {
+            const fromNode = graphData.nodes.find((n) => n.id === conn.from);
+            const toNode = graphData.nodes.find((n) => n.id === conn.to);
+            if (fromNode && toNode) {
+              const startPos = fromNode.position.map((p) => p / 1000) as [
+                number,
+                number,
+                number
+              ];
+              const endPos = toNode.position.map((p) => p / 1000) as [
+                number,
+                number,
+                number
+              ];
+              return (
+                <Connection
+                  key={index}
+                  start={startPos}
+                  end={endPos}
+                  exploded={exploded}
+                />
+              );
+            }
+            return null;
+          })}
+        <DreiFlyControls
           ref={controlsRef}
-          movementSpeed={speed}
+          movementSpeed={chatOpen ? 0 : speed}
           rollSpeed={2}
           dragToLook
         />
+        {isMobile && (
+          <CameraController
+            controlsRef={controlsRef}
+            mobileMove={mobileMove}
+            mobileRotate={mobileRotate}
+          />
+        )}
       </Canvas>
-      {chatOpen && <ChatWindow onClose={() => setChatOpen(false)} />}
-      <ControlsOverlay />
-
-      {/* Explosion toggle button */}
-      <div style={{ position: "absolute", top: 20, right: 20, zIndex: 100 }}>
-        <button
-          onClick={() => setExploded((prev) => !prev)}
-          style={{ padding: "8px 12px" }}
-        >
-          {exploded ? "Reset Layout" : "Explode Nodes"}
-        </button>
-      </div>
+      {chatOpen && (
+        <ChatWindow
+          onClose={() => {
+            setChatOpen(false);
+            setAiResponse("");
+          }}
+          onResponseChange={setAiResponse}
+          onStreamingChange={setIsStreaming}
+        />
+      )}
+      <ControlsOverlay
+        onMoveChange={setMobileMove}
+        onRotateChange={setMobileRotate}
+        isMobile={isMobile}
+      />
+      {selectedNode && graphData && (
+        <InfoPanel
+          activeNode={selectedNode}
+          graphNodes={graphData.nodes}
+          onClose={() => {
+            setSelectedNode(null);
+            setHoveredNode(null);
+          }}
+        />
+      )}
     </div>
   );
 };

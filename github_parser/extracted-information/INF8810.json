@@ -1,0 +1,276 @@
+{
+    "project": {
+      "name": "Hadoop MapReduce with Docker",
+      "description": {
+        "summary": "A Dockerized Hadoop environment for running a WordCount MapReduce job. It simplifies setup and configuration for both HDFS and YARN, allowing users to compile and execute MapReduce jobs within a containerized environment.",
+        "problem_solved": "Eliminates the complexity of manually installing and configuring a Hadoop environment by leveraging Docker, making it easier to develop and test MapReduce jobs locally or in any environment that supports Docker.",
+        "impact": "By containerizing the entire Hadoop stack, the project accelerates the development cycle, reduces setup time, and ensures a consistent environment for running big data tasks. It improves accessibility for learners and professionals who want to experiment with Hadoop without investing heavily in hardware or complex configurations.",
+        "technologies": [
+          "Docker",
+          "Hadoop",
+          "Java",
+          "MapReduce",
+          "SSH",
+          "XML",
+          "Linux"
+        ],
+        "role": "Contributor/Developer",
+        "challenges": [
+          "Ensuring the Hadoop services (HDFS, YARN) and SSH were properly configured within the container",
+          "Managing environment variables, paths, and SSH key generation for seamless Hadoop operations",
+          "Creating a straightforward workflow with docker-compose for mounting code and data"
+        ],
+        "relevance": "Demonstrates expertise in containerization, DevOps practices, and Hadoop-based big data processing, aligning with broader goals of building scalable and maintainable data solutions."
+      },
+      "architecture": {
+        "overview": "A single-node Hadoop setup deployed in a Docker container. Dockerfile provisions Java, Hadoop, SSH, and essential configurations. docker-compose manages the container lifecycle, volume mounting for source code and data, and network settings. Users can compile and run the WordCount job against data stored in HDFS.",
+        "components": [
+          {
+            "name": "Docker Container (hadoop-container)",
+            "description": "Encapsulates the Java runtime, Hadoop binaries, SSH, and configuration files needed to run HDFS and YARN in a single-node environment."
+          },
+          {
+            "name": "MapReduce Application (WordCount)",
+            "description": "A sample Java-based MapReduce job demonstrating how to compile and run applications within the Dockerized Hadoop environment."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Containerize Hadoop services within a single Docker image",
+            "reasoning": "Reduces setup overhead and ensures consistency across development environments, allowing quicker iteration and testing of MapReduce applications."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "Volume mounting source code and data",
+            "impact": "Enables rapid code updates and data access without having to rebuild the Docker image for each change, streamlining the development workflow."
+          }
+        ],
+        "lessons_learned": [
+          "Managing Hadoop configuration and SSH services inside a Docker container can be complex but is simplified with a well-structured Dockerfile and scripts",
+          "docker-compose greatly reduces friction in orchestrating multi-file configurations and volumes",
+          "A single-node Hadoop environment is enough for testing and development but requires careful attention to environment variables and service starts"
+        ]
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "description": "Instructions on how to build and run the Docker container, connect to it (via VS Code or CLI), compile the WordCount job, and execute it on sample data in HDFS.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Dockerfile",
+          "description": "Builds the Docker image by installing OpenJDK, Hadoop, and SSH. Configures environment variables, sets up SSH keys, and defines startup scripts for Hadoop services.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "docker-compose.yml",
+          "description": "Defines the container service for Hadoop, specifying ports, volume mounts for code/data, environment variables, and networking details. Orchestrates a single-node Hadoop cluster.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "configs/core-site.xml",
+          "description": "Sets the default HDFS URI to hdfs://localhost:9000, indicating where Hadoop should locate its file system.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "configs/hadoop-env.sh",
+          "description": "Specifies environment variables for Hadoop, including JAVA_HOME, SSH options, and IPv6 settings, ensuring correct operation within the Docker container.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "configs/hdfs-site.xml",
+          "description": "Defines Hadoop Distributed File System (HDFS) properties, such as replication factor (set to 1 for single-node mode).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "configs/mapred-site.xml",
+          "description": "Configures MapReduce settings, ensuring that mapper and reducer tasks run with the correct Hadoop environment variables under YARN.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "configs/yarn-site.xml",
+          "description": "Specifies NodeManager's auxiliary services (e.g., mapreduce_shuffle), essential for running MapReduce jobs under YARN.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "src/WordCount.java",
+          "description": "Implements a basic MapReduce job to count the frequency of words in the provided input text. Uses a mapper to split lines into tokens and a reducer to sum their counts.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "WordCount",
+              "description": "Main class for the MapReduce job, setting up job configuration and orchestrating the mapper, reducer, input, and output paths.",
+              "methods": [
+                {
+                  "name": "main",
+                  "description": "Entry point that configures the job (mapper, reducer, combiner, key/value classes) and runs the job with the specified input and output paths.",
+                  "parameters": [
+                    {
+                      "name": "args",
+                      "type": "String[]",
+                      "description": "Command-line arguments specifying HDFS input and output paths."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "Terminates the application with a status code indicating success or failure of the MapReduce job."
+                  }
+                }
+              ],
+              "attributes": []
+            },
+            {
+              "name": "WordCount.TokenizerMapper",
+              "description": "Splits each line into tokens (words) and emits them with a count of 1, serving as the mapper class for the WordCount job.",
+              "methods": [
+                {
+                  "name": "map",
+                  "description": "Processes each line of text, tokenizes it, and writes out each word with a value of 1.",
+                  "parameters": [
+                    {
+                      "name": "key",
+                      "type": "Object",
+                      "description": "Byte offset of the current line in the input file (unused directly)."
+                    },
+                    {
+                      "name": "value",
+                      "type": "Text",
+                      "description": "The content of the current line being processed."
+                    },
+                    {
+                      "name": "context",
+                      "type": "Context",
+                      "description": "Provides access to the job configuration and collector for emitting key-value pairs."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "Writes out (word, 1) for each token in the input line."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "one",
+                  "type": "IntWritable",
+                  "description": "Constant representing the value '1' for each encountered word."
+                },
+                {
+                  "name": "word",
+                  "type": "Text",
+                  "description": "Holds the current token before emitting it as a key."
+                }
+              ]
+            },
+            {
+              "name": "WordCount.IntSumReducer",
+              "description": "Sums the counts for each word emitted by the mapper, serving as the reducer class for the WordCount job.",
+              "methods": [
+                {
+                  "name": "reduce",
+                  "description": "Aggregates the values for a particular word and emits the total count.",
+                  "parameters": [
+                    {
+                      "name": "key",
+                      "type": "Text",
+                      "description": "The word being aggregated."
+                    },
+                    {
+                      "name": "values",
+                      "type": "Iterable<IntWritable>",
+                      "description": "A list of counts (1s) for the given word."
+                    },
+                    {
+                      "name": "context",
+                      "type": "Context",
+                      "description": "Allows writing the reduced output and accessing job configuration."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "Writes out the (word, totalCount) to the final results."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "result",
+                  "type": "IntWritable",
+                  "description": "Stores the aggregated count for the current word before writing it out."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "org.apache.hadoop.conf.Configuration",
+              "purpose": "Used to configure the MapReduce job."
+            },
+            {
+              "module": "org.apache.hadoop.fs.Path",
+              "purpose": "Specifies the file system paths for input and output."
+            },
+            {
+              "module": "org.apache.hadoop.io.IntWritable",
+              "purpose": "Writable data type representing integer values within Hadoop."
+            },
+            {
+              "module": "org.apache.hadoop.io.Text",
+              "purpose": "Writable data type representing text (string) values."
+            },
+            {
+              "module": "org.apache.hadoop.mapreduce.Job",
+              "purpose": "Defines the job, including mapper, reducer, combiner, and relevant configurations."
+            },
+            {
+              "module": "org.apache.hadoop.mapreduce.Mapper",
+              "purpose": "Base class for implementing the Map step in MapReduce."
+            },
+            {
+              "module": "org.apache.hadoop.mapreduce.Reducer",
+              "purpose": "Base class for implementing the Reduce step in MapReduce."
+            },
+            {
+              "module": "org.apache.hadoop.mapreduce.lib.input.FileInputFormat",
+              "purpose": "Specifies where the job reads its input from."
+            },
+            {
+              "module": "org.apache.hadoop.mapreduce.lib.output.FileOutputFormat",
+              "purpose": "Specifies where the job writes its output."
+            },
+            {
+              "module": "java.io.IOException",
+              "purpose": "Handles potential input/output exceptions during MapReduce tasks."
+            }
+          ]
+        },
+        {
+          "path": "src/input.txt",
+          "description": "Sample data file demonstrating usage of the WordCount job. Contains text lines that will be processed for token frequency analysis.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        }
+      ]
+    }
+  }
+  

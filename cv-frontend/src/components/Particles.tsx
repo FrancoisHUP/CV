@@ -21,7 +21,7 @@ const Particles = ({ count = 100 }) => {
         new THREE.BufferAttribute(particles, 3)
       );
     }
-  }, []);
+  }, [count, particles, velocities]);
 
   // Animate particles
   useFrame(() => {

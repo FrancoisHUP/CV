@@ -1,0 +1,716 @@
+{
+    "project": {
+      "name": "TP2_INF889G",
+      "description": {
+        "summary": "This project demonstrates a Harris corner detection pipeline and a panorama stitching approach using RANSAC-based homography estimation.",
+        "problem_solved": "Efficiently detect feature points (corners) in images and align or stitch multiple images to form a coherent panorama.",
+        "impact": "It improves image stitching accuracy and robustness by combining Harris corner detection with feature descriptor matching and homography estimation.",
+        "technologies": [
+          "Python",
+          "NumPy",
+          "SciPy"
+        ],
+        "role": "Developer/Contributor",
+        "challenges": [
+          "Implementing Harris corner detection with non-maximum suppression",
+          "Robustly estimating a homography with RANSAC to handle outliers in feature matching",
+          "Managing image coordinate transformations and boundary conditions during panorama stitching"
+        ],
+        "relevance": "Relates to broader expertise in computer vision, image processing, and feature-based alignment methods."
+      },
+      "architecture": {
+        "overview": "The system is structured into two main modules: one for Harris corner detection and feature descriptor creation (harris_image.py) and one for panorama construction (panorama_image.py).",
+        "components": [
+          {
+            "name": "Corner Detection Module (harris_image.py)",
+            "description": "Provides functionality for detecting Harris corners, computing feature descriptors, and applying non-maximum suppression."
+          },
+          {
+            "name": "Panorama Construction Module (panorama_image.py)",
+            "description": "Handles the matching of features between images, computes a homography via RANSAC, and warps/stitches images to form a panorama."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Use Harris corner detection for feature extraction.",
+            "reasoning": "The Harris detector is a classic, well-understood algorithm for reliable corner detection. Alternative methods (e.g., FAST, SIFT) could be used, but Harris is simpler to implement and sufficient for many tasks."
+          },
+          {
+            "decision": "Use RANSAC to compute a robust homography.",
+            "reasoning": "Feature matches often contain outliers. RANSAC handles these outliers effectively, increasing accuracy in the final alignment."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "Vectorized operations with NumPy",
+            "impact": "Reduces Python-level loops and speeds up image processing (e.g., applying filters, computing derivatives)."
+          }
+        ],
+        "lessons_learned": [
+          "Ensuring correct boundary handling and coordinate transformations is crucial for seamless panorama stitching.",
+          "Implementing non-maximum suppression carefully is key to avoiding false positives in corner detection.",
+          "RANSAC parameter tuning (threshold, number of iterations, cutoff) significantly affects stitching quality."
+        ]
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "description": "Provides a short overview or introduction to the project.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "harris_image.py",
+          "description": "Implements Harris corner detection, descriptor creation, and utility functions (e.g., smoothing, marking corners).",
+          "functions": [
+            {
+              "name": "describe_point",
+              "description": "Creates a feature descriptor for a specified point in the image.",
+              "parameters": [
+                {
+                  "name": "im",
+                  "type": "np.ndarray",
+                  "description": "Source image (RGB) as a NumPy array."
+                },
+                {
+                  "name": "pos",
+                  "type": "list",
+                  "description": "Position [row, col] of the point to describe."
+                }
+              ],
+              "returns": {
+                "type": "dict",
+                "description": "A dictionary containing the descriptor data and metadata (position, descriptor array, etc.)."
+              }
+            },
+            {
+              "name": "mark_spot",
+              "description": "Draws a crosshair marker at a given point in the image.",
+              "parameters": [
+                {
+                  "name": "im",
+                  "type": "np.ndarray",
+                  "description": "RGB image to mark."
+                },
+                {
+                  "name": "p",
+                  "type": "list",
+                  "description": "Position [row, col] where the mark is placed."
+                },
+                {
+                  "name": "color",
+                  "type": "list",
+                  "description": "Optional RGB color for the marker. Default is [255,0,255]."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "The modified image with the marker drawn."
+              }
+            },
+            {
+              "name": "mark_corners",
+              "description": "Marks multiple corners in an image using crosshair markers.",
+              "parameters": [
+                {
+                  "name": "im",
+                  "type": "np.ndarray",
+                  "description": "RGB image to mark."
+                },
+                {
+                  "name": "d",
+                  "type": "list",
+                  "description": "List of descriptors, each containing corner positions."
+                },
+                {
+                  "name": "n",
+                  "type": "int",
+                  "description": "Number of descriptors (corners) to mark."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "The modified image with corners marked."
+              }
+            },
+            {
+              "name": "smooth_image",
+              "description": "Applies a Gaussian filter to smooth the image.",
+              "parameters": [
+                {
+                  "name": "im",
+                  "type": "np.ndarray",
+                  "description": "Image to be smoothed."
+                },
+                {
+                  "name": "sigma",
+                  "type": "float",
+                  "description": "Standard deviation for the Gaussian filter."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "The smoothed image."
+              }
+            },
+            {
+              "name": "structure_matrix",
+              "description": "Computes the structure tensor (matrix) of the image (Ix^2, Iy^2, IxIy).",
+              "parameters": [
+                {
+                  "name": "im",
+                  "type": "np.ndarray",
+                  "description": "Grayscale (normalized) image."
+                },
+                {
+                  "name": "sigma",
+                  "type": "float",
+                  "description": "Standard deviation for smoothing the derivatives."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "A tensor where each pixel has [Ix^2, Iy^2, IxIy]."
+              }
+            },
+            {
+              "name": "cornerness_response",
+              "description": "Computes the Harris cornerness response from the structure matrix.",
+              "parameters": [
+                {
+                  "name": "S",
+                  "type": "np.ndarray",
+                  "description": "Structure tensor from structure_matrix function."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "The Harris response map (cornerness values)."
+              }
+            },
+            {
+              "name": "nms_image",
+              "description": "Non-maximum suppression to keep only local maxima in a response map.",
+              "parameters": [
+                {
+                  "name": "im",
+                  "type": "np.ndarray",
+                  "description": "Single-channel image of feature responses."
+                },
+                {
+                  "name": "w",
+                  "type": "int",
+                  "description": "Half-window size around each pixel to consider for local maxima."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "Image of the same size, containing only local maxima or -∞ where suppressed."
+              }
+            },
+            {
+              "name": "harris_corner_detector",
+              "description": "Main Harris corner detector pipeline, returning descriptors for detected corners.",
+              "parameters": [
+                {
+                  "name": "im",
+                  "type": "np.ndarray",
+                  "description": "RGB image."
+                },
+                {
+                  "name": "sigma",
+                  "type": "float",
+                  "description": "Gaussian sigma for Harris detection."
+                },
+                {
+                  "name": "thresh",
+                  "type": "float",
+                  "description": "Threshold for cornerness above which points are considered corners."
+                },
+                {
+                  "name": "nms",
+                  "type": "int",
+                  "description": "Window size for non-maximum suppression."
+                }
+              ],
+              "returns": {
+                "type": "list",
+                "description": "List of descriptors (dict) for each detected corner."
+              }
+            },
+            {
+              "name": "detect_and_draw_corners",
+              "description": "Detects Harris corners and draws them on the image.",
+              "parameters": [
+                {
+                  "name": "im",
+                  "type": "np.ndarray",
+                  "description": "RGB image."
+                },
+                {
+                  "name": "sigma",
+                  "type": "float",
+                  "description": "Gaussian sigma for Harris detection."
+                },
+                {
+                  "name": "thresh",
+                  "type": "float",
+                  "description": "Threshold for cornerness above which points are considered corners."
+                },
+                {
+                  "name": "nms",
+                  "type": "int",
+                  "description": "Window size for non-maximum suppression."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "The input image with detected corners marked."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "numpy",
+              "purpose": "Array operations and numerical computations."
+            },
+            {
+              "module": "scipy.ndimage",
+              "purpose": "Provides gaussian_filter and sobel functions for image processing."
+            }
+          ]
+        },
+        {
+          "path": "panorama_image.py",
+          "description": "Implements functions for feature matching, homography estimation (RANSAC), and image stitching to create a panorama.",
+          "functions": [
+            {
+              "name": "make_translation_homography",
+              "description": "Creates a 3x3 matrix representing a simple translation homography.",
+              "parameters": [
+                {
+                  "name": "dr",
+                  "type": "float",
+                  "description": "Translation along the row axis."
+                },
+                {
+                  "name": "dc",
+                  "type": "float",
+                  "description": "Translation along the column axis."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "3x3 translation homography matrix."
+              }
+            },
+            {
+              "name": "match_compare",
+              "description": "Comparator for sorting matches based on distance.",
+              "parameters": [
+                {
+                  "name": "a",
+                  "type": "float",
+                  "description": "Distance for match a."
+                },
+                {
+                  "name": "b",
+                  "type": "float",
+                  "description": "Distance for match b."
+                }
+              ],
+              "returns": {
+                "type": "int",
+                "description": "Result of comparison: -1 if a < b, 1 if a > b, 0 if equal."
+              }
+            },
+            {
+              "name": "both_images",
+              "description": "Creates a side-by-side canvas with image a on the left and image b on the right.",
+              "parameters": [
+                {
+                  "name": "a",
+                  "type": "np.ndarray",
+                  "description": "First image."
+                },
+                {
+                  "name": "b",
+                  "type": "np.ndarray",
+                  "description": "Second image."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "Combined image with a on the left and b on the right."
+              }
+            },
+            {
+              "name": "draw_matches",
+              "description": "Draws lines between matching points in two images displayed side-by-side.",
+              "parameters": [
+                {
+                  "name": "a",
+                  "type": "np.ndarray",
+                  "description": "First image."
+                },
+                {
+                  "name": "b",
+                  "type": "np.ndarray",
+                  "description": "Second image."
+                },
+                {
+                  "name": "matches",
+                  "type": "list",
+                  "description": "List of match dictionaries containing positions and distances."
+                },
+                {
+                  "name": "inliers",
+                  "type": "int",
+                  "description": "Number of inliers to draw in a different color (green)."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "Side-by-side image with match lines drawn."
+              }
+            },
+            {
+              "name": "draw_inliers",
+              "description": "Draws matches with inliers in green between two images, based on a homography.",
+              "parameters": [
+                {
+                  "name": "a",
+                  "type": "np.ndarray",
+                  "description": "First image."
+                },
+                {
+                  "name": "b",
+                  "type": "np.ndarray",
+                  "description": "Second image."
+                },
+                {
+                  "name": "H",
+                  "type": "np.ndarray",
+                  "description": "Homography matrix."
+                },
+                {
+                  "name": "matches",
+                  "type": "list",
+                  "description": "Array of matches between a and b."
+                },
+                {
+                  "name": "thresh",
+                  "type": "float",
+                  "description": "Threshold to define inliers based on projection error."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "Image with lines drawn indicating inliers in green."
+              }
+            },
+            {
+              "name": "find_and_draw_matches",
+              "description": "Detects corners in both images, finds matches, and draws lines between matches.",
+              "parameters": [
+                {
+                  "name": "a",
+                  "type": "np.ndarray",
+                  "description": "First image."
+                },
+                {
+                  "name": "b",
+                  "type": "np.ndarray",
+                  "description": "Second image."
+                },
+                {
+                  "name": "sigma",
+                  "type": "float",
+                  "description": "Gaussian sigma for Harris detector."
+                },
+                {
+                  "name": "thresh",
+                  "type": "float",
+                  "description": "Threshold for cornerness."
+                },
+                {
+                  "name": "nms",
+                  "type": "int",
+                  "description": "Window for non-maximum suppression."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "Combined image with corners marked and match lines drawn."
+              }
+            },
+            {
+              "name": "l1_distance",
+              "description": "Computes the L1 distance (sum of absolute differences) between two floating point arrays.",
+              "parameters": [
+                {
+                  "name": "a",
+                  "type": "np.ndarray",
+                  "description": "First array."
+                },
+                {
+                  "name": "b",
+                  "type": "np.ndarray",
+                  "description": "Second array."
+                }
+              ],
+              "returns": {
+                "type": "float",
+                "description": "Sum of absolute differences."
+              }
+            },
+            {
+              "name": "match_descriptors",
+              "description": "Finds best matches between two sets of descriptors.",
+              "parameters": [
+                {
+                  "name": "a",
+                  "type": "list",
+                  "description": "List of descriptors from image A."
+                },
+                {
+                  "name": "b",
+                  "type": "list",
+                  "description": "List of descriptors from image B."
+                }
+              ],
+              "returns": {
+                "type": "list",
+                "description": "List of match dictionaries with indices and positions in both images."
+              }
+            },
+            {
+              "name": "project_point",
+              "description": "Applies a homography to transform a point from one coordinate space to another.",
+              "parameters": [
+                {
+                  "name": "H",
+                  "type": "np.ndarray",
+                  "description": "3x3 homography matrix."
+                },
+                {
+                  "name": "p",
+                  "type": "list",
+                  "description": "Point [row, col] to project."
+                }
+              ],
+              "returns": {
+                "type": "list",
+                "description": "Projected 2D point [row, col]."
+              }
+            },
+            {
+              "name": "point_distance",
+              "description": "Calculates the Euclidean (L2) distance between two points.",
+              "parameters": [
+                {
+                  "name": "p",
+                  "type": "list",
+                  "description": "First point [row, col]."
+                },
+                {
+                  "name": "q",
+                  "type": "list",
+                  "description": "Second point [row, col]."
+                }
+              ],
+              "returns": {
+                "type": "float",
+                "description": "Euclidean distance between p and q."
+              }
+            },
+            {
+              "name": "model_inliers",
+              "description": "Computes the number of inliers under a given homography and reorders matches to place inliers first.",
+              "parameters": [
+                {
+                  "name": "H",
+                  "type": "np.ndarray",
+                  "description": "Homography matrix."
+                },
+                {
+                  "name": "matches",
+                  "type": "list",
+                  "description": "List of match dictionaries."
+                },
+                {
+                  "name": "inlier_thresh",
+                  "type": "float",
+                  "description": "Inlier distance threshold."
+                }
+              ],
+              "returns": {
+                "type": "(int, list)",
+                "description": "Tuple containing the number of inliers and the reordered matches."
+              }
+            },
+            {
+              "name": "randomize_matches",
+              "description": "Randomly shuffles the list of matches (used in RANSAC).",
+              "parameters": [
+                {
+                  "name": "matches",
+                  "type": "list",
+                  "description": "List of match dictionaries."
+                }
+              ],
+              "returns": {
+                "type": "list",
+                "description": "Shuffled list of matches."
+              }
+            },
+            {
+              "name": "compute_homography",
+              "description": "Computes a homography using a subset of match points. Can use exact or least-squares solution.",
+              "parameters": [
+                {
+                  "name": "matches",
+                  "type": "list",
+                  "description": "List of match dictionaries."
+                },
+                {
+                  "name": "n",
+                  "type": "int",
+                  "description": "Number of matches to use; must be >= 4."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "3x3 homography matrix mapping image A coordinates to image B."
+              }
+            },
+            {
+              "name": "RANSAC",
+              "description": "Performs RANSAC to robustly estimate a homography from noisy matches.",
+              "parameters": [
+                {
+                  "name": "matches",
+                  "type": "list",
+                  "description": "List of match dictionaries."
+                },
+                {
+                  "name": "thresh",
+                  "type": "float",
+                  "description": "Inlier distance threshold."
+                },
+                {
+                  "name": "k",
+                  "type": "int",
+                  "description": "Number of iterations to run RANSAC."
+                },
+                {
+                  "name": "cutoff",
+                  "type": "int",
+                  "description": "Early-exit threshold for number of inliers."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "Best 3x3 homography matrix found by RANSAC."
+              }
+            },
+            {
+              "name": "combine_images",
+              "description": "Warps one image into another’s coordinate space using the provided homography, then blends them into a single canvas.",
+              "parameters": [
+                {
+                  "name": "a",
+                  "type": "np.ndarray",
+                  "description": "First image (base)."
+                },
+                {
+                  "name": "b",
+                  "type": "np.ndarray",
+                  "description": "Second image to warp onto the first."
+                },
+                {
+                  "name": "H",
+                  "type": "np.ndarray",
+                  "description": "Homography mapping coordinates of the first image to the second."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "Combined panorama-like image."
+              }
+            },
+            {
+              "name": "panorama_image",
+              "description": "Main pipeline to create a panorama by detecting features in two images, matching them, running RANSAC, and warping/combining the images.",
+              "parameters": [
+                {
+                  "name": "a",
+                  "type": "np.ndarray",
+                  "description": "First (base) image."
+                },
+                {
+                  "name": "b",
+                  "type": "np.ndarray",
+                  "description": "Second image to stitch onto the first."
+                },
+                {
+                  "name": "sigma",
+                  "type": "float",
+                  "description": "Gaussian sigma for Harris corner detection. Default=2."
+                },
+                {
+                  "name": "thresh",
+                  "type": "float",
+                  "description": "Threshold for corner detection. Default=0.0003."
+                },
+                {
+                  "name": "nms",
+                  "type": "int",
+                  "description": "Window size for non-maximum suppression. Default=3."
+                },
+                {
+                  "name": "inlier_thresh",
+                  "type": "float",
+                  "description": "Threshold for RANSAC inliers. Default=5."
+                },
+                {
+                  "name": "iters",
+                  "type": "int",
+                  "description": "Number of RANSAC iterations. Default=5000."
+                },
+                {
+                  "name": "cutoff",
+                  "type": "int",
+                  "description": "Early-exit inlier cutoff for RANSAC. Default=100."
+                }
+              ],
+              "returns": {
+                "type": "np.ndarray",
+                "description": "Resulting stitched image."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "harris_image",
+              "purpose": "Imports harris_corner_detector and mark_corners for corner detection and marking."
+            },
+            {
+              "module": "numpy",
+              "purpose": "Used for array operations and numerical computations."
+            },
+            {
+              "module": "numpy.linalg",
+              "purpose": "Provides matrix determinant (det) and other linear algebra tools."
+            }
+          ]
+        }
+      ]
+    }
+  }
+  

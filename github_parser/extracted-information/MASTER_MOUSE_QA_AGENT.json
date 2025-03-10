@@ -1,0 +1,63 @@
+{
+    "project": {
+      "name": "MASTER_MOUSE_QA_AGENT",
+      "description": {
+        "summary": "A project aiming to perform question answering by retrieving and processing relevant documents (potentially from PDFs, vector indexes, and other sources).",
+        "problem_solved": "Facilitates efficient information retrieval and question answering from a variety of data sources.",
+        "impact": "Helps centralize research materials, improves speed and accuracy of QA, and allows for advanced retrieval-augmented generation methods.",
+        "technologies": [
+          "Python",
+          "Retrieval-Augmented Generation",
+          "BERT-like encoders",
+          "BM25",
+          "Vector-based Retrieval"
+        ],
+        "role": "Contributor (responsible for integrating retrieval methods and question answering pipelines).",
+        "challenges": [
+          "Integrating multiple retrieval strategies (vector-based, BM25, etc.) and ensuring seamless handoff to a language model for QA."
+        ],
+        "relevance": "Demonstrates expertise in retrieval-augmented generation, which is essential for advanced NLP applications and aligns with broader interests in AI-driven data extraction."
+      },
+      "architecture": {
+        "overview": "A retrieval-augmented question answering pipeline that fetches relevant documents from various sources (cloud, local files, PDFs) and processes them with large language models.",
+        "components": [
+          {
+            "name": "Document Retriever",
+            "description": "Fetches and ranks relevant documents from provided data sources (cloud storage, local PDFs, etc.)."
+          },
+          {
+            "name": "Language Model QA",
+            "description": "Uses a large language model to process the retrieved documents and generate final answers."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Use multiple retrieval methods (BM25, vector search).",
+            "reasoning": "Combines lexical and semantic retrieval for improved accuracy."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "Employ caching of frequently queried documents.",
+            "impact": "Speeds up repeated queries and reduces overall latency."
+          }
+        ],
+        "lessons_learned": [
+          "Combining multiple retrieval strategies can significantly improve answer quality.",
+          "Effective prompt design and context size management are crucial for performance."
+        ]
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "description": "Provides an overview of the project, including references to the thesis, data links, and relevant presentations.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        }
+      ]
+    }
+  }
+  

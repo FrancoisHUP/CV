@@ -1,0 +1,317 @@
+{
+    "project": {
+      "name": "TP1 INF889G in colab",
+      "description": {
+        "summary": "A set of scripts and notebooks for image annotation tasks, demonstrating how to capture and store coordinates (both single points and circles) using matplotlib and tkinter.",
+        "problem_solved": "Facilitates the process of annotating images (either by individual clicks or drawn circles), making it easier to collect precise coordinates for later processing or analysis.",
+        "impact": "Streamlines manual annotation by providing graphical user interfaces, reducing human error and improving data collection efficiency for image-based projects.",
+        "technologies": [
+          "Python",
+          "tkinter",
+          "matplotlib",
+          "Pillow"
+        ],
+        "role": "Contributor/Developer",
+        "challenges": [
+          "Implementing real-time feedback for circle drawing in a tkinter GUI.",
+          "Ensuring coordinates are normalized correctly for consistent annotation.",
+          "Managing event bindings (click, drag, release) for an intuitive user experience."
+        ],
+        "relevance": "Highlights experience in building custom GUI tools and handling interactive image processing, relevant for computer vision and data annotation pipelines."
+      },
+      "architecture": {
+        "overview": "The project consists of two main Python scripts for annotation. One script (Annotate.py) uses matplotlib for capturing clicked coordinates. The other script (Annotate_circle.py) uses tkinter for drawing circles. Annotations are saved to plain text files for easy integration into further processing workflows.",
+        "components": [
+          {
+            "name": "Annotate (matplotlib)",
+            "description": "Captures single-click coordinates using matplotlib events and stores them in a text file."
+          },
+          {
+            "name": "Annotate_circle (tkinter)",
+            "description": "Allows users to draw circles by clicking and dragging, normalizes and saves the circle data (center and radius) to a text file."
+          },
+          {
+            "name": "Annotations Text Files",
+            "description": "Store the collected annotation data (points or circles) in plain text for further processing."
+          },
+          {
+            "name": "Requirements",
+            "description": "Lists the required Python packages (tk, matplotlib, Pillow) for running the annotation scripts."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Use matplotlib for simple point annotation and tkinter for circle annotations.",
+            "reasoning": "Matplotlib’s built-in event handling is sufficient for single-click point capture, while tkinter provides more flexibility for real-time circle drawing."
+          },
+          {
+            "decision": "Normalize circle coordinates and radius to a standard width/height.",
+            "reasoning": "Ensures portability of annotations across different image resolutions and aspect ratios."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "Resizing images before displaying in the tkinter canvas.",
+            "impact": "Allows for smoother drawing operations and more responsive GUI performance with large images."
+          }
+        ],
+        "lessons_learned": [
+          "Effective handling of GUI events requires careful management of state (e.g., start/end points for drawing).",
+          "Normalizing coordinates is crucial for consistent results across varying image sizes.",
+          "Balancing simplicity (matplotlib approach) vs. flexibility (tkinter approach) depends on annotation needs."
+        ]
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "description": "A brief readme file introducing the TP1 INF889G project and how to use it.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "Annotate.py",
+          "description": "Captures single-click coordinates on an image using matplotlib, then stores them in annotations.txt.",
+          "functions": [
+            {
+              "name": "onclick",
+              "description": "Handles mouse click events, records the x and y coordinates, appends them to the global list, and annotates the matplotlib figure.",
+              "parameters": [
+                {
+                  "name": "event",
+                  "type": "matplotlib.backend_bases.Event",
+                  "description": "Contains information about the mouse click (e.g., xdata, ydata)."
+                }
+              ],
+              "returns": {
+                "type": "None",
+                "description": "No explicit return; coordinates are stored in a global list and optionally annotated on the figure."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "matplotlib.pyplot",
+              "purpose": "Used for displaying the image, setting up the figure, and handling click events."
+            },
+            {
+              "module": "matplotlib.image",
+              "purpose": "Reads the image file for display in the matplotlib figure."
+            }
+          ]
+        },
+        {
+          "path": "Annotate_circle.py",
+          "description": "Uses tkinter to let users draw circles on an image (by click and drag) and saves the normalized center and radius.",
+          "functions": [],
+          "classes": [
+            {
+              "name": "CircleAnnotationApp",
+              "description": "Manages the tkinter-based circle annotation process, including loading images, capturing mouse events, normalizing coordinates, and saving annotations.",
+              "methods": [
+                {
+                  "name": "__init__",
+                  "description": "Initializes the application, binds mouse events, and sets up the undo button.",
+                  "parameters": [
+                    {
+                      "name": "root",
+                      "type": "tk.Tk",
+                      "description": "The main tkinter window."
+                    },
+                    {
+                      "name": "image_path",
+                      "type": "str",
+                      "description": "The file path to the image to be annotated."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Constructor method; no return value."
+                  }
+                },
+                {
+                  "name": "load_image",
+                  "description": "Loads and resizes the image, creates an ImageTk object, and displays it on a canvas.",
+                  "parameters": [
+                    {
+                      "name": "image_path",
+                      "type": "str",
+                      "description": "Path to the image file."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "Updates the instance attributes with the loaded image."
+                  }
+                },
+                {
+                  "name": "on_click",
+                  "description": "Stores the initial click coordinates for starting a circle.",
+                  "parameters": [
+                    {
+                      "name": "event",
+                      "type": "tkinter.Event",
+                      "description": "Contains information about the click location (x, y)."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "No direct return; sets the class attributes start_x and start_y."
+                  }
+                },
+                {
+                  "name": "on_drag",
+                  "description": "As the mouse drags, updates the circle’s radius on the canvas.",
+                  "parameters": [
+                    {
+                      "name": "event",
+                      "type": "tkinter.Event",
+                      "description": "Contains the current mouse position."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "No direct return; re-draws the circle and center point on the canvas."
+                  }
+                },
+                {
+                  "name": "on_release",
+                  "description": "Finalizes the circle annotation, normalizes its coordinates, and adds it to the annotations list.",
+                  "parameters": [
+                    {
+                      "name": "event",
+                      "type": "tkinter.Event",
+                      "description": "Contains the final mouse position on release."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "No direct return; stores the annotation (including normalized coords) in the annotations list."
+                  }
+                },
+                {
+                  "name": "undo",
+                  "description": "Removes the most recent annotation from the canvas and internal list.",
+                  "parameters": [
+                    {
+                      "name": "event",
+                      "type": "tkinter.Event/None",
+                      "description": "Optional event if invoked via a button or keyboard shortcut. Defaults to None."
+                    }
+                  ],
+                  "returns": {
+                    "type": "None",
+                    "description": "No direct return; modifies the internal annotations list and canvas elements."
+                  }
+                },
+                {
+                  "name": "close_and_save",
+                  "description": "Saves all annotations to a file and closes the application window.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "None",
+                    "description": "No direct return; writes annotations to disk and terminates the GUI."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "root",
+                  "type": "tk.Tk",
+                  "description": "The main tkinter window instance."
+                },
+                {
+                  "name": "image_path",
+                  "type": "str",
+                  "description": "Path to the currently loaded image."
+                },
+                {
+                  "name": "image",
+                  "type": "PIL.Image",
+                  "description": "The PIL Image object loaded from disk."
+                },
+                {
+                  "name": "photo",
+                  "type": "ImageTk.PhotoImage",
+                  "description": "The Tk-compatible image displayed on the canvas."
+                },
+                {
+                  "name": "canvas",
+                  "type": "tk.Canvas",
+                  "description": "Canvas widget that displays the image and drawn circles."
+                },
+                {
+                  "name": "annotations",
+                  "type": "list",
+                  "description": "List of tuples storing info about each drawn circle (circle id, center id, normalized coords)."
+                },
+                {
+                  "name": "start_x",
+                  "type": "int/float",
+                  "description": "X coordinate of the mouse press event."
+                },
+                {
+                  "name": "start_y",
+                  "type": "int/float",
+                  "description": "Y coordinate of the mouse press event."
+                },
+                {
+                  "name": "current_circle",
+                  "type": "int/None",
+                  "description": "Canvas item ID for the currently drawn circle."
+                },
+                {
+                  "name": "current_center",
+                  "type": "int/None",
+                  "description": "Canvas item ID for the small center indicator."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "tkinter",
+              "purpose": "Provides GUI components (root window, canvas, buttons)."
+            },
+            {
+              "module": "filedialog from tkinter",
+              "purpose": "Enables file selection dialog for loading images."
+            },
+            {
+              "module": "PIL",
+              "purpose": "Handles image loading, resizing, and conversion for tkinter."
+            },
+            {
+              "module": "math (sqrt)",
+              "purpose": "Calculates the radius for the drawn circles."
+            }
+          ]
+        },
+        {
+          "path": "annotations.txt",
+          "description": "Stores normalized circle annotations (x_center, y_center, radius) for each drawn circle.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "annotations_center.txt",
+          "description": "Stores center coordinates (x, y) for annotated points (alternative or older annotation format).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "requirements.txt",
+          "description": "Lists the packages necessary for running the annotation scripts: tk, matplotlib, Pillow.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        }
+      ]
+    }
+  }
+  

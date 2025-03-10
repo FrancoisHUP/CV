@@ -1,0 +1,534 @@
+{
+    "project": {
+      "name": "Puissance4 (ConnectFour)",
+      "description": {
+        "summary": "A command-line Connect Four (Puissance 4) game refactored from legacy code to an OOP design. The project includes UML diagrams (class, sequence, and object) and a Maven-based Java implementation.",
+        "problem_solved": "Demonstrates how to transform a procedural or legacy codebase into a more extensible, object-oriented design, suitable for games similar to Connect Four and potentially other board games like Checkers.",
+        "impact": "Facilitated the application of SOLID principles, improved maintainability, and enabled future extensions (e.g., integrating other board games). Showcases how refactoring a monolithic design into smaller, cohesive classes can simplify evolution and testing.",
+        "technologies": [
+          "Java",
+          "Maven",
+          "JUnit",
+          "PlantUML",
+          "GitHub Actions"
+        ],
+        "role": "Developer/Contributor (responsible for refactoring legacy code, adding tests, and producing UML documentation).",
+        "challenges": [
+          "Refactoring legacy code without breaking existing functionality.",
+          "Ensuring compliance with SOLID principles and OO best practices.",
+          "Designing clean abstractions (e.g., separate classes for Board, Cell, Piece, etc.)."
+        ],
+        "relevance": "Reinforces object-oriented programming, design patterns, and software engineering principles, aligning with broader goals of building maintainable Java applications."
+      },
+      "architecture": {
+        "overview": "The system uses a Model-View-like approach, where 'ConnectFour' manages game logic, and 'Main' provides the CLI interface. UML diagrams illustrate how classes (Game, Board, Player, Piece, Cell, etc.) interact to handle user input, board updates, and win-check logic.",
+        "components": [
+          {
+            "name": "Main",
+            "description": "Entry point class that orchestrates user input, instantiates the ConnectFour game, and manages the game loop."
+          },
+          {
+            "name": "ConnectFour",
+            "description": "Core class implementing the Connect Four game logic, including board initialization, move handling, and win condition checks."
+          },
+          {
+            "name": "Board (Conceptual in UML)",
+            "description": "Represents the playing field, storing cells and facilitating piece placement. In this codebase, represented by a 2D array within ConnectFour."
+          },
+          {
+            "name": "Player (Conceptual in UML)",
+            "description": "Represents a participant in the game. In the current implementation, identified by a character token ('R' or 'Y')."
+          },
+          {
+            "name": "Piece (Conceptual in UML)",
+            "description": "Abstract piece placed on the board. In ConnectFour, these are represented by single characters in a grid."
+          },
+          {
+            "name": "Cell (Conceptual in UML)",
+            "description": "Encapsulates a position on the board. In ConnectFour, a cell is an index in the 2D grid. UML proposals show how these can be specialized for more advanced features."
+          },
+          {
+            "name": "CellFactory (Conceptual in UML)",
+            "description": "In the provided UML diagrams, this demonstrates how cells can be created or specialized. Not directly used in the ConnectFour code, but part of the planned architecture for expansions like ladders, snakes, etc."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Use a 2D char array to represent the board internally.",
+            "reasoning": "Direct indexing simplifies dropping tokens and checking rows, columns, and diagonals. It also mirrors how typical Connect Four boards are laid out."
+          },
+          {
+            "decision": "Leverage Java Streams to generate string representations.",
+            "reasoning": "Provides concise code for displaying rows and columns, but keeps performance acceptable for small game boards."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "Minimal repeated checks when placing tokens.",
+            "impact": "Reduces the overhead of scanning columns by stopping as soon as a free cell is found."
+          },
+          {
+            "optimization": "String-based win-checking using ‘indexOf’ for streaks.",
+            "impact": "Keeps the logic simple and efficient for detecting four consecutive symbols without manually iterating each sub-sequence."
+          }
+        ],
+        "lessons_learned": [
+          "Importance of separating concerns (input handling vs. game logic).",
+          "Value of continuous testing to ensure refactoring does not break functionality.",
+          "UML diagrams can guide and document architectural decisions."
+        ]
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "description": "Provides an overview of the project, objectives, instructions, and requirements. Explains how to build and run the code, as well as the high-level specifications for Connect Four.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "classDiag.puml",
+          "description": "PlantUML diagram illustrating the proposed class structure (Game, Board, Player, Cell, etc.) and their relationships. Designed for a more general board game framework.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "objectDiag.puml",
+          "description": "PlantUML diagram showing a sample object diagram instantiation (Game, Player, Board, Cells, Pieces) at runtime.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "pom.xml",
+          "description": "Maven configuration file specifying project metadata, build plugins, and dependencies (e.g., JUnit).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "sequenceDiag.puml",
+          "description": "PlantUML sequence diagram illustrating the flow of the game setup and the interactions between Game, Player, Board, and Piece during initialization and gameplay.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "test1.puml",
+          "description": "Another PlantUML diagram focusing on the ConnectFour class’s structure. Demonstrates attributes and methods in UML form, using a partial class definition for illustration.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "src/main/java/Main.java",
+          "description": "Entry point of the application. Instantiates ConnectFour, manages player turns, reads user input, and prints game state until a winner is found or the board is full.",
+          "functions": [
+            {
+              "name": "main",
+              "description": "Starts the command-line Connect Four game, prompting for columns and displaying results. Loops until the game ends.",
+              "parameters": [
+                {
+                  "name": "args",
+                  "type": "String[]",
+                  "description": "Command-line arguments (unused)."
+                }
+              ],
+              "returns": {
+                "type": "void",
+                "description": "No return value; prints results to the console."
+              }
+            }
+          ],
+          "classes": [
+            {
+              "name": "Main",
+              "description": "Holds the main method for launching the Connect Four game.",
+              "methods": [
+                {
+                  "name": "main",
+                  "description": "Coordinates the entire game flow and displays results.",
+                  "parameters": [
+                    {
+                      "name": "args",
+                      "type": "String[]",
+                      "description": "Command-line arguments (unused)."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "PLAYERS",
+                  "type": "char[]",
+                  "description": "Array representing the two player symbols, 'R' and 'Y'."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "java.util.Scanner",
+              "purpose": "Used to read user input from the console."
+            },
+            {
+              "module": "com.inf5153.game.ConnectFour",
+              "purpose": "Main game logic for Connect Four."
+            }
+          ]
+        },
+        {
+          "path": "src/main/java/com/inf5153/game/ConnectFour.java",
+          "description": "Implements the Connect Four board logic, including placing tokens, tracking moves, and checking for wins.",
+          "functions": [
+            {
+              "name": "ConnectFour",
+              "description": "Constructor setting board dimensions and initializing the grid with empty cells.",
+              "parameters": [
+                {
+                  "name": "w",
+                  "type": "int",
+                  "description": "Width of the Connect Four board."
+                },
+                {
+                  "name": "h",
+                  "type": "int",
+                  "description": "Height of the Connect Four board."
+                }
+              ],
+              "returns": {
+                "type": "ConnectFour",
+                "description": "A new ConnectFour instance."
+              }
+            },
+            {
+              "name": "toString",
+              "description": "Generates a string representation of the column indices and current grid state.",
+              "parameters": [],
+              "returns": {
+                "type": "String",
+                "description": "String representation of the board."
+              }
+            },
+            {
+              "name": "horizontal",
+              "description": "Returns the row (as a string) in which the last token was placed.",
+              "parameters": [],
+              "returns": {
+                "type": "String",
+                "description": "The horizontal row containing the last move."
+              }
+            },
+            {
+              "name": "vertical",
+              "description": "Returns the column (as a string) in which the last token was placed.",
+              "parameters": [],
+              "returns": {
+                "type": "String",
+                "description": "The vertical column containing the last move."
+              }
+            },
+            {
+              "name": "slashDiagonal",
+              "description": "Constructs a string representing the '/' diagonal of the last move.",
+              "parameters": [],
+              "returns": {
+                "type": "String",
+                "description": "The diagonal string containing the last move."
+              }
+            },
+            {
+              "name": "backslashDiagonal",
+              "description": "Constructs a string representing the '\\' diagonal of the last move.",
+              "parameters": [],
+              "returns": {
+                "type": "String",
+                "description": "The diagonal string containing the last move."
+              }
+            },
+            {
+              "name": "contains",
+              "description": "Checks if a given substring exists in a provided string.",
+              "parameters": [
+                {
+                  "name": "str",
+                  "type": "String",
+                  "description": "The full string to search within."
+                },
+                {
+                  "name": "substring",
+                  "type": "String",
+                  "description": "The substring to find."
+                }
+              ],
+              "returns": {
+                "type": "boolean",
+                "description": "True if substring is found; false otherwise."
+              }
+            },
+            {
+              "name": "isWinningPlay",
+              "description": "Checks if the last move placed results in a win (four in a row).",
+              "parameters": [],
+              "returns": {
+                "type": "boolean",
+                "description": "True if the last move was a winning play; false otherwise."
+              }
+            },
+            {
+              "name": "chooseAndDrop",
+              "description": "Prompts and places a player's token in a chosen column, validating input and checking for column capacity.",
+              "parameters": [
+                {
+                  "name": "symbol",
+                  "type": "char",
+                  "description": "Player token ('R' or 'Y')."
+                },
+                {
+                  "name": "input",
+                  "type": "Scanner",
+                  "description": "Scanner for user input."
+                }
+              ],
+              "returns": {
+                "type": "void",
+                "description": "No return value; updates the grid in-place."
+              }
+            }
+          ],
+          "classes": [
+            {
+              "name": "ConnectFour",
+              "description": "Manages the Connect Four board, including the grid, valid moves, and detection of winning conditions.",
+              "methods": [
+                {
+                  "name": "ConnectFour",
+                  "description": "Constructor for setting up the board dimensions and initializing the grid.",
+                  "parameters": [
+                    {
+                      "name": "w",
+                      "type": "int",
+                      "description": "Board width."
+                    },
+                    {
+                      "name": "h",
+                      "type": "int",
+                      "description": "Board height."
+                    }
+                  ],
+                  "returns": {
+                    "type": "ConnectFour",
+                    "description": "A new ConnectFour object."
+                  }
+                },
+                {
+                  "name": "toString",
+                  "description": "String representation of the board.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "String",
+                    "description": "Board layout."
+                  }
+                },
+                {
+                  "name": "horizontal",
+                  "description": "Returns the last-move row as a string.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "String",
+                    "description": "Row containing the last token."
+                  }
+                },
+                {
+                  "name": "vertical",
+                  "description": "Returns the last-move column as a string.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "String",
+                    "description": "Column containing the last token."
+                  }
+                },
+                {
+                  "name": "slashDiagonal",
+                  "description": "Returns the '/' diagonal string for the last move.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "String",
+                    "description": "Slash diagonal string."
+                  }
+                },
+                {
+                  "name": "backslashDiagonal",
+                  "description": "Returns the '\\' diagonal string for the last move.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "String",
+                    "description": "Backslash diagonal string."
+                  }
+                },
+                {
+                  "name": "contains",
+                  "description": "Checks if 'substring' appears in 'str'.",
+                  "parameters": [
+                    {
+                      "name": "str",
+                      "type": "String",
+                      "description": "String to search."
+                    },
+                    {
+                      "name": "substring",
+                      "type": "String",
+                      "description": "Substring to find."
+                    }
+                  ],
+                  "returns": {
+                    "type": "boolean",
+                    "description": "True if found; false otherwise."
+                  }
+                },
+                {
+                  "name": "isWinningPlay",
+                  "description": "Determines if the most recent move resulted in a win.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "boolean",
+                    "description": "True if it's a winning move."
+                  }
+                },
+                {
+                  "name": "chooseAndDrop",
+                  "description": "Asks user for a column and drops the token into that column if available.",
+                  "parameters": [
+                    {
+                      "name": "symbol",
+                      "type": "char",
+                      "description": "Player token."
+                    },
+                    {
+                      "name": "input",
+                      "type": "Scanner",
+                      "description": "Input stream for player choice."
+                    }
+                  ],
+                  "returns": {
+                    "type": "void",
+                    "description": "Updates the grid."
+                  }
+                }
+              ],
+              "attributes": [
+                {
+                  "name": "width",
+                  "type": "int",
+                  "description": "Number of columns in the board."
+                },
+                {
+                  "name": "height",
+                  "type": "int",
+                  "description": "Number of rows in the board."
+                },
+                {
+                  "name": "grid",
+                  "type": "char[][]",
+                  "description": "2D array storing the board's cells."
+                },
+                {
+                  "name": "lastCol",
+                  "type": "int",
+                  "description": "Column index of the last move."
+                },
+                {
+                  "name": "lastTop",
+                  "type": "int",
+                  "description": "Row index of the last move."
+                }
+              ]
+            }
+          ],
+          "imports": [
+            {
+              "module": "java.util.Arrays",
+              "purpose": "Used for initializing and manipulating the board's rows."
+            },
+            {
+              "module": "java.util.Scanner",
+              "purpose": "Handles input for dropping tokens in chooseAndDrop."
+            },
+            {
+              "module": "java.util.stream.Collectors",
+              "purpose": "Helps build string representations of the board."
+            },
+            {
+              "module": "java.util.stream.IntStream",
+              "purpose": "Facilitates concise row/column construction in toString."
+            }
+          ]
+        },
+        {
+          "path": "src/test/java/ConnectFour.java",
+          "description": "A basic JUnit test file named identically to the main class. Contains a simple test verifying arithmetic (as a placeholder).",
+          "functions": [
+            {
+              "name": "connectFourTest",
+              "description": "Example test method to showcase JUnit setup (currently tests addition).",
+              "parameters": [],
+              "returns": {
+                "type": "void",
+                "description": "Asserts a simple arithmetic result."
+              }
+            }
+          ],
+          "classes": [
+            {
+              "name": "ConnectFour",
+              "description": "Test class (unrelated to the main game class) for demonstration purposes.",
+              "methods": [
+                {
+                  "name": "connectFourTest",
+                  "description": "Runs a sample JUnit test verifying 4+4=8.",
+                  "parameters": [],
+                  "returns": {
+                    "type": "void",
+                    "description": "No return value."
+                  }
+                }
+              ],
+              "attributes": []
+            }
+          ],
+          "imports": [
+            {
+              "module": "org.junit.Test",
+              "purpose": "Enables JUnit test annotations."
+            },
+            {
+              "module": "org.junit.Assert",
+              "purpose": "Used for assertion methods like assertEquals."
+            }
+          ]
+        },
+        {
+          "path": ".github/workflows/java.yml",
+          "description": "GitHub Actions workflow for continuous integration of the Java code. Builds with Maven on each push.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": ".github/workflows/puml.yml",
+          "description": "GitHub Actions workflow that generates PlantUML diagrams on each push.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        }
+      ]
+    }
+  }
+  

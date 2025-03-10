@@ -1,0 +1,519 @@
+{
+    "project": {
+      "name": "AI News Podcast",
+      "description": {
+        "summary": "This project automates the generation of a complete podcast from a newsletter feed.",
+        "problem_solved": "It streamlines the process of converting text-based newsletter content into an audio podcast, removing the need for manual podcast creation.",
+        "impact": "By automatically fetching and cleaning RSS data, generating content with Google's Generative AI, and synthesizing audio with ElevenLabs TTS, the project improves accessibility and reduces the overhead of producing audio content.",
+        "technologies": [
+          "Python",
+          "Feedparser",
+          "Google Generative AI (Gemini)",
+          "Google Sheets API",
+          "ElevenLabs TTS",
+          "Requests",
+          "Pytest",
+          "dotenv"
+        ],
+        "role": "Developer/Contributor",
+        "challenges": [
+          "Ensuring reliable RSS parsing and cleaning of HTML content using feedparser and regex.",
+          "Integrating Google Generative AI and Sheets API for logging prompts and responses.",
+          "Handling text-to-speech conversions with ElevenLabs, including authentication and error handling."
+        ],
+        "relevance": "It demonstrates end-to-end automation (data retrieval, data cleaning, AI content generation, TTS) and showcases skills in Python development, API integration, and building a small pipeline for content creation."
+      },
+      "architecture": {
+        "overview": "The system pulls newsletter content from an RSS feed, cleans it, optionally logs prompts/results to Google Sheets, uses a Generative AI model (Gemini) to create or expand content, and then converts text to audio via ElevenLabs TTS.",
+        "components": [
+          {
+            "name": "RSS Fetching & Cleaning",
+            "description": "Fetches and parses the RSS feed, cleans HTML tags and entities to extract plain text content."
+          },
+          {
+            "name": "Generative AI Integration",
+            "description": "Uses the Google Generative AI (Gemini) to generate or expand text content, optionally logging prompts and responses to Google Sheets."
+          },
+          {
+            "name": "Text-to-Speech (TTS)",
+            "description": "Converts the generated or cleaned text into an MP3 audio file using the ElevenLabs API."
+          },
+          {
+            "name": "Google Sheets Logging",
+            "description": "Authenticates and appends AI prompts/results to a specific Google Sheets spreadsheet."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Use Python feedparser and custom cleaning functions for RSS parsing.",
+            "reasoning": "feedparser is a lightweight, well-known library for parsing RSS/Atom feeds, and regex/html unescape reliably cleans HTML tags."
+          },
+          {
+            "decision": "Use Google Generative AI (Gemini) for text generation.",
+            "reasoning": "It allows advanced content generation and easy integration with Python via google-generativeai library."
+          },
+          {
+            "decision": "Use ElevenLabs for TTS.",
+            "reasoning": "ElevenLabs provides natural-sounding voices and a straightforward HTTP-based API."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "Caching or reusing tokens for Google API authentication in `gen_podcast.py`.",
+            "impact": "Reduces re-authentication overhead and speeds up repeated calls."
+          },
+          {
+            "optimization": "Splitting RSS items and cleaning them selectively rather than line-by-line scanning.",
+            "impact": "Simplifies data processing and reduces complexities in text handling."
+          }
+        ],
+        "lessons_learned": [
+          "Careful handling of authentication tokens for third-party services (Google APIs, ElevenLabs).",
+          "Ensuring robust error handling when external services (RSS feeds, TTS) fail or return unexpected data.",
+          "Maintaining a consistent data pipeline from input (RSS) to final output (MP3)."
+        ]
+      },
+      "files": [
+        {
+          "path": "README.md",
+          "description": "Provides an overview of the project purpose, setup instructions, and references for submodules and external APIs.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "credentials.json",
+          "description": "Contains OAuth 2.0 credentials for Google services (client_id, client_secret, etc.). Used by Google Sheets and Google Auth libraries.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "gen_podcast.py",
+          "description": "Handles Google Generative AI (Gemini) integration, Google Sheets logging, and main function for generating AI content.",
+          "functions": [
+            {
+              "name": "authenticate_google_sheets",
+              "description": "Authenticates Google Sheets API using credentials.json and token.json. Refreshes token if expired.",
+              "parameters": [],
+              "returns": {
+                "type": "google.oauth2.credentials.Credentials",
+                "description": "Google OAuth credentials object for accessing Google Sheets."
+              }
+            },
+            {
+              "name": "log_to_google_sheets",
+              "description": "Logs a prompt/response pair (prompt, result) to a Google Sheets spreadsheet.",
+              "parameters": [
+                {
+                  "name": "prompt",
+                  "type": "str",
+                  "description": "The text prompt that was used."
+                },
+                {
+                  "name": "result",
+                  "type": "str",
+                  "description": "The resulting text from the AI model."
+                }
+              ],
+              "returns": {
+                "type": "None",
+                "description": "Writes directly to the spreadsheet; no return value."
+              }
+            },
+            {
+              "name": "generate_with_gemini",
+              "description": "Generates content using the Gemini model from Google Generative AI. Can log the response to Google Sheets.",
+              "parameters": [
+                {
+                  "name": "prompt",
+                  "type": "str",
+                  "description": "The text prompt used for AI generation."
+                },
+                {
+                  "name": "mock",
+                  "type": "bool",
+                  "description": "If True, returns a mock response instead of calling the AI model."
+                }
+              ],
+              "returns": {
+                "type": "str or None",
+                "description": "Generated text from Gemini, or None if an error occurred."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "google.generativeai",
+              "purpose": "Provides Generative AI functionality (Gemini model)."
+            },
+            {
+              "module": "dotenv",
+              "purpose": "Loads environment variables from .env."
+            },
+            {
+              "module": "os",
+              "purpose": "Manages environment variables and file paths."
+            },
+            {
+              "module": "google.oauth2.credentials",
+              "purpose": "Handles OAuth2 credentials for Google services."
+            },
+            {
+              "module": "google_auth_oauthlib.flow",
+              "purpose": "Manages OAuth2 flow using client secrets file."
+            },
+            {
+              "module": "googleapiclient.discovery",
+              "purpose": "Builds a Google Sheets service instance."
+            },
+            {
+              "module": "google.auth.transport.requests",
+              "purpose": "Refreshes OAuth tokens via HTTP requests."
+            },
+            {
+              "module": "pathlib",
+              "purpose": "Provides object-oriented filesystem paths."
+            }
+          ]
+        },
+        {
+          "path": "main.py",
+          "description": "The main entry point for the application. Fetches and processes RSS feed items, cleans them, and converts them to audio.",
+          "functions": [
+            {
+              "name": "main",
+              "description": "Coordinates fetching RSS data, filtering by date, saving content, and performing TTS conversions.",
+              "parameters": [],
+              "returns": {
+                "type": "None",
+                "description": "Executes the entire pipeline and writes MP3 output."
+              }
+            },
+            {
+              "name": "parse_args",
+              "description": "Parses command-line arguments (RSS URL and optional date).",
+              "parameters": [],
+              "returns": {
+                "type": "argparse.Namespace",
+                "description": "An object containing the parsed command-line arguments (rss_url, date)."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "pathlib",
+              "purpose": "For handling file and directory paths."
+            },
+            {
+              "module": "argparse",
+              "purpose": "For handling CLI arguments."
+            },
+            {
+              "module": "datetime",
+              "purpose": "For parsing and comparing dates."
+            },
+            {
+              "module": "utils.get_data",
+              "purpose": "Fetches and cleans RSS feed data."
+            },
+            {
+              "module": "tts.tts_11labs",
+              "purpose": "Performs text-to-speech using ElevenLabs."
+            }
+          ]
+        },
+        {
+          "path": "pyproject.toml",
+          "description": "Project metadata and dependencies. Defines the package name, version, Python requirement, and library dependencies.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "token.json",
+          "description": "Stores a refreshable OAuth2 token for Google APIs, so the user doesn't need to log in repeatedly.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "uv.lock",
+          "description": "Lock file generated by uv (Astral.sh UV CLI) or a similar environment sync utility. Lists pinned Python package versions.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": ".env.example",
+          "description": "Template environment file containing placeholders for API keys (OpenAI, Gemini, Spreadsheet ID).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": ".python-version",
+          "description": "Specifies the Python version (3.12) for the project environment.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "tests/test_clean_rss_item.py",
+          "description": "Contains unit tests (Pytest) for verifying RSS item cleaning functionality.",
+          "functions": [
+            {
+              "name": "test_clean_rss_item_with_real_data",
+              "description": "Tests the cleaning of RSS items by comparing processed output against an expected cleaned file.",
+              "parameters": [],
+              "returns": {
+                "type": "None",
+                "description": "Asserts that the cleaned text matches expected output."
+              }
+            },
+            {
+              "name": "test_clean_rss_item_edge_cases",
+              "description": "Parametrized tests to ensure the cleaning function handles HTML, encoded entities, and empty input.",
+              "parameters": [
+                {
+                  "name": "input_text",
+                  "type": "str",
+                  "description": "The input text or HTML snippet to be cleaned."
+                },
+                {
+                  "name": "expected_output",
+                  "type": "str",
+                  "description": "The expected cleaned result."
+                }
+              ],
+              "returns": {
+                "type": "None",
+                "description": "Asserts the cleaned result matches expected output."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "pytest",
+              "purpose": "Used for structuring and running Python unit tests."
+            },
+            {
+              "module": "pathlib",
+              "purpose": "File path operations for reading test data."
+            },
+            {
+              "module": "utils.get_data",
+              "purpose": "Imports `clean_rss_item` function to test."
+            }
+          ]
+        },
+        {
+          "path": "tts/tts_11labs.py",
+          "description": "Provides functions to fetch available voices and convert text to speech using the ElevenLabs API.",
+          "functions": [
+            {
+              "name": "fetch_available_voices",
+              "description": "Retrieves a list of available voice details from the ElevenLabs API.",
+              "parameters": [],
+              "returns": {
+                "type": "list",
+                "description": "A list of voice metadata (name, voice_id, etc.)."
+              }
+            },
+            {
+              "name": "text_to_speech",
+              "description": "Sends text to the ElevenLabs endpoint for TTS conversion, returning the response object.",
+              "parameters": [
+                {
+                  "name": "text",
+                  "type": "str",
+                  "description": "The text to be converted to audio."
+                },
+                {
+                  "name": "output_file",
+                  "type": "str",
+                  "description": "Path for saving the generated MP3 file (optional, used in example)."
+                },
+                {
+                  "name": "voice_id",
+                  "type": "str",
+                  "description": "The specific ElevenLabs voice ID to use."
+                }
+              ],
+              "returns": {
+                "type": "requests.Response",
+                "description": "The HTTP response from the ElevenLabs API (contains audio content on success)."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "requests",
+              "purpose": "Used for making HTTP requests to the ElevenLabs API."
+            },
+            {
+              "module": "dotenv",
+              "purpose": "Loads environment variables from .env."
+            },
+            {
+              "module": "os",
+              "purpose": "Reads environment variables and handles file path creation."
+            }
+          ]
+        },
+        {
+          "path": "utils/clean_data.py",
+          "description": "Contains a helper function to clean RSS feed items and a process_file function to run cleaning on an entire file.",
+          "functions": [
+            {
+              "name": "clean_rss_item",
+              "description": "Decodes HTML entities and removes HTML tags from a given text item.",
+              "parameters": [
+                {
+                  "name": "item",
+                  "type": "str",
+                  "description": "Raw text (possibly containing HTML) from an RSS item."
+                }
+              ],
+              "returns": {
+                "type": "str",
+                "description": "The cleaned and stripped text."
+              }
+            },
+            {
+              "name": "process_file",
+              "description": "Reads an entire file, cleans each RSS-like item, and writes the cleaned items to an output file.",
+              "parameters": [
+                {
+                  "name": "input_file",
+                  "type": "Path or str",
+                  "description": "Path to the input file."
+                },
+                {
+                  "name": "output_file",
+                  "type": "Path or str",
+                  "description": "Path to the output file."
+                }
+              ],
+              "returns": {
+                "type": "None",
+                "description": "Writes cleaned content directly to the output file."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "pathlib",
+              "purpose": "Path handling for reading and writing files."
+            },
+            {
+              "module": "html",
+              "purpose": "Unescape HTML entities."
+            },
+            {
+              "module": "re",
+              "purpose": "Regex for removing HTML tags."
+            }
+          ]
+        },
+        {
+          "path": "utils/get_data.py",
+          "description": "Provides functions to fetch and parse RSS feeds, clean them, and filter items by publication date.",
+          "functions": [
+            {
+              "name": "clean_rss_item",
+              "description": "Decodes HTML entities, removes tags, and strips whitespace from a text snippet.",
+              "parameters": [
+                {
+                  "name": "item",
+                  "type": "str",
+                  "description": "HTML text from an RSS entry (title, description, etc.)."
+                }
+              ],
+              "returns": {
+                "type": "str",
+                "description": "Cleaned plain text."
+              }
+            },
+            {
+              "name": "fetch_rss",
+              "description": "Parses the RSS feed from a given URL using feedparser.",
+              "parameters": [
+                {
+                  "name": "rss_url",
+                  "type": "str",
+                  "description": "The URL of the RSS feed to parse."
+                }
+              ],
+              "returns": {
+                "type": "feedparser.FeedParserDict",
+                "description": "A parsed RSS feed object."
+              }
+            },
+            {
+              "name": "get_most_recent_date",
+              "description": "Finds the most recent publication date among RSS entries.",
+              "parameters": [
+                {
+                  "name": "feed",
+                  "type": "feedparser.FeedParserDict",
+                  "description": "Parsed RSS feed data."
+                }
+              ],
+              "returns": {
+                "type": "datetime.date or None",
+                "description": "Date of the most recent entry or None if no entries exist."
+              }
+            },
+            {
+              "name": "get_rss_items_by_date",
+              "description": "Filters RSS items by a specified date; if no date is given, uses the latest date found.",
+              "parameters": [
+                {
+                  "name": "feed",
+                  "type": "feedparser.FeedParserDict",
+                  "description": "Parsed RSS feed data."
+                },
+                {
+                  "name": "target_date",
+                  "type": "datetime.date or None",
+                  "description": "The specific date for which to retrieve items; if None, uses the most recent."
+                }
+              ],
+              "returns": {
+                "type": "list",
+                "description": "A list of cleaned RSS items matching the given date, each as a text block."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "feedparser",
+              "purpose": "Parses RSS/Atom feeds into a structured object."
+            },
+            {
+              "module": "html",
+              "purpose": "Unescape HTML entities."
+            },
+            {
+              "module": "re",
+              "purpose": "Removes HTML tags using regex."
+            },
+            {
+              "module": "datetime",
+              "purpose": "Handles date comparisons (for filtering feed items)."
+            }
+          ]
+        }
+      ]
+    }
+  }
+  

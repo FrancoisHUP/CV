@@ -1,0 +1,23 @@
+# Use an official Python runtime as a parent image.
+FROM python:3.10-slim
+
+# Set environment variables.
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Create and set working directory.
+WORKDIR /app
+
+# Install dependencies.
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application code.
+COPY . .
+
+# Expose the port that the app runs on.
+EXPOSE 8080
+
+# Start Gunicorn with 2 workers.
+CMD ["gunicorn", "--bind", ":8080", "--workers", "2", "main:app"]
+

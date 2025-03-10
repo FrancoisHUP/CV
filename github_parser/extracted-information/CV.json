@@ -1,0 +1,671 @@
+{
+    "project": {
+      "name": "Francoishup-CV",
+      "description": {
+        "summary": "A personal portfolio website that leverages React, TypeScript, and Three.js to create an interactive 3D experience.",
+        "problem_solved": "Demonstrates a creative and engaging way to showcase personal projects and skills, transcending traditional static portfolio pages.",
+        "impact": "Enhances user engagement and highlights technical expertise through real-time 3D graphics, improving the overall user experience.",
+        "technologies": [
+          "React",
+          "TypeScript",
+          "Three.js",
+          "React Three Fiber",
+          "Docker",
+          "Nginx",
+          "Vite",
+          "TailwindCSS",
+          "Framer Motion",
+          "GSAP",
+          "Socket.IO Client"
+        ],
+        "role": "Lead Developer & Designer",
+        "challenges": [
+          "Integrating complex 3D rendering with React components and routing",
+          "Ensuring performance optimizations for real-time animations",
+          "Managing a containerized environment for smooth deployments"
+        ],
+        "relevance": "Demonstrates modern front-end development practices, including React with TypeScript, containerization using Docker, and 3D rendering, aligning with broader career goals in full-stack development and immersive web experiences."
+      },
+      "architecture": {
+        "overview": "The system consists of a Docker Compose setup that builds and runs a React-based front-end served by Nginx. The front-end uses Three.js/React Three Fiber for 3D rendering, and React Router for page navigation.",
+        "components": [
+          {
+            "name": "Docker Compose & Dockerfile",
+            "description": "Defines the container environment, building a production-optimized React app and serving it via Nginx."
+          },
+          {
+            "name": "React + Three.js Application",
+            "description": "Renders the interactive 3D scene and portfolio UI, handling user interactions, routing, and state management."
+          },
+          {
+            "name": "TailwindCSS & Framer Motion",
+            "description": "Used for styling and animations, respectively, providing a responsive design and smooth UX transitions."
+          }
+        ]
+      },
+      "technical_details": {
+        "design_decisions": [
+          {
+            "decision": "Using React Three Fiber for 3D rendering instead of a custom Three.js setup.",
+            "reasoning": "It seamlessly integrates with React’s component architecture and allows reusing hooks and React patterns for 3D objects."
+          },
+          {
+            "decision": "Containerizing the application with Docker.",
+            "reasoning": "Ensures consistent environment across different machines and simplifies deployment."
+          }
+        ],
+        "performance_optimizations": [
+          {
+            "optimization": "Reduced geometry complexity and leveraged GPU acceleration in Three.js.",
+            "impact": "Improved rendering performance and maintained smooth frame rates."
+          },
+          {
+            "optimization": "Used Vite for faster builds and HMR (Hot Module Replacement).",
+            "impact": "Reduced development build times, enabling quick iteration."
+          }
+        ],
+        "lessons_learned": [
+          "Techniques for implementing advanced 3D graphics and interactions in a React application.",
+          "Strategies for optimizing performance in real-time rendering scenarios.",
+          "Best practices for Docker-based deployment with Nginx."
+        ]
+      },
+      "files": [
+        {
+          "path": "docker-compose.yml",
+          "description": "Defines the Docker services for running the React front-end with Nginx.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "cv-frontend/README.md",
+          "description": "Provides documentation on setting up and using the React + TypeScript + Vite template.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "cv-frontend/dockerfile",
+          "description": "Multi-stage Dockerfile to build the React application and serve it with Nginx.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "cv-frontend/eslint.config.js",
+          "description": "ESLint configuration for TypeScript and React, including recommended rules and plugins.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "@eslint/js",
+              "purpose": "Provides base ESLint configurations."
+            },
+            {
+              "module": "globals",
+              "purpose": "Adds predefined global variables for browser or Node environments."
+            },
+            {
+              "module": "eslint-plugin-react-hooks",
+              "purpose": "Enforces React hook rules."
+            },
+            {
+              "module": "eslint-plugin-react-refresh",
+              "purpose": "Handles Fast Refresh validations in React."
+            },
+            {
+              "module": "typescript-eslint",
+              "purpose": "Adds TypeScript support to ESLint."
+            }
+          ]
+        },
+        {
+          "path": "cv-frontend/index.html",
+          "description": "Root HTML file that loads the React application by referencing main.tsx.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "cv-frontend/package.json",
+          "description": "Lists all project dependencies, scripts, and metadata for the React application.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "cv-frontend/tsconfig.app.json",
+          "description": "TypeScript configuration specific to the application build settings.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "cv-frontend/tsconfig.json",
+          "description": "References main TypeScript configurations, bundling multiple tsconfig files.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "cv-frontend/tsconfig.node.json",
+          "description": "TypeScript configuration for Node-related build processes (e.g., Vite config).",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "cv-frontend/vite.config.ts",
+          "description": "Defines Vite build and development settings, including React and TailwindCSS plugins.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "vite",
+              "purpose": "Provides Vite’s defineConfig function."
+            },
+            {
+              "module": "@vitejs/plugin-react",
+              "purpose": "Enables React fast refresh and JSX transformations."
+            },
+            {
+              "module": "@tailwindcss/vite",
+              "purpose": "Integrates TailwindCSS with Vite."
+            }
+          ]
+        },
+        {
+          "path": "cv-frontend/.gitignore",
+          "description": "Specifies which files and directories should be ignored by Git.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "cv-frontend/src/App.css",
+          "description": "CSS for top-level styling of the main App component.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "cv-frontend/src/App.tsx",
+          "description": "Defines the root React component that sets up the navigation and routes for the application.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "react-router-dom",
+              "purpose": "Provides client-side routing (Routes, Route)."
+            },
+            {
+              "module": "./pages/Home",
+              "purpose": "Home page component."
+            },
+            {
+              "module": "./pages/Projects",
+              "purpose": "Projects page component."
+            },
+            {
+              "module": "./pages/About",
+              "purpose": "About page component."
+            },
+            {
+              "module": "./pages/Blog",
+              "purpose": "Blog page component."
+            },
+            {
+              "module": "./components/MagneticLink",
+              "purpose": "Interactive link component with magnetic hover effect."
+            }
+          ]
+        },
+        {
+          "path": "cv-frontend/src/index.css",
+          "description": "Global CSS, including font imports and TailwindCSS base styles.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "cv-frontend/src/main.tsx",
+          "description": "Entry point for the React application, rendering the App component to the root DOM element.",
+          "functions": [],
+          "classes": [],
+          "imports": [
+            {
+              "module": "react",
+              "purpose": "Core React library for building UI components."
+            },
+            {
+              "module": "react-dom/client",
+              "purpose": "Provides createRoot API for rendering in React 18+."
+            },
+            {
+              "module": "react-router-dom",
+              "purpose": "BrowserRouter for routing."
+            },
+            {
+              "module": "./index.css",
+              "purpose": "Global styles."
+            },
+            {
+              "module": "./App.tsx",
+              "purpose": "Main application component."
+            }
+          ]
+        },
+        {
+          "path": "cv-frontend/src/vite-env.d.ts",
+          "description": "TypeScript ambient declarations for Vite’s import.meta and related features.",
+          "functions": [],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "cv-frontend/src/components/ChatWindow.tsx",
+          "description": "Component that provides a basic chat-like interface overlay, allowing user input and displaying a simulated AI response.",
+          "functions": [
+            {
+              "name": "ChatWindow",
+              "description": "Renders an overlay with a textarea for user input and displays a mock AI response.",
+              "parameters": [
+                {
+                  "name": "onClose",
+                  "type": "function",
+                  "description": "Callback to close the chat window."
+                }
+              ],
+              "returns": {
+                "type": "JSX.Element",
+                "description": "A rendered chat overlay component."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "react",
+              "purpose": "useState, useRef, useEffect hooks for managing state and lifecycle."
+            }
+          ]
+        },
+        {
+          "path": "cv-frontend/src/components/Connections.tsx",
+          "description": "Renders a glowing cylinder connecting two points in 3D space, representing a 'neuron connection.'",
+          "functions": [
+            {
+              "name": "Connection",
+              "description": "Creates a cylinder between two 3D points with an animated pulsating shader.",
+              "parameters": [
+                {
+                  "name": "start",
+                  "type": "[number, number, number]",
+                  "description": "3D starting coordinates of the cylinder."
+                },
+                {
+                  "name": "end",
+                  "type": "[number, number, number]",
+                  "description": "3D ending coordinates of the cylinder."
+                }
+              ],
+              "returns": {
+                "type": "JSX.Element",
+                "description": "Cylinder geometry rendered in the scene."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "react",
+              "purpose": "useRef and useMemo hooks."
+            },
+            {
+              "module": "@react-three/fiber",
+              "purpose": "useFrame for animation updates within the Three.js render loop."
+            },
+            {
+              "module": "@react-three/drei",
+              "purpose": "Cylinder, a pre-built geometry component from Drei."
+            },
+            {
+              "module": "three",
+              "purpose": "THREE library classes like Vector3, Quaternion, ShaderMaterial, etc."
+            }
+          ]
+        },
+        {
+          "path": "cv-frontend/src/components/ControlsOverlay.tsx",
+          "description": "Displays an on-screen overlay showing mouse/keyboard controls for navigating the 3D scene.",
+          "functions": [
+            {
+              "name": "ControlsOverlay",
+              "description": "Renders a UI overlay with instructions for movement and an optional bubble icon to reopen instructions.",
+              "parameters": [],
+              "returns": {
+                "type": "JSX.Element",
+                "description": "A set of interactive UI elements explaining the 3D scene controls."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "react",
+              "purpose": "useEffect, useState hooks for toggling visibility."
+            },
+            {
+              "module": "framer-motion",
+              "purpose": "Adds animation effects to UI elements."
+            }
+          ]
+        },
+        {
+          "path": "cv-frontend/src/components/Fairy.tsx",
+          "description": "Renders a glowing sphere (a 'fairy') that wanders around the scene or moves in front of the camera when triggered.",
+          "functions": [
+            {
+              "name": "Fairy",
+              "description": "Handles the wandering logic and movement triggered by user input (e.g., Enter key).",
+              "parameters": [
+                {
+                  "name": "onChatOpen",
+                  "type": "function",
+                  "description": "Callback to open the chat when the fairy is summoned."
+                },
+                {
+                  "name": "isChatOpen",
+                  "type": "boolean",
+                  "description": "Indicates whether the chat is currently open."
+                }
+              ],
+              "returns": {
+                "type": "JSX.Element",
+                "description": "A Three.js Sphere that moves around or teleports to the user."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "react",
+              "purpose": "useRef, useState, useEffect for controlling internal state."
+            },
+            {
+              "module": "@react-three/drei",
+              "purpose": "Sphere, a helper to create sphere geometry."
+            },
+            {
+              "module": "@react-three/fiber",
+              "purpose": "useFrame and useThree to interact with the render loop and camera."
+            },
+            {
+              "module": "gsap",
+              "purpose": "Tweening library for smooth transitional animations."
+            },
+            {
+              "module": "three",
+              "purpose": "Core 3D mathematics (Vector3, etc.)."
+            }
+          ]
+        },
+        {
+          "path": "cv-frontend/src/components/MagneticLink.tsx",
+          "description": "A React Router link with a 'magnetic' hover effect, pulling the mouse pointer slightly and scaling up.",
+          "functions": [
+            {
+              "name": "MagneticLink",
+              "description": "Applies a magnetic-like effect when hovered, redirecting to a specified route on click.",
+              "parameters": [
+                {
+                  "name": "to",
+                  "type": "string",
+                  "description": "Route path to navigate to."
+                },
+                {
+                  "name": "children",
+                  "type": "React.ReactNode",
+                  "description": "The text or elements within the link."
+                }
+              ],
+              "returns": {
+                "type": "JSX.Element",
+                "description": "A styled link with interactive GSAP hover animations."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "react",
+              "purpose": "useRef for DOM manipulation."
+            },
+            {
+              "module": "react-router-dom",
+              "purpose": "Link component for navigation."
+            },
+            {
+              "module": "gsap",
+              "purpose": "Applies hover animations to the link."
+            }
+          ]
+        },
+        {
+          "path": "cv-frontend/src/components/NeuronScene.tsx",
+          "description": "Main 3D scene rendering multiple 'nodes' (projects) and 'connections' (cylinders), including camera controls and a floating 'Fairy' component.",
+          "functions": [
+            {
+              "name": "NeuronScene",
+              "description": "Sets up the Three.js canvas, flying controls, nodes, connections, and chat overlay interactions.",
+              "parameters": [],
+              "returns": {
+                "type": "JSX.Element",
+                "description": "A container for the 3D neuron-like network, overlay UI, and chat window."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "react",
+              "purpose": "useRef, useState, useEffect to manage scene states."
+            },
+            {
+              "module": "@react-three/fiber",
+              "purpose": "Canvas for 3D rendering and FlyControls for navigation."
+            },
+            {
+              "module": "@react-three/drei",
+              "purpose": "Additional 3D helpers like FlyControls."
+            },
+            {
+              "module": "./ControlsOverlay",
+              "purpose": "UI overlay with instructions for user controls."
+            },
+            {
+              "module": "./Particles",
+              "purpose": "Background particle effect in the 3D scene."
+            },
+            {
+              "module": "./Fairy",
+              "purpose": "Floating sphere that can appear near the camera on command."
+            },
+            {
+              "module": "./ChatWindow",
+              "purpose": "Overlay for chat interactions."
+            },
+            {
+              "module": "./Node",
+              "purpose": "Visual representation of a single project node."
+            },
+            {
+              "module": "./Connections",
+              "purpose": "Connects nodes with a 3D line or cylinder."
+            }
+          ]
+        },
+        {
+          "path": "cv-frontend/src/components/Node.tsx",
+          "description": "Renders a 'node' representing a project as a glowing core sphere with an outer shell, showing tooltip text on hover.",
+          "functions": [
+            {
+              "name": "Node",
+              "description": "Displays a sphere with an emissive core and a translucent shell, plus optional hover text for project info.",
+              "parameters": [
+                {
+                  "name": "position",
+                  "type": "[number, number, number]",
+                  "description": "Coordinates in the 3D space."
+                },
+                {
+                  "name": "title",
+                  "type": "string",
+                  "description": "Label shown in a tooltip on hover."
+                },
+                {
+                  "name": "link",
+                  "type": "string",
+                  "description": "URL or route navigated to on click."
+                }
+              ],
+              "returns": {
+                "type": "JSX.Element",
+                "description": "Two spheres (core + shell) plus an optional tooltip via Html when hovered."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "react",
+              "purpose": "useRef, useState, useEffect for animation triggers."
+            },
+            {
+              "module": "@react-three/drei",
+              "purpose": "Sphere and Html for 3D objects and overlay text."
+            },
+            {
+              "module": "gsap",
+              "purpose": "Scaling animations for hover interactions."
+            },
+            {
+              "module": "three",
+              "purpose": "Core 3D classes and math if needed."
+            }
+          ]
+        },
+        {
+          "path": "cv-frontend/src/components/Particles.tsx",
+          "description": "Generates a field of moving points to serve as a dynamic background in the 3D scene.",
+          "functions": [
+            {
+              "name": "Particles",
+              "description": "Positions a specified number of particles in random locations and moves them slightly for a subtle effect.",
+              "parameters": [
+                {
+                  "name": "count",
+                  "type": "number",
+                  "description": "How many particles to generate."
+                }
+              ],
+              "returns": {
+                "type": "JSX.Element",
+                "description": "A Points object containing multiple particles in the 3D scene."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "react",
+              "purpose": "useRef, useEffect for referencing and initializing geometry."
+            },
+            {
+              "module": "@react-three/fiber",
+              "purpose": "useFrame for per-frame updates to particle positions."
+            },
+            {
+              "module": "three",
+              "purpose": "THREE classes for buffer geometry and point materials."
+            }
+          ]
+        },
+        {
+          "path": "cv-frontend/src/pages/About.tsx",
+          "description": "Displays information about the website owner or author.",
+          "functions": [
+            {
+              "name": "About",
+              "description": "Renders a static page with details about the author.",
+              "parameters": [],
+              "returns": {
+                "type": "JSX.Element",
+                "description": "A simple React component for the About page."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "cv-frontend/src/pages/Blog.tsx",
+          "description": "Lists or previews blog posts of the user.",
+          "functions": [
+            {
+              "name": "Blog",
+              "description": "Renders a static page that might eventually host blog content.",
+              "parameters": [],
+              "returns": {
+                "type": "JSX.Element",
+                "description": "A placeholder blog page component."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": []
+        },
+        {
+          "path": "cv-frontend/src/pages/Home.tsx",
+          "description": "Home page containing the main 3D scene (NeuronScene) as the primary content.",
+          "functions": [
+            {
+              "name": "Home",
+              "description": "Integrates the NeuronScene into a full-page layout.",
+              "parameters": [],
+              "returns": {
+                "type": "JSX.Element",
+                "description": "A container for the 3D neuron network experience."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": [
+            {
+              "module": "../components/NeuronScene",
+              "purpose": "The main 3D rendering component used on the Home page."
+            }
+          ]
+        },
+        {
+          "path": "cv-frontend/src/pages/Projects.tsx",
+          "description": "Page that lists the user's projects or portfolio items.",
+          "functions": [
+            {
+              "name": "Projects",
+              "description": "Renders a static layout listing personal or professional projects.",
+              "parameters": [],
+              "returns": {
+                "type": "JSX.Element",
+                "description": "A simple React component for the Projects page."
+              }
+            }
+          ],
+          "classes": [],
+          "imports": []
+        }
+      ]
+    }
+  }
+  

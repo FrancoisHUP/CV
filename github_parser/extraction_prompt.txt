@@ -13,31 +13,51 @@ The JSON should follow this schema:
 {
   "project": {
     "name": "Project Name",
-    "description": "A high-level summary of what this project does.",
+    "description": {
+      "summary": "A high-level summary of what this project does.",
+      "problem_solved": "The specific problem this project addresses.",
+      "impact": "How this project improved efficiency, performance, or user experience.",
+      "technologies": ["Python", "TensorFlow", "OpenAI Gym", "NumPy"],
+      "role": "Your specific role (e.g., Developer, Lead Engineer, Contributor).",
+      "challenges": [
+        "Key technical or design challenges faced and how they were overcome."
+      ],
+      "relevance": "How this project relates to your broader expertise and career goals."
+    },
     "architecture": {
-      "overview": "A description of the overall structure, main modules, and how they interact.",
+      "overview": "A high-level description of how the system is designed.",
       "components": [
         {
           "name": "Component Name",
-          "description": "What this component does and how it fits into the project."
+          "description": "The role of this component in the overall architecture."
         }
       ]
     },
-    "dependencies": [
-      {
-        "name": "Dependency Name",
-        "version": "X.Y.Z",
-        "purpose": "Why this dependency is needed."
-      }
-    ],
+    "technical_details": {
+      "design_decisions": [
+        {
+          "decision": "Why this approach was chosen over an alternative.",
+          "reasoning": "The logic behind this choice, including trade-offs."
+        }
+      ],
+      "performance_optimizations": [
+        {
+          "optimization": "A specific improvement made.",
+          "impact": "How it affected performance or efficiency."
+        }
+      ],
+      "lessons_learned": [
+        "Key insights or takeaways from working on this project."
+      ]
+    },
     "files": [
       {
         "path": "path/name_file.py",
-        "description": "What this file is responsible for.",
+        "description": "A high-level summary of this file’s purpose.",
         "functions": [
           {
             "name": "function_name",
-            "description": "A description of what this function does.",
+            "description": "What this function does.",
             "parameters": [
               {
                 "name": "param_name",
@@ -54,7 +74,7 @@ The JSON should follow this schema:
         "classes": [
           {
             "name": "ClassName",
-            "description": "A description of what this class does.",
+            "description": "What this class represents.",
             "methods": [
               {
                 "name": "method_name",
@@ -94,6 +114,6 @@ The JSON should follow this schema:
 ```
 
 Here is the file : 
-<file_conten>
+<file_content>
 
 
