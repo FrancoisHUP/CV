@@ -56,13 +56,13 @@ const BlogDetail = () => {
 
   // Like button handler with the ID converted to a string.
   const handleLike = async () => {
+    setHasLiked(true);
     if (!hasLiked && post) {
       if (!post) return;
       const postRef = doc(db, "blogPosts", String(post.id));
       try {
         await setDoc(postRef, { likes: increment(1) }, { merge: true });
         setLikes((prev) => prev + 1);
-        setHasLiked(true);
       } catch (error) {
         console.error("Error updating likes:", error);
       }
@@ -140,12 +140,12 @@ const BlogDetail = () => {
         <button
           onClick={handleLike}
           disabled={hasLiked}
-          className={`flex items-center space-x-1 focus:outline-none ${
-            hasLiked ? "opacity-50 cursor-not-allowed" : "hover:text-gray-500"
+          className={`flex items-center space-x-1 focus:outline-none  ${
+            hasLiked ? " cursor-not-allowed text-white" : "hover:text-gray-500"
           }`}
         >
-          <ThumbsUp className="h-6 w-6 text-white mr-2" />
-          <span>{likes}</span>
+          <ThumbsUp className="h-6 w-6 text-white mr-2 h" />
+          <span className="ml-1 text-white">{likes}</span>
         </button>
         <button
           onClick={() => setShareModalOpen(true)}

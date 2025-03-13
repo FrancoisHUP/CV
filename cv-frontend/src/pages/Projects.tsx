@@ -73,7 +73,7 @@ const Projects = () => {
   );
 
   // Sort projects.
-  const sortedProjects = filteredProjects.sort((a, b) => {
+  const sortedProjects = [...filteredProjects].sort((a, b) => {
     switch (sortOption) {
       case "date_asc":
         return (
@@ -128,7 +128,33 @@ const Projects = () => {
     return (
       <div className="flex flex-col min-h-[calc(100vh-64px)] p-5">
         <HeroSection />
-        <div className="flex-grow text-center">Loading projects...</div>
+        <div className="mb-6 flex flex-col justify-between sm:flex-row sm:items-center sm:space-x-4">
+          <input
+            type="text"
+            placeholder="Search projects..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="border rounded px-3 py-2 mb-3 sm:mb-0"
+            style={{ borderColor: "rgba(255,255,255,0.3)" }}
+          />
+
+          <div className="flex flex-wrap gap-2">
+            {sortOptions.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => handleSortChange(option.value)}
+                className={`px-4 py-2 border rounded bg-white ${
+                  sortOption === option.value
+                    ? "active-sort"
+                    : "border-gray-300 hover:bg-gray-100"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="flex-grow text-center mt-12">Loading projects...</div>
       </div>
     );
   }
@@ -168,7 +194,7 @@ const Projects = () => {
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {currentProjects.map((project, index) => (
             <div
-              key={project.id || index}
+              key={`${project.id}-${index}`}
               className="border border-animate rounded overflow-hidden shadow hover:shadow-lg"
             >
               <Link

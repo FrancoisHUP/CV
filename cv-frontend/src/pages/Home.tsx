@@ -64,7 +64,7 @@ const Portfolio = () => {
                 letterSpacing: "1px",
               }}
             >
-              AI/Machine learning engineer & Sofware engineer
+              AI/Machine Learning Engineer & Software Engineer
             </p>
             <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
               <button onClick={() => navigate("/projects")}>🖥️ Projects</button>

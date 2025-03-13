@@ -37,6 +37,7 @@ interface Project {
   github_stars?: number;
   likes?: number;
   views?: number;
+  live_demo_url?: string;
 }
 
 const ProjectDetail = () => {
@@ -46,6 +47,16 @@ const ProjectDetail = () => {
   const [views, setViews] = useState<number>(0);
   const [hasLiked, setHasLiked] = useState<boolean>(false);
   const [copySuccess, setCopySuccess] = useState<string>("");
+  // New state to control the 5 seconds delay
+  const [isDelayOver, setIsDelayOver] = useState<boolean>(false);
+
+  // Start the delay timer when component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsDelayOver(true);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleCopy = async () => {
     try {
@@ -66,7 +77,6 @@ const ProjectDetail = () => {
     const fetchProject = async () => {
       try {
         const projectsRef = collection(db, "projects");
-        // Ensure projectName is formatted correctly
         console.log("projectName", `/projects/${projectName}`);
         const q = query(
           projectsRef,
@@ -129,15 +139,29 @@ const ProjectDetail = () => {
     }
   };
 
+  // When project is not found, show skeleton for at least 5 seconds before showing "Project Not Found"
   if (!project) {
-    return (
-      <div className="p-5 flex flex-col justify-center items-center mt-10">
-        <h1 className="text-3xl mb-4">Project Not Found</h1>
-        <Link to="/projects" className="text-blue-500 hover:underline">
-          ← Back to Projects
-        </Link>
-      </div>
-    );
+    if (!isDelayOver) {
+      // Render your skeleton/loader here
+      return (
+        <div className="p-5 flex flex-col justify-center items-center mt-10">
+          <div className="w-full max-w-md space-y-4">
+            <div className="h-6 bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-6 bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-6 bg-gray-700 rounded animate-pulse"></div>
+          </div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="p-5 flex flex-col justify-center items-center mt-10">
+          <h1 className="text-3xl mb-4">Project Not Found</h1>
+          <Link to="/projects" className="text-blue-500 hover:underline">
+            ← Back to Projects
+          </Link>
+        </div>
+      );
+    }
   }
 
   return (
@@ -194,20 +218,27 @@ const ProjectDetail = () => {
           {project.github_url && (
             <OpenOnGithub githubLink={project.github_url} />
           )}
-          {project.url && (
+          {project.live_demo_url !== "" && (
             <a
-              href={project.url}
+              href={project.live_demo_url}
               target="_blank"
               rel="noopener noreferrer"
               className="relative inline-flex items-center space-x-3 px-5 py-2.5 bg-[#0A0A0A] hover:bg-[#111111] text-white rounded-lg shadow-lg transition-colors duration-300"
             >
-              {/* Record-like animated dot */}
               <div className="relative">
                 <span className="absolute top-1.5 inline-flex h-1/2 w-full rounded-full bg-red-600 opacity-75 animate-ping"></span>
                 <span className="relative inline-flex h-3 w-3 rounded-full bg-red-600"></span>
               </div>
               <span className="font-semibold">Live Demo</span>
             </a>
+          )}
+          {project.paper_url && (
+            <button
+              onClick={() => window.open(project.paper_url, "_blank")}
+              className="relative inline-flex items-center space-x-3 px-5 py-2.5 bg-[#1A1A1A] hover:border text-white rounded-lg shadow-lg transition-colors duration-300"
+            >
+              <span className="font-semibold"> 📝 Paper</span>
+            </button>
           )}
         </div>
       </div>

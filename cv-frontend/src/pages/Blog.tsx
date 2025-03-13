@@ -57,12 +57,12 @@ const BlogPost: React.FC<{ post: PostType }> = ({ post }) => {
   const handleLike = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     e.preventDefault();
+    setHasLiked(true);
     if (!hasLiked) {
       const postDocRef = doc(db, "blogPosts", String(post.id));
       try {
         await setDoc(postDocRef, { likes: increment(1) }, { merge: true });
         setLikes((prev) => prev + 1);
-        setHasLiked(true);
       } catch (error) {
         console.error("Error updating likes:", error);
       }

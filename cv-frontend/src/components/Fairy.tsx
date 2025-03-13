@@ -260,7 +260,7 @@ const Fairy = ({
             <div
               style={{
                 pointerEvents: "auto",
-                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                backgroundColor: "rgba(0, 0, 0, 0.80)",
                 color: "white",
                 padding: "5px",
                 borderRadius: "5px",

@@ -28,21 +28,21 @@ const RadialSocialMenu: React.FC<RadialSocialMenuProps> = ({
       icon: (
         <img src="/icons/linkedin.png" alt="LinkedIn" className="w-5 h-5" />
       ),
-      link: "https://www.linkedin.com/in/your-profile",
+      link: "https://www.linkedin.com/in/francois-huppe-marcoux/",
     },
     {
       icon: <img src="/icons/twitter.ico" alt="Twitter" className="w-5 h-5" />,
-      link: "https://twitter.com/your-profile",
+      link: "https://x.com/FrancoisHUP",
     },
     {
       icon: (
         <img src="/icons/substack.svg" alt="Substack" className="w-5 h-5" />
       ),
-      link: "https://your-substack-url.substack.com",
+      link: "https://highlearningrate.substack.com/publish/home?utm_source=substack&utm_content=dashboard_pub_switcher",
     },
     {
       icon: <img src="/icons/discord.ico" alt="Discord" className="w-5 h-5" />,
-      link: "https://discord.gg/your-invite",
+      link: "https://discord.gg/fJ5tceKxTM",
     },
   ],
 }) => {

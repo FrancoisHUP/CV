@@ -1,3 +1,4 @@
+// cv-frontend/src/components/InfoPanel.tsx
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { NodeType } from "./NeuronScene";
@@ -76,7 +77,8 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
       className="absolute top-5 left-5 max-w-xl max-h-[calc(100vh-100px)] overflow-y-auto text-white p-6 rounded-3xl shadow-2xl border border-gray-500 backdrop-blur-md"
       initial={{ opacity: 0, scale: 0.8, x: -50 }}
       animate={{ opacity: 1, scale: 1, x: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      exit={{ opacity: 0, scale: 0.8, x: -50 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
       style={{
         fontSize: "22px",
         background:

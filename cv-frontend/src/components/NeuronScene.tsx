@@ -1,5 +1,6 @@
+// cv-frontend/src/components/NeuronScene.tsx
 import { useRef, useState, useEffect } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { FlyControls as DreiFlyControls } from "@react-three/drei";
 import { FlyControls as ThreeFlyControls } from "three-stdlib";
 import ControlsOverlay from "./ControlsOverlay";
@@ -9,7 +10,7 @@ import ChatWindow from "./ChatWindow";
 import Node from "./Node";
 import Connection from "./Connections";
 import InfoPanel from "./InfoPanel";
-import { useThree } from "@react-three/fiber";
+import { AnimatePresence } from "framer-motion";
 
 export type NodeType = {
   id: string;
@@ -171,6 +172,21 @@ const NeuronScene = () => {
     };
   }, [chatOpen]);
 
+  // NEW: Close InfoPanel when user presses W, A, S, or D to move in the scene
+  useEffect(() => {
+    const handleMovementKey = (event: KeyboardEvent) => {
+      const movementKeys = ["w", "a", "s", "d", "W", "A", "S", "D"];
+      if (movementKeys.includes(event.key) && selectedNode) {
+        setSelectedNode(null);
+        setHoveredNode(null);
+      }
+    };
+    window.addEventListener("keydown", handleMovementKey);
+    return () => {
+      window.removeEventListener("keydown", handleMovementKey);
+    };
+  }, [selectedNode]);
+
   useEffect(() => {
     if (controlsRef.current) {
       controlsRef.current.movementSpeed = chatOpen ? 0 : speed;
@@ -308,16 +324,18 @@ const NeuronScene = () => {
         onRotateChange={setMobileRotate}
         isMobile={isMobile}
       />
-      {selectedNode && graphData && (
-        <InfoPanel
-          activeNode={selectedNode}
-          graphNodes={graphData.nodes}
-          onClose={() => {
-            setSelectedNode(null);
-            setHoveredNode(null);
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {selectedNode && graphData && (
+          <InfoPanel
+            activeNode={selectedNode}
+            graphNodes={graphData.nodes}
+            onClose={() => {
+              setSelectedNode(null);
+              setHoveredNode(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
